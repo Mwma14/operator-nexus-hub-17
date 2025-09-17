@@ -15,51 +15,47 @@ const ProductFilters = ({
   onCategoryChange
 }: ProductFiltersProps) => {
   return (
-    <div className="space-y-6 mb-8">
+    <div className="space-y-8 mb-12">
       {/* Operator Filters */}
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-3">Filter by Operator</h3>
-        <div className="flex flex-wrap gap-3">
-          <Button
-            variant={selectedOperator === null ? "default" : "outline"}
+        <h3 className="text-xl font-semibold text-white mb-4 font-space-grotesk">Network Operator</h3>
+        <div className="flex flex-wrap gap-4">
+          <button
+            className={`filter-btn ${selectedOperator === null ? 'active' : ''}`}
             onClick={() => onOperatorChange(null)}
-            className={selectedOperator === null ? "bg-primary text-primary-foreground" : ""}
           >
-            All
-          </Button>
+            All Networks
+          </button>
           {operators.map((operator) => (
-            <Button
+            <button
               key={operator}
-              variant={selectedOperator === operator ? "default" : "outline"}
+              className={`filter-btn ${selectedOperator === operator ? 'active' : ''}`}
               onClick={() => onOperatorChange(operator)}
-              className={selectedOperator === operator ? "bg-primary text-primary-foreground" : ""}
             >
               {operator}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Category Filters */}
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-3">Filter by Category</h3>
-        <div className="flex flex-wrap gap-3">
-          <Button
-            variant={selectedCategory === null ? "default" : "outline"}
+        <h3 className="text-xl font-semibold text-white mb-4 font-space-grotesk">Product Category</h3>
+        <div className="flex flex-wrap gap-4">
+          <button
+            className={`filter-btn ${selectedCategory === null ? 'active' : ''}`}
             onClick={() => onCategoryChange(null)}
-            className={selectedCategory === null ? "bg-primary text-primary-foreground" : ""}
           >
-            All
-          </Button>
+            All Categories
+          </button>
           {categories.map((category) => (
-            <Button
+            <button
               key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
+              className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
               onClick={() => onCategoryChange(category)}
-              className={selectedCategory === category ? "bg-primary text-primary-foreground" : ""}
             >
               {category}
-            </Button>
+            </button>
           ))}
         </div>
       </div>

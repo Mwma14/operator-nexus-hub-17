@@ -6,53 +6,57 @@
 
 @layer base {
   :root {
-    /* Dark theme base colors */
-    --background: 240 10% 2%;
+    /* Sophisticated dark theme */
+    --background: 240 10% 3.9%;
     --foreground: 210 40% 98%;
 
-    --card: 240 10% 4%;
+    --card: 240 10% 3.9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 4%;
+    --popover: 240 10% 3.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Vibrant yellow primary */
-    --primary: 48 96% 50%;
-    --primary-foreground: 240 10% 2%;
+    /* Premium gradient primary */
+    --primary: 45 93% 47%;
+    --primary-foreground: 240 10% 3.9%;
 
-    --secondary: 240 8% 8%;
+    --secondary: 240 5% 6%;
     --secondary-foreground: 210 40% 90%;
 
-    --muted: 240 8% 6%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 240 5% 6%;
+    --muted-foreground: 217 10% 64.9%;
 
-    --accent: 240 8% 8%;
+    --accent: 240 5% 6%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 8% 12%;
-    --input: 240 8% 8%;
-    --ring: 48 96% 50%;
+    --border: 240 5.9% 10%;
+    --input: 240 5% 6%;
+    --ring: 45 93% 47%;
 
     --radius: 0.75rem;
 
-    /* Custom design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(48 96% 50%), hsl(45 100% 60%));
-    --gradient-hero: linear-gradient(135deg, hsl(240 10% 2%), hsl(240 10% 4%));
-    --gradient-card: linear-gradient(135deg, hsl(240 10% 4%), hsl(240 8% 6%));
-    --gradient-glow: radial-gradient(circle, hsl(48 96% 50% / 0.15), transparent 70%);
+    /* Advanced gradient system */
+    --gradient-primary: linear-gradient(135deg, #F59E0B 0%, #EAB308 25%, #F97316 75%, #DC2626 100%);
+    --gradient-secondary: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E1B4B 100%);
+    --gradient-accent: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+    --gradient-card: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+    --gradient-mesh: radial-gradient(circle at 20% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 50%), 
+                     radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.15) 0%, transparent 50%),
+                     radial-gradient(circle at 40% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%);
     
-    /* Neon glows */
-    --glow-primary: 0 0 20px hsl(48 96% 50% / 0.3);
-    --glow-secondary: 0 0 40px hsl(48 96% 50% / 0.1);
-    --shadow-card: 0 4px 20px hsl(240 10% 2% / 0.8);
-    --shadow-card-hover: 0 8px 40px hsl(240 10% 2% / 0.9), 0 0 20px hsl(48 96% 50% / 0.2);
+    /* Sophisticated shadows */
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-large: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 30px rgba(245, 158, 11, 0.3);
     
-    /* Animation durations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Premium transitions */
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -68,62 +72,169 @@
 }
 
 @layer components {
-  /* Hero animations */
-  .grid-pattern {
-    background-image: 
-      linear-gradient(rgba(240, 185, 11, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240, 185, 11, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
+  /* Sophisticated mesh background */
+  .mesh-gradient {
+    background: var(--gradient-mesh);
+    position: relative;
   }
   
-  .pulse-glow {
-    animation: pulse-glow 4s ease-in-out infinite;
-  }
-  
-  @keyframes pulse-glow {
-    0%, 100% { 
-      box-shadow: var(--glow-secondary);
-      transform: scale(1);
-    }
-    50% { 
-      box-shadow: var(--glow-primary);
-      transform: scale(1.02);
-    }
-  }
-  
-  /* SIM card wave animation */
-  .sim-wave {
-    animation: sim-wave 3s ease-in-out infinite;
-  }
-  
-  @keyframes sim-wave {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-10px) rotate(2deg); }
-    75% { transform: translateY(10px) rotate(-2deg); }
-  }
-  
-  /* Selection corners */
-  .selection-corners::before,
-  .selection-corners::after {
+  .mesh-gradient::before {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 2px solid hsl(var(--primary));
+    inset: 0;
+    background: var(--gradient-secondary);
+    opacity: 0.8;
+  }
+  
+  /* Flowing shape animations */
+  .floating-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .floating-orb:nth-child(1) {
+    width: 300px;
+    height: 300px;
+    background: var(--gradient-primary);
+    top: -150px;
+    left: -150px;
+    animation-delay: 0s;
+  }
+  
+  .floating-orb:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    top: 50%;
+    right: -100px;
+    animation-delay: 2s;
+  }
+  
+  .floating-orb:nth-child(3) {
+    width: 250px;
+    height: 250px;
+    background: linear-gradient(135deg, #06B6D4, #3B82F6);
+    bottom: -125px;
+    left: 30%;
+    animation-delay: 4s;
+  }
+  
+  @keyframes float {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg) scale(1);
+    }
+    33% { 
+      transform: translateY(-20px) rotate(2deg) scale(1.05);
+    }
+    66% { 
+      transform: translateY(10px) rotate(-1deg) scale(0.95);
+    }
+  }
+  
+  /* Premium glassmorphism */
+  .glass-card {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-large);
+  }
+  
+  /* Advanced button styles */
+  .btn-premium {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: var(--transition-smooth);
   }
   
-  .selection-corners::before {
-    top: -1px;
-    left: -1px;
-    border-right: none;
-    border-bottom: none;
+  .btn-premium:hover::before {
+    left: 100%;
   }
   
-  .selection-corners::after {
-    bottom: -1px;
-    right: -1px;
-    border-left: none;
-    border-top: none;
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Sophisticated filter buttons */
+  .filter-btn {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    transition: var(--transition-base);
+    border-radius: 999px;
+    padding: 12px 24px;
+    font-weight: 500;
+  }
+  
+  .filter-btn:hover {
+    background: rgba(15, 23, 42, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  
+  .filter-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+  }
+  
+  /* Premium product cards */
+  .product-card {
+    background: var(--gradient-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: var(--transition-base);
+  }
+  
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-large);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  
+  .product-card:hover::before {
+    opacity: 1;
+  }
+  
+  .product-card.selected {
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2);
+  }
+  
+  .product-card.selected::before {
+    opacity: 1;
   }
 }

@@ -18,51 +18,49 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
   };
 
   return (
-    <Card 
+    <div 
       className={`
-        relative transition-all duration-300 cursor-pointer group
-        ${isSelected 
-          ? 'border-primary shadow-lg shadow-primary/20 selection-corners' 
-          : 'border-border hover:border-border/70 hover:shadow-md'
-        }
-        bg-card hover:bg-card/80
+        product-card rounded-2xl p-6 cursor-pointer group
+        ${isSelected ? 'selected' : ''}
       `}
       onClick={() => onSelect?.(product)}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className={`w-3 h-3 rounded-full ${operatorColors[product.operator]}`} />
-          <span className="text-xs text-muted-foreground font-medium">
+      {/* Header with operator badge */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className={`w-4 h-4 rounded-full ${operatorColors[product.operator]} shadow-lg`} />
+          <span className="text-white/80 font-semibold text-sm tracking-wide">
             {product.operator}
           </span>
         </div>
-        <CardTitle className="text-lg font-semibold text-foreground">
-          {product.name}
-        </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
-          {product.description}
-        </CardDescription>
-      </CardHeader>
+        <span className="text-xs text-white/60 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+          {product.category}
+        </span>
+      </div>
       
-      <CardContent className="pb-3">
-        <div className="flex items-baseline justify-between">
-          <div className="flex items-baseline space-x-1">
-            <span className="text-2xl font-bold text-primary">
-              {product.price.toLocaleString()}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              {product.currency}
-            </span>
-          </div>
-          <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded-full">
-            {product.category}
+      {/* Product details */}
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-white mb-2 font-space-grotesk">
+          {product.name}
+        </h3>
+        <p className="text-white/70 text-sm leading-relaxed">
+          {product.description}
+        </p>
+      </div>
+      
+      {/* Price and action */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-baseline space-x-2">
+          <span className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+            {product.price.toLocaleString()}
+          </span>
+          <span className="text-white/60 text-sm font-medium">
+            {product.currency}
           </span>
         </div>
-      </CardContent>
-      
-      <CardFooter>
+        
         <Button 
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 group-hover:shadow-md transition-all"
+          className="btn-premium px-6 py-3 rounded-xl font-semibold group-hover:shadow-md transition-all"
           onClick={(e) => {
             e.stopPropagation();
             // Handle purchase logic here
@@ -71,8 +69,8 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
           <ShoppingCart className="mr-2 h-4 w-4" />
           Purchase
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

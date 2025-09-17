@@ -21,15 +21,15 @@ const ProductListing = () => {
   };
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-800 relative">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4 font-space-grotesk">
-            Available Products
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold text-white mb-6 font-space-grotesk">
+            Premium Products
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose from our wide selection of telecom products from leading operators
+          <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
+            Choose from our curated selection of telecom products from Myanmar's leading network operators
           </p>
         </div>
 
@@ -42,9 +42,9 @@ const ProductListing = () => {
         />
 
         {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            Showing {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+        <div className="mb-8">
+          <p className="text-white/60 text-lg">
+            Showing {filteredProducts.length} premium product{filteredProducts.length !== 1 ? 's' : ''}
             {selectedOperator && ` from ${selectedOperator}`}
             {selectedCategory && ` in ${selectedCategory}`}
           </p>
@@ -64,19 +64,21 @@ const ProductListing = () => {
 
         {/* No Results */}
         {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              No products found matching your criteria
-            </p>
-            <button
-              onClick={() => {
-                setSelectedOperator(null);
-                setSelectedCategory(null);
-              }}
-              className="mt-4 text-primary hover:underline"
-            >
-              Clear all filters
-            </button>
+          <div className="text-center py-20">
+            <div className="glass-card rounded-3xl p-12 max-w-md mx-auto">
+              <p className="text-xl text-white/80 mb-4">
+                No products found matching your criteria
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedOperator(null);
+                  setSelectedCategory(null);
+                }}
+                className="btn-premium px-8 py-3 rounded-xl font-semibold"
+              >
+                Clear all filters
+              </button>
+            </div>
           </div>
         )}
       </div>
