@@ -1,9 +1,36 @@
-import { Search, User } from "lucide-react";
+import { Search, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 const Navbar = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -28,16 +55,29 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/auth">
-              <Button variant="ghost" className="text-foreground hover:text-primary">
-                Sign In
+            {user ? (
+              <Button 
+                onClick={handleLogout}
+                variant="ghost" 
+                className="text-foreground hover:text-primary"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
               </Button>
-            </Link>
-            <Link to="/auth">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Join Now
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" className="text-foreground hover:text-primary">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    Join Now
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Buttons */}
@@ -45,11 +85,21 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Link to="/auth">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Join Now
+            {user ? (
+              <Button 
+                onClick={handleLogout}
+                size="sm" 
+                variant="ghost"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
-            </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  Join Now
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
