@@ -29,10 +29,10 @@ const Auth = () => {
       } catch (error) {
 
 
-        // User not authenticated, stay on auth page
-      }};checkUser();
-  }, [navigate]);
 
+
+        // User not authenticated, stay on auth page
+      }};checkUser();}, [navigate]);
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !name) {
@@ -150,15 +150,15 @@ const Auth = () => {
 
   if (isResetMode) {
     return (
-      <div className="w-screen h-screen overflow-x-hidden bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen w-full overflow-x-hidden bg-background flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
         <div className="absolute inset-0 mesh-gradient">
           <div className="floating-orb"></div>
           <div className="floating-orb"></div>
           <div className="floating-orb"></div>
         </div>
         
-        <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl glass-card relative z-10">
-          <CardHeader className="space-y-2 p-4 sm:p-6 md:p-8">
+        <Card className="w-full max-w-sm sm:max-w-md lg:max-w-lg glass-card relative z-10 mx-auto">
+          <CardHeader className="space-y-2 p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <Button
                 variant="ghost"
@@ -168,18 +168,18 @@ const Auth = () => {
 
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-primary font-space-grotesk">
+              <h1 className="text-sm sm:text-base md:text-lg font-bold text-primary font-space-grotesk">
                 OPERATORS HUB
               </h1>
             </div>
-            <CardTitle className="text-xl sm:text-2xl md:text-3xl text-center">
+            <CardTitle className="text-xl sm:text-2xl text-center">
               Reset Password
             </CardTitle>
-            <CardDescription className="text-center text-sm sm:text-base text-muted-foreground">
+            <CardDescription className="text-center text-sm text-muted-foreground">
               Enter your email address and we'll send you a link to reset your password
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 sm:p-6 md:p-8 pt-0">
+          <CardContent className="p-4 sm:p-6 pt-0">
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="reset-email" className="text-sm font-medium">
@@ -210,33 +210,33 @@ const Auth = () => {
   }
 
   return (
-    <div className="w-screen h-screen overflow-x-hidden bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-full overflow-x-hidden bg-background flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
       <div className="absolute inset-0 mesh-gradient">
         <div className="floating-orb"></div>
         <div className="floating-orb"></div>
         <div className="floating-orb"></div>
       </div>
       
-      <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl glass-card relative z-10">
-        <CardHeader className="space-y-2 p-4 sm:p-6 md:p-8">
+      <Card className="w-full max-w-sm sm:max-w-md lg:max-w-lg glass-card relative z-10 mx-auto">
+        <CardHeader className="space-y-2 p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
             <Link to="/">
               <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-primary font-space-grotesk">
+            <h1 className="text-sm sm:text-base md:text-lg font-bold text-primary font-space-grotesk">
               OPERATORS HUB
             </h1>
           </div>
-          <CardTitle className="text-xl sm:text-2xl md:text-3xl text-center">
+          <CardTitle className="text-xl sm:text-2xl text-center">
             Welcome
           </CardTitle>
-          <CardDescription className="text-center text-sm sm:text-base text-muted-foreground">
+          <CardDescription className="text-center text-sm text-muted-foreground">
             Sign in to your account or create a new one
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6 md:p-8 pt-0">
+        <CardContent className="p-4 sm:p-6 pt-0">
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6 h-10 sm:h-12">
               <TabsTrigger value="signin" className="text-sm sm:text-base font-medium">
