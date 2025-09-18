@@ -36,7 +36,7 @@ const HeroBanner = () => {
       setIsCreditDialogOpen(true);
     } catch (error) {
       toast({
-        title: "Authentication Required", 
+        title: "Authentication Required",
         description: "Please sign in to purchase credits.",
         variant: "destructive"
       });
