@@ -136,7 +136,7 @@ const Navbar = () => {
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  {user?.Roles?.includes('Administrator') &&
+                  {user?.Email === 'thewayofthedragg@gmail.com' &&
                 <>
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
@@ -216,7 +216,7 @@ const Navbar = () => {
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  {user?.Roles?.includes('Administrator') &&
+                  {user?.Email === 'thewayofthedragg@gmail.com' &&
                 <>
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
