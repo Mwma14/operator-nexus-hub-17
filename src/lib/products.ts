@@ -1,12 +1,18 @@
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
-  currency: "MMK";
+  currency: string;
   operator: "MPT" | "OOREDOO" | "ATOM" | "MYTEL";
   category: "Data" | "Minutes" | "Points" | "Packages" | "Beautiful Numbers";
   logo?: string;
+  is_active?: boolean;
+  stock_quantity?: number;
+  validity_days?: number;
+  admin_notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const products: Product[] = [

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Product } from "@/lib/products";
+import { type Product } from "@/lib/products";
 import { ShoppingCart } from "lucide-react";
 
 
@@ -8,6 +8,7 @@ interface ProductCardProps {
   product: Product;
   isSelected?: boolean;
   onSelect?: (product: Product) => void;
+  onPurchase?: (product: Product) => void;
 }
 
 const ProductCard = ({ product, isSelected = false, onSelect, onPurchase }: ProductCardProps) => {
