@@ -41,7 +41,7 @@ const Premium = () => {
       setUser(userResponse.data);
 
       // Get user profile to get balance
-      const profileResponse = await window.ezsite.apis.tablePage(44145, {
+      const profileResponse = await window.ezsite.apis.tablePage(44173, {
         PageNo: 1,
         PageSize: 1,
         Filters: [{

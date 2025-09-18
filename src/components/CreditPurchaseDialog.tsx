@@ -5,8 +5,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle 
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,16 +27,16 @@ interface CreditPurchaseDialogProps {
 type PurchaseStep = 'AMOUNT' | 'PAYMENT_METHOD' | 'PAYMENT_PROOF' | 'PROCESSING' | 'SUCCESS';
 
 const CREDIT_PACKAGES = [
-  { credits: 10, price: 1000, popular: false },
-  { credits: 30, price: 3000, popular: true },
-  { credits: 50, price: 5000, popular: false },
-  { credits: 100, price: 10000, popular: false }
-];
+{ credits: 10, price: 1000, popular: false },
+{ credits: 30, price: 3000, popular: true },
+{ credits: 50, price: 5000, popular: false },
+{ credits: 100, price: 10000, popular: false }];
+
 
 const PAYMENT_METHODS = [
-  { id: 'kpay', name: 'K PAY', icon: '💳', description: 'Mobile payment via K PAY app' },
-  { id: 'wavepay', name: 'Wave Pay', icon: '📱', description: 'Digital wallet payment via Wave Pay' }
-];
+{ id: 'kpay', name: 'K PAY', icon: '💳', description: 'Mobile payment via K PAY app' },
+{ id: 'wavepay', name: 'Wave Pay', icon: '📱', description: 'Digital wallet payment via Wave Pay' }];
+
 
 export default function CreditPurchaseDialog({
   isOpen,
@@ -307,29 +307,29 @@ export default function CreditPurchaseDialog({
 
         <div className="space-y-4">
           {/* Step 1: Amount Selection */}
-          {step === 'AMOUNT' && (
-            <div className="space-y-6">
+          {step === 'AMOUNT' &&
+          <div className="space-y-6">
               <div className="space-y-3">
                 <Label className="text-base font-medium">Credit Packages</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {CREDIT_PACKAGES.map((pkg, index) => (
-                    <Card
-                      key={index}
-                      className={`cursor-pointer transition-all relative ${
-                        selectedPackage === index
-                          ? 'ring-2 ring-blue-500 bg-blue-50'
-                          : 'hover:shadow-md'
-                      }`}
-                      onClick={() => {
-                        setSelectedPackage(index);
-                        setCustomAmount('');
-                      }}
-                    >
-                      {pkg.popular && (
-                        <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                  {CREDIT_PACKAGES.map((pkg, index) =>
+                <Card
+                  key={index}
+                  className={`cursor-pointer transition-all relative ${
+                  selectedPackage === index ?
+                  'ring-2 ring-blue-500 bg-blue-50' :
+                  'hover:shadow-md'}`
+                  }
+                  onClick={() => {
+                    setSelectedPackage(index);
+                    setCustomAmount('');
+                  }}>
+
+                      {pkg.popular &&
+                  <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
                           Popular
                         </div>
-                      )}
+                  }
                       <CardContent className="p-4 text-center">
                         <div className="font-bold text-lg">{pkg.credits}</div>
                         <div className="text-sm text-muted-foreground">Credits</div>
@@ -338,7 +338,7 @@ export default function CreditPurchaseDialog({
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                )}
                 </div>
               </div>
 
@@ -347,25 +347,25 @@ export default function CreditPurchaseDialog({
                   Custom Amount
                 </Label>
                 <Input
-                  id="custom"
-                  type="number"
-                  min="1"
-                  max="1000"
-                  placeholder="Enter number of credits (max 1000)"
-                  value={customAmount}
-                  onChange={(e) => {
-                    setCustomAmount(e.target.value);
-                    setSelectedPackage(null);
-                  }}
-                />
-                {customAmount && parseInt(customAmount) > 0 && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                id="custom"
+                type="number"
+                min="1"
+                max="1000"
+                placeholder="Enter number of credits (max 1000)"
+                value={customAmount}
+                onChange={(e) => {
+                  setCustomAmount(e.target.value);
+                  setSelectedPackage(null);
+                }} />
+
+                {customAmount && parseInt(customAmount) > 0 &&
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calculator className="h-4 w-4" />
                     <span>
                       Total: {(parseInt(customAmount) * 100).toLocaleString()} MMK
                     </span>
                   </div>
-                )}
+              }
               </div>
 
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
@@ -373,21 +373,21 @@ export default function CreditPurchaseDialog({
                   <span className="text-blue-700">Exchange Rate:</span>
                   <span className="font-medium text-blue-800">1 Credit = 100 MMK</span>
                 </div>
-                {currentBalance > 0 && (
-                  <div className="flex justify-between text-sm">
+                {currentBalance > 0 &&
+              <div className="flex justify-between text-sm">
                     <span className="text-blue-700">Current Balance:</span>
                     <span className="font-medium text-blue-800">
                       {currentBalance.toLocaleString()} Credits
                     </span>
                   </div>
-                )}
+              }
               </div>
             </div>
-          )}
+          }
 
           {/* Step 2: Payment Method Selection */}
-          {step === 'PAYMENT_METHOD' && (
-            <div className="space-y-4">
+          {step === 'PAYMENT_METHOD' &&
+          <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="text-center">
                   <p className="text-blue-800 font-medium text-lg">
@@ -402,16 +402,16 @@ export default function CreditPurchaseDialog({
               <div className="space-y-3">
                 <Label className="text-base font-medium">Select Payment Method</Label>
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  {PAYMENT_METHODS.map((method) => (
-                    <Card
-                      key={method.id}
-                      className={`cursor-pointer transition-all ${
-                        paymentMethod === method.id
-                          ? 'ring-2 ring-blue-500 bg-blue-50'
-                          : 'hover:shadow-sm'
-                      }`}
-                      onClick={() => setPaymentMethod(method.id)}
-                    >
+                  {PAYMENT_METHODS.map((method) =>
+                <Card
+                  key={method.id}
+                  className={`cursor-pointer transition-all ${
+                  paymentMethod === method.id ?
+                  'ring-2 ring-blue-500 bg-blue-50' :
+                  'hover:shadow-sm'}`
+                  }
+                  onClick={() => setPaymentMethod(method.id)}>
+
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value={method.id} id={method.id} />
@@ -429,15 +429,15 @@ export default function CreditPurchaseDialog({
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                )}
                 </RadioGroup>
               </div>
             </div>
-          )}
+          }
 
           {/* Step 3: Payment Proof Upload */}
-          {step === 'PAYMENT_PROOF' && (
-            <div className="space-y-4">
+          {step === 'PAYMENT_PROOF' &&
+          <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="text-center">
                   <p className="text-amber-800 font-medium">
@@ -455,38 +455,38 @@ export default function CreditPurchaseDialog({
                   Upload Payment Screenshot *
                 </Label>
                 <Input
-                  id="payment-proof"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="cursor-pointer"
-                />
-                {paymentProofFile && (
-                  <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded">
+                id="payment-proof"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="cursor-pointer" />
+
+                {paymentProofFile &&
+              <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded">
                     <CheckCircle className="h-4 w-4" />
                     <span>{paymentProofFile.name} selected</span>
                   </div>
-                )}
+              }
                 <p className="text-xs text-muted-foreground">
                   Supported formats: JPG, PNG, GIF (Maximum file size: 5MB)
                 </p>
               </div>
             </div>
-          )}
+          }
 
           {/* Step 4: Processing */}
-          {step === 'PROCESSING' && (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          {step === 'PROCESSING' &&
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <LoadingSpinner />
               <p className="text-gray-600 text-center">
                 {uploading ? 'Uploading payment proof...' : 'Submitting purchase request...'}
               </p>
             </div>
-          )}
+          }
 
           {/* Step 5: Success */}
-          {step === 'SUCCESS' && (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          {step === 'SUCCESS' &&
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <CheckCircle className="h-16 w-16 text-green-500" />
               <div className="text-center space-y-2">
                 <p className="font-medium text-lg">Request Submitted Successfully!</p>
@@ -501,52 +501,52 @@ export default function CreditPurchaseDialog({
                 </p>
               </div>
             </div>
-          )}
+          }
         </div>
 
         {/* Footer Buttons */}
-        {step === 'AMOUNT' && (
-          <DialogFooter className="flex gap-2">
+        {step === 'AMOUNT' &&
+        <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              onClick={handleAmountConfirm}
-              disabled={getSelectedCredits() <= 0}
-            >
+            onClick={handleAmountConfirm}
+            disabled={getSelectedCredits() <= 0}>
+
               Continue
             </Button>
           </DialogFooter>
-        )}
+        }
 
-        {step === 'PAYMENT_METHOD' && (
-          <DialogFooter className="flex gap-2">
+        {step === 'PAYMENT_METHOD' &&
+        <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={handleBack}>
               Back
             </Button>
             <Button
-              onClick={handlePaymentMethodConfirm}
-              disabled={!paymentMethod}
-            >
+            onClick={handlePaymentMethodConfirm}
+            disabled={!paymentMethod}>
+
               Continue
             </Button>
           </DialogFooter>
-        )}
+        }
 
-        {step === 'PAYMENT_PROOF' && (
-          <DialogFooter className="flex gap-2">
+        {step === 'PAYMENT_PROOF' &&
+        <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={handleBack} disabled={loading}>
               Back
             </Button>
             <Button
-              onClick={handleFinalConfirm}
-              disabled={!paymentProofFile || loading}
-            >
+            onClick={handleFinalConfirm}
+            disabled={!paymentProofFile || loading}>
+
               {loading ? 'Processing...' : 'Submit Request'}
             </Button>
           </DialogFooter>
-        )}
+        }
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>);
+
 }
