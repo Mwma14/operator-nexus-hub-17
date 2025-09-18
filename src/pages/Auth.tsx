@@ -36,29 +36,29 @@ const Auth = () => {
         setCheckingAuth(false);
       }
     };
-    
+
     checkUser();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         // Check if user profile exists, if not create one
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .single();
+        const { data: profile } = await supabase.
+        from('user_profiles').
+        select('id').
+        eq('user_id', session.user.id).
+        single();
 
         if (!profile) {
           // Create user profile
-          await supabase
-            .from('user_profiles')
-            .insert({
-              user_id: session.user.id,
-              email: session.user.email!,
-              full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
-              credits_balance: 0
-            });
+          await supabase.
+          from('user_profiles').
+          insert({
+            user_id: session.user.id,
+            email: session.user.email!,
+            full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+            credits_balance: 0
+          });
         }
 
         toast({
@@ -77,8 +77,8 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>);
+
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -112,7 +112,7 @@ const Auth = () => {
         title: 'Success',
         description: 'Please check your email to confirm your account'
       });
-      
+
       // Clear form
       setEmail('');
       setPassword('');
@@ -246,8 +246,8 @@ const Auth = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -312,8 +312,8 @@ const Auth = () => {
                         className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ?
-                          <EyeOff className="h-4 w-4 text-muted-foreground" /> :
-                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                         }
                       </Button>
                     </div>
@@ -373,8 +373,8 @@ const Auth = () => {
                         className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ?
-                          <EyeOff className="h-4 w-4 text-muted-foreground" /> :
-                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                         }
                       </Button>
                     </div>
@@ -388,8 +388,8 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Auth;

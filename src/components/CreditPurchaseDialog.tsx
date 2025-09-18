@@ -195,15 +195,15 @@ export default function CreditPurchaseDialog({
       setUploading(true);
 
       // Create payment request record
-      const { error: insertError } = await supabase
-        .from('payment_requests')
-        .insert({
-          user_id: session.user.id,
-          credits_requested: getSelectedCredits(),
-          total_cost_mmk: getTotalPrice(),
-          payment_method: PAYMENT_METHODS.find((pm) => pm.id === paymentMethod)?.name || paymentMethod,
-          status: 'pending'
-        });
+      const { error: insertError } = await supabase.
+      from('payment_requests').
+      insert({
+        user_id: session.user.id,
+        credits_requested: getSelectedCredits(),
+        total_cost_mmk: getTotalPrice(),
+        payment_method: PAYMENT_METHODS.find((pm) => pm.id === paymentMethod)?.name || paymentMethod,
+        status: 'pending'
+      });
 
       if (insertError) {
         throw new Error('Failed to create payment request: ' + insertError.message);
