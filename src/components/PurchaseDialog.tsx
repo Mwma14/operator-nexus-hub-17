@@ -300,7 +300,7 @@ export default function PurchaseDialog({
 
               {/* Insufficient Balance Warning */}
               {balanceAfterPurchase < 0 &&
-                <div className="glass-card rounded-xl p-4 border border-red-400/30 bg-gradient-to-r from-red-900/20 to-red-800/20">
+            <div className="glass-card rounded-xl p-4 border border-red-400/30 bg-gradient-to-r from-red-900/20 to-red-800/20">
                   <p className="text-red-300 font-medium flex items-center gap-2">
                     <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -308,7 +308,7 @@ export default function PurchaseDialog({
                     Insufficient balance! You need {Math.abs(balanceAfterPurchase).toLocaleString()} MMK more.
                   </p>
                 </div>
-              }
+            }
             </>
           }
 
@@ -317,23 +317,23 @@ export default function PurchaseDialog({
               <div className="space-y-3">
                 <Label htmlFor="phone" className="text-gray-200 font-medium">Phone Number *</Label>
                 <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="09123456789"
-                  value={phoneNumber}
-                  onChange={(e) => handlePhoneChange(e.target.value)}
-                  className={`glass-card border-white/20 bg-slate-900/50 text-white placeholder:text-gray-400 focus:border-amber-400/50 focus:ring-amber-400/20 ${
-                    phoneError ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20' : ''
-                  }`}
-                />
+                id="phone"
+                type="tel"
+                placeholder="09123456789"
+                value={phoneNumber}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                className={`glass-card border-white/20 bg-slate-900/50 text-white placeholder:text-gray-400 focus:border-amber-400/50 focus:ring-amber-400/20 ${
+                phoneError ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20' : ''}`
+                } />
+
                 {phoneError &&
-                  <p className="text-red-400 text-sm flex items-center gap-2">
+              <p className="text-red-400 text-sm flex items-center gap-2">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                     {phoneError}
                   </p>
-                }
+              }
               </div>
               <div className="glass-card rounded-xl p-4 border border-blue-400/30 bg-gradient-to-r from-blue-900/20 to-cyan-800/20">
                 <p className="text-blue-200 flex items-center gap-2">
@@ -369,18 +369,18 @@ export default function PurchaseDialog({
 
         {step === 'DETAILS' &&
         <DialogFooter className="flex gap-3 pt-2">
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40"
-            >
+            <Button
+            variant="outline"
+            onClick={onClose}
+            className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40">
+
               Cancel
             </Button>
             <Button
-              onClick={handleConfirmPurchase}
-              disabled={balanceAfterPurchase < 0}
-              className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            onClick={handleConfirmPurchase}
+            disabled={balanceAfterPurchase < 0}
+            className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed">
+
               Confirm Purchase
             </Button>
           </DialogFooter>
@@ -388,18 +388,18 @@ export default function PurchaseDialog({
 
         {step === 'PHONE_INPUT' &&
         <DialogFooter className="flex gap-3 pt-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setStep('DETAILS')}
-              className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40"
-            >
+            <Button
+            variant="outline"
+            onClick={() => setStep('DETAILS')}
+            className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40">
+
               Back
             </Button>
             <Button
-              onClick={handlePhoneSubmit}
-              disabled={!phoneNumber || !!phoneError || loading}
-              className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            onClick={handlePhoneSubmit}
+            disabled={!phoneNumber || !!phoneError || loading}
+            className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed">
+
               {loading ? 'Processing...' : 'Complete Purchase'}
             </Button>
           </DialogFooter>

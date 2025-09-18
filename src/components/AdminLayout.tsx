@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu } from 'lucide-react';
+import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
 import ProductManagement from '@/components/ProductManagement';
 import UserManagement from '@/components/UserManagement';
+import { PaymentRequestManagement } from '@/components/PaymentRequestManagement';
 import ApprovalWorkflows from '@/components/ApprovalWorkflows';
 
 type TabValue = 'dashboard' | 'products' | 'users' | 'approvals';
@@ -23,6 +24,7 @@ const navItems: NavItem[] = [
 { value: 'dashboard', label: 'Dashboard', icon: BarChart3, component: AdminDashboard },
 { value: 'products', label: 'Products', icon: Package, component: ProductManagement },
 { value: 'users', label: 'Users', icon: Users, component: UserManagement },
+{ value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
 { value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflows }];
 
 
@@ -155,7 +157,7 @@ export default function AdminLayout() {
                     <TabsTrigger
                       key={item.value}
                       value={item.value}
-                      className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-400 data-[state=active]:via-amber-400 data-[state=active]:to-yellow-400 data-[state=active]:text-black text-white/70 hover:text-white transition-all rounded-xl min-h-[44px]">
+                      className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-400 data-[state=active]:via-amber-400 data-[state=active]:to-yellow-400 data-[state=active]:text-black text-white/70 hover:text-white transition-all rounded-xl min-h-[44px] bg-[#040406] text-white">
                         <Icon className="h-4 w-4" />
                         <span className="hidden lg:inline">{item.label}</span>
                       </TabsTrigger>);
