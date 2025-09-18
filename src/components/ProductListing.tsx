@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { products, type Product } from "@/lib/products";
+import { type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import ProductFilters from "./ProductFilters";
 import LoadingSpinner from "./LoadingSpinner";
@@ -18,11 +18,14 @@ const ProductListing = () => {
   const [userBalance, setUserBalance] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     checkAuthStatus();
+    fetchProducts();
   }, []);
 
   // Scroll to products section when filters are applied
@@ -37,6 +40,37 @@ const ProductListing = () => {
       }
     }
   }, [selectedOperator, selectedCategory]);
+
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const { data, error } = await window.ezsite.apis.tablePage(44172, {
+        PageNo: 1,
+        PageSize: 1000,
+        OrderByField: 'created_at',
+        IsAsc: false,
+        Filters: [
+          {
+            name: 'is_active',
+            op: 'Equal',
+            value: true
+          }
+        ]
+      });
+
+      if (error) throw new Error(error);
+      setProducts(data?.List || []);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load products',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
 
   const checkAuthStatus = async () => {
     try {
@@ -194,13 +228,19 @@ const ProductListing = () => {
 
         {/* Product Grid */}
         <div id="products-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) =>
-          <ProductCard
-            key={product.id}
-            product={product}
-            isSelected={selectedProduct?.id === product.id}
-            onSelect={handleProductSelect}
-            onPurchase={handlePurchase} />
+          {loadingProducts ? (
+            <div className="col-span-full flex justify-center py-12">
+              <LoadingSpinner size="lg" />
+            </div>
+          ) : (
+            filteredProducts.map((product) =>
+              <ProductCard
+                key={product.id}
+                product={product}
+                isSelected={selectedProduct?.id === product.id}
+                onSelect={handleProductSelect}
+                onPurchase={handlePurchase} />
+            )
           )}
         </div>
 
