@@ -48,12 +48,12 @@ const ProductListing = () => {
         PageNo: 1,
         PageSize: 1,
         Filters: [
-          {
-            name: "user_id",
-            op: "Equal",
-            value: userId
-          }
-        ]
+        {
+          name: "user_id",
+          op: "Equal",
+          value: userId
+        }]
+
       });
 
       if (!profileResponse.error && profileResponse.data.List.length > 0) {
@@ -69,7 +69,7 @@ const ProductListing = () => {
             credits_balance: 0,
             phone_number: '',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           });
           setUserBalance(0);
         }
@@ -97,7 +97,7 @@ const ProductListing = () => {
     if (checkingAuth) {
       toast({
         title: "Please wait",
-        description: "Checking authentication status...",
+        description: "Checking authentication status..."
       });
       return;
     }
@@ -106,7 +106,7 @@ const ProductListing = () => {
       toast({
         title: "Authentication Required",
         description: "Please log in to purchase products.",
-        variant: "destructive",
+        variant: "destructive"
       });
       navigate("/auth");
       return;
@@ -141,12 +141,12 @@ const ProductListing = () => {
           <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
             Choose from our curated selection of telecom products from Myanmar's leading network operators
           </p>
-          {isAuthenticated && (
-            <div className="mt-6 inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
+          {isAuthenticated &&
+          <div className="mt-6 inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
               <span className="text-sm font-medium">Current Balance:</span>
               <span className="font-bold">{userBalance.toLocaleString()} MMK</span>
             </div>
-          )}
+          }
         </div>
 
         {/* Filters */}
@@ -204,8 +204,8 @@ const ProductListing = () => {
           }}
           product={selectedProduct}
           userBalance={userBalance}
-          onPurchaseComplete={handlePurchaseComplete}
-        />
+          onPurchaseComplete={handlePurchaseComplete} />
+
       </div>
     </section>);
 

@@ -27,10 +27,10 @@ const Auth = () => {
           navigate("/");
         }
       } catch (error) {
-        // User not authenticated, stay on auth page
-      }
-    };
 
+
+        // User not authenticated, stay on auth page
+      }};
     checkUser();
   }, [navigate]);
 
@@ -61,7 +61,7 @@ const Auth = () => {
         title: "Success",
         description: "Please check your email to confirm your account"
       });
-      
+
       // Clear form
       setEmail("");
       setPassword("");
@@ -92,7 +92,7 @@ const Auth = () => {
     try {
       const response = await window.ezsite.apis.login({
         email,
-        password,
+        password
       });
 
       if (response.error) {
@@ -131,7 +131,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const response = await window.ezsite.apis.sendResetPwdEmail({
-        email,
+        email
       });
 
       if (response.error) {

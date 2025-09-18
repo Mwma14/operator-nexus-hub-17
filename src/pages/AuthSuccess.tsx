@@ -40,12 +40,12 @@ export default function AuthSuccess() {
           </p>
           <button
             onClick={() => navigate('/auth')}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
-          >
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+
             Click here to go now
           </button>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 }
