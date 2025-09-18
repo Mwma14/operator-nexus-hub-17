@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Product } from "@/lib/products";
 import { ShoppingCart } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+
 
 interface ProductCardProps {
   product: Product;
@@ -11,7 +11,6 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps) => {
-  const navigate = useNavigate();
   const operatorColors = {
     MPT: "bg-blue-600",
     OOREDOO: "bg-red-600",
@@ -65,7 +64,14 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
           className="btn-premium px-6 py-3 rounded-xl font-semibold group-hover:shadow-md transition-all"
           onClick={(e) => {
             e.stopPropagation();
-            navigate('/premium');
+            // Scroll to premium products section
+            const premiumSection = document.getElementById('premium-products');
+            if (premiumSection) {
+              premiumSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              });
+            }
           }}>
 
           <ShoppingCart className="mr-2 h-4 w-4" />
