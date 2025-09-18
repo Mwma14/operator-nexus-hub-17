@@ -39,7 +39,7 @@ const Premium = () => {
       }
 
       setUser(userResponse.data);
-      
+
       // Get user profile to get balance
       const profileResponse = await window.ezsite.apis.tablePage(44145, {
         PageNo: 1,
@@ -97,9 +97,9 @@ const Premium = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
       {/* Header */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-shrink-0">
         <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"
@@ -126,26 +126,29 @@ const Premium = () => {
                 <div className="text-center">
                   <div className="text-white/80 text-sm mb-1">Current Balance:</div>
                   <div className="text-2xl font-bold text-blue-400">
-                    {isBalanceLoading ? (
-                      <LoadingSpinner size="sm" />
-                    ) : (
-                      `${userBalance.toLocaleString()} MMK`
-                    )}
+                    {isBalanceLoading ?
+                    <LoadingSpinner size="sm" /> :
+
+                    `${userBalance.toLocaleString()} MMK`
+                    }
                   </div>
                 </div>
                 <Button
                   onClick={handleBuyCreditClick}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-all duration-200 transform hover:scale-105"
-                >
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition-all duration-200 transform hover:scale-105">
+
                   Buy Credit
                 </Button>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Main Content Area - takes remaining space */}
+      <div className="flex-1 container mx-auto px-4 pb-8 flex flex-col">
         {/* Premium Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {premiumProducts.map((product) =>
           <ProductCard
             key={product.id}
@@ -156,7 +159,7 @@ const Premium = () => {
 
         {/* No premium products fallback */}
         {premiumProducts.length === 0 &&
-        <div className="text-center py-16">
+        <div className="text-center py-16 flex-1 flex items-center justify-center">
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
               <h3 className="text-2xl font-semibold text-white mb-4">
                 No Premium Products Available
@@ -173,6 +176,9 @@ const Premium = () => {
             </div>
           </div>
         }
+        
+        {/* Spacer to push content up when needed */}
+        <div className="flex-1 min-h-[200px]"></div>
       </div>
 
       {/* Credit Purchase Dialog */}
@@ -182,8 +188,8 @@ const Premium = () => {
         currentBalance={userBalance}
         onBalanceUpdate={(newBalance) => {
           setUserBalance(newBalance);
-        }}
-      />
+        }} />
+
     </div>);
 
 };
