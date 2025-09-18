@@ -97,7 +97,7 @@ const Premium = () => {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
       {/* Header */}
       <div className="container mx-auto px-4 py-8 flex-shrink-0">
         <div className="flex items-center justify-between mb-8">
@@ -146,22 +146,22 @@ const Premium = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-4 pb-16">
+      <div className="container mx-auto px-4 pb-16 flex-1">
         {/* Premium Products Grid */}
-        {premiumProducts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        {premiumProducts.length > 0 &&
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             {premiumProducts.map((product) =>
-            <ProductCard
-              key={product.id}
-              product={product} />
+          <ProductCard
+            key={product.id}
+            product={product} />
 
-            )}
+          )}
           </div>
-        )}
+        }
 
         {/* No premium products fallback */}
-        {premiumProducts.length === 0 && (
-          <div className="text-center py-16">
+        {premiumProducts.length === 0 &&
+        <div className="text-center py-16">
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 max-w-md mx-auto">
               <h3 className="text-2xl font-semibold text-white mb-4">
                 No Premium Products Available
@@ -177,7 +177,7 @@ const Premium = () => {
               </Button>
             </div>
           </div>
-        )}
+        }
       </div>
 
       {/* Credit Purchase Dialog */}
