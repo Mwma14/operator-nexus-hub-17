@@ -11,8 +11,8 @@ const Premium = () => {
 
   // Filter premium products (price >= 50,000 MMK OR Beautiful Numbers category)
   const premiumProducts = useMemo(() => {
-    return products.filter(product => 
-      product.price >= 50000 || product.category === 'Beautiful Numbers'
+    return products.filter((product) =>
+    product.price >= 50000 || product.category === 'Beautiful Numbers'
     );
   }, []);
 
@@ -24,8 +24,8 @@ const Premium = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="text-white hover:text-orange-400 hover:bg-white/10 transition-colors"
-          >
+            className="text-white hover:text-orange-400 hover:bg-white/10 transition-colors">
+
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
@@ -42,17 +42,17 @@ const Premium = () => {
 
         {/* Premium Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {premiumProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-            />
-          ))}
+          {premiumProducts.map((product) =>
+          <ProductCard
+            key={product.id}
+            product={product} />
+
+          )}
         </div>
 
         {/* No premium products fallback */}
-        {premiumProducts.length === 0 && (
-          <div className="text-center py-16">
+        {premiumProducts.length === 0 &&
+        <div className="text-center py-16">
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
               <h3 className="text-2xl font-semibold text-white mb-4">
                 No Premium Products Available
@@ -61,17 +61,17 @@ const Premium = () => {
                 We're working on bringing you exclusive premium products soon.
               </p>
               <Button
-                onClick={() => navigate('/')}
-                className="btn-premium"
-              >
+              onClick={() => navigate('/')}
+              className="btn-premium">
+
                 Browse All Products
               </Button>
             </div>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Premium;

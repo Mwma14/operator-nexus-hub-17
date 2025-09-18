@@ -48,7 +48,7 @@ const Profile = () => {
   const loadProfileData = async (userId: string) => {
     try {
       setIsLoading(true);
-      
+
       // Mock profile data - in real app, this would come from Supabase
       const mockProfile: UserProfile = {
         id: userId,
@@ -62,60 +62,60 @@ const Profile = () => {
 
       // Mock orders data
       const mockOrders: Order[] = [
-        {
-          id: '1',
-          user_id: userId,
-          product_id: 'mpt-data-1gb',
-          product_name: 'MPT 1GB Data Pack',
-          product_description: 'High-speed data for 30 days',
-          amount: 2000,
-          currency: 'MMK',
-          status: 'completed',
-          operator: 'MPT',
-          category: 'Data',
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:31:00Z',
-          transaction_id: 'TXN123456'
-        },
-        {
-          id: '2',
-          user_id: userId,
-          product_id: 'ooredoo-minutes-100',
-          product_name: 'Ooredoo 100 Minutes',
-          product_description: '100 minutes to all networks',
-          amount: 1500,
-          currency: 'MMK',
-          status: 'completed',
-          operator: 'OOREDOO',
-          category: 'Minutes',
-          created_at: '2024-01-10T14:20:00Z',
-          updated_at: '2024-01-10T14:21:00Z',
-          transaction_id: 'TXN123455'
-        },
-        {
-          id: '3',
-          user_id: userId,
-          product_id: 'mytel-package',
-          product_name: 'MyTel Combo Package',
-          product_description: 'Data + Minutes package',
-          amount: 3000,
-          currency: 'MMK',
-          status: 'pending',
-          operator: 'MYTEL',
-          category: 'Packages',
-          created_at: '2024-01-20T09:15:00Z',
-          updated_at: '2024-01-20T09:15:00Z'
-        }
-      ];
+      {
+        id: '1',
+        user_id: userId,
+        product_id: 'mpt-data-1gb',
+        product_name: 'MPT 1GB Data Pack',
+        product_description: 'High-speed data for 30 days',
+        amount: 2000,
+        currency: 'MMK',
+        status: 'completed',
+        operator: 'MPT',
+        category: 'Data',
+        created_at: '2024-01-15T10:30:00Z',
+        updated_at: '2024-01-15T10:31:00Z',
+        transaction_id: 'TXN123456'
+      },
+      {
+        id: '2',
+        user_id: userId,
+        product_id: 'ooredoo-minutes-100',
+        product_name: 'Ooredoo 100 Minutes',
+        product_description: '100 minutes to all networks',
+        amount: 1500,
+        currency: 'MMK',
+        status: 'completed',
+        operator: 'OOREDOO',
+        category: 'Minutes',
+        created_at: '2024-01-10T14:20:00Z',
+        updated_at: '2024-01-10T14:21:00Z',
+        transaction_id: 'TXN123455'
+      },
+      {
+        id: '3',
+        user_id: userId,
+        product_id: 'mytel-package',
+        product_name: 'MyTel Combo Package',
+        product_description: 'Data + Minutes package',
+        amount: 3000,
+        currency: 'MMK',
+        status: 'pending',
+        operator: 'MYTEL',
+        category: 'Packages',
+        created_at: '2024-01-20T09:15:00Z',
+        updated_at: '2024-01-20T09:15:00Z'
+      }];
+
 
       // Mock order stats
       const mockOrderStats: OrderStats = {
         total_orders: mockOrders.length,
-        successful_orders: mockOrders.filter(o => o.status === 'completed').length,
-        pending_orders: mockOrders.filter(o => o.status === 'pending').length,
-        total_spent: mockOrders
-          .filter(o => o.status === 'completed')
-          .reduce((sum, o) => sum + o.amount, 0)
+        successful_orders: mockOrders.filter((o) => o.status === 'completed').length,
+        pending_orders: mockOrders.filter((o) => o.status === 'pending').length,
+        total_spent: mockOrders.
+        filter((o) => o.status === 'completed').
+        reduce((sum, o) => sum + o.amount, 0)
       };
 
       setProfile(mockProfile);
@@ -146,21 +146,21 @@ const Profile = () => {
 
   const getStatusBadgeVariant = (status: Order['status']) => {
     switch (status) {
-      case 'completed': return 'default';
-      case 'pending': return 'secondary';
-      case 'failed': return 'destructive';
-      case 'cancelled': return 'outline';
-      default: return 'secondary';
+      case 'completed':return 'default';
+      case 'pending':return 'secondary';
+      case 'failed':return 'destructive';
+      case 'cancelled':return 'outline';
+      default:return 'secondary';
     }
   };
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.
+    split(' ').
+    map((part) => part[0]).
+    join('').
+    toUpperCase().
+    slice(0, 2);
   };
 
   if (isLoading) {
@@ -171,15 +171,15 @@ const Profile = () => {
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map(i => (
-                <Skeleton key={i} className="h-32" />
-              ))}
+              {[1, 2, 3, 4].map((i) =>
+              <Skeleton key={i} className="h-32" />
+              )}
             </div>
             <Skeleton className="h-96 w-full" />
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -270,8 +270,8 @@ const Profile = () => {
                     <Avatar className="h-20 w-20">
                       <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="text-lg">
-                        {profile?.full_name ? getInitials(profile.full_name) : 
-                         profile?.email ? getInitials(profile.email) : 'U'}
+                        {profile?.full_name ? getInitials(profile.full_name) :
+                        profile?.email ? getInitials(profile.email) : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
@@ -299,16 +299,16 @@ const Profile = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {orders.length === 0 ? (
-                    <div className="text-center py-8">
+                  {orders.length === 0 ?
+                  <div className="text-center py-8">
                       <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <h3 className="text-lg font-medium mb-2">No orders yet</h3>
                       <p className="text-muted-foreground">
                         Start shopping to see your orders here.
                       </p>
-                    </div>
-                  ) : (
-                    <Table>
+                    </div> :
+
+                  <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Product</TableHead>
@@ -320,8 +320,8 @@ const Profile = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {orders.map((order) => (
-                          <TableRow key={order.id}>
+                        {orders.map((order) =>
+                      <TableRow key={order.id}>
                             <TableCell>
                               <div>
                                 <div className="font-medium">{order.product_name}</div>
@@ -348,10 +348,10 @@ const Profile = () => {
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSelectedOrder(order)}
-                                  >
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedOrder(order)}>
+
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </DialogTrigger>
@@ -359,8 +359,8 @@ const Profile = () => {
                                   <DialogHeader>
                                     <DialogTitle>Order Details</DialogTitle>
                                   </DialogHeader>
-                                  {selectedOrder && (
-                                    <div className="space-y-4">
+                                  {selectedOrder &&
+                              <div className="space-y-4">
                                       <div className="grid grid-cols-2 gap-4">
                                         <div>
                                           <label className="text-sm font-medium">Order ID</label>
@@ -401,14 +401,14 @@ const Profile = () => {
                                           </p>
                                         </div>
                                       </div>
-                                      {selectedOrder.transaction_id && (
-                                        <div>
+                                      {selectedOrder.transaction_id &&
+                                <div>
                                           <label className="text-sm font-medium">Transaction ID</label>
                                           <p className="text-sm text-muted-foreground">
                                             {selectedOrder.transaction_id}
                                           </p>
                                         </div>
-                                      )}
+                                }
                                       <div>
                                         <label className="text-sm font-medium">Description</label>
                                         <p className="text-sm text-muted-foreground">
@@ -416,23 +416,23 @@ const Profile = () => {
                                         </p>
                                       </div>
                                     </div>
-                                  )}
+                              }
                                 </DialogContent>
                               </Dialog>
                             </TableCell>
                           </TableRow>
-                        ))}
+                      )}
                       </TableBody>
                     </Table>
-                  )}
+                  }
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Profile;

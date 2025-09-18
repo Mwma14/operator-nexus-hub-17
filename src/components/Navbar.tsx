@@ -76,12 +76,12 @@ const Navbar = () => {
   };
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.
+    split(' ').
+    map((part) => part[0]).
+    join('').
+    toUpperCase().
+    slice(0, 2);
   };
 
   const getUserDisplayName = () => {
@@ -151,19 +151,19 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="cursor-pointer"
-                >
-                  {isLoggingOut ? (
-                    <LoadingSpinner size="sm" />
-                  ) : (
-                    <>
+                  className="cursor-pointer">
+
+                  {isLoggingOut ?
+                  <LoadingSpinner size="sm" /> :
+
+                  <>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
                     </>
-                  )}
+                  }
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu> :
@@ -227,19 +227,19 @@ const Navbar = () => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="cursor-pointer"
-                >
-                  {isLoggingOut ? (
-                    <LoadingSpinner size="sm" />
-                  ) : (
-                    <>
+                  className="cursor-pointer">
+
+                  {isLoggingOut ?
+                  <LoadingSpinner size="sm" /> :
+
+                  <>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
                     </>
-                  )}
+                  }
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu> :
