@@ -6,14 +6,14 @@
 
 @layer base {
   :root {
-    /* Sophisticated dark theme */
-    --background: 240 10% 3.9%;
+    /* Deep dark theme */
+    --background: 240 15% 2%;
     --foreground: 210 40% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 240 12% 3%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 240 12% 3%;
     --popover-foreground: 210 40% 98%;
 
     /* Premium gradient primary */
