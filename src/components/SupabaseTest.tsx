@@ -10,12 +10,12 @@ export default function SupabaseTest() {
   const runTests = async () => {
     setLoading(true);
     setResults(null);
-    
+
     try {
       const connectionTest = await testSupabaseConnection();
       const authTest = await testSupabaseAuth();
       const tablesTest = await listTables();
-      
+
       setResults({
         connection: connectionTest,
         auth: authTest,
@@ -38,22 +38,22 @@ export default function SupabaseTest() {
         {loading ? 'Testing...' : 'Run Connection Tests'}
       </Button>
       
-      {results && (
-        <div className="space-y-4">
-          {results.error ? (
-            <Alert variant="destructive">
+      {results &&
+      <div className="space-y-4">
+          {results.error ?
+        <Alert variant="destructive">
               <AlertDescription>
                 Test Error: {results.error}
               </AlertDescription>
-            </Alert>
-          ) : (
-            <>
+            </Alert> :
+
+        <>
               <Alert variant={results.connection?.success ? "default" : "destructive"}>
                 <AlertDescription>
                   <strong>Connection Test:</strong> {results.connection?.success ? 'Success' : 'Failed'}
-                  {results.connection?.error && (
-                    <div className="mt-2">Error: {results.connection.error}</div>
-                  )}
+                  {results.connection?.error &&
+              <div className="mt-2">Error: {results.connection.error}</div>
+              }
                 </AlertDescription>
               </Alert>
               
@@ -72,9 +72,9 @@ export default function SupabaseTest() {
                 </AlertDescription>
               </Alert>
             </>
-          )}
+        }
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }

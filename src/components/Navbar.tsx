@@ -5,21 +5,44 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
+import { toast } from "@/hooks/use-toast";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+          toast({
+            title: "Authentication Error",
+            description: "Failed to check authentication status",
+            variant: "destructive",
+          });
+        } else {
+          setUser(session?.user ?? null);
+        }
+      } catch (error) {
+        console.error('Unexpected auth error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+        setIsLoading(false);
       }
     );
 
@@ -27,8 +50,27 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+    try {
+      setIsLoggingOut(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out of your account",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout failed",
+        description: error instanceof Error ? error.message : "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -55,17 +97,25 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            {user ?
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              className="text-foreground hover:text-primary">
-
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button> :
-
-            <>
+            {isLoading ? (
+              <LoadingSpinner size="sm" />
+            ) : user ? (
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                disabled={isLoggingOut}
+                className="text-foreground hover:text-primary">
+                {isLoggingOut ? (
+                  <LoadingSpinner size="sm" />
+                ) : (
+                  <>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </>
+                )}
+              </Button>
+            ) : (
+              <>
                 <Link to="/auth">
                   <Button variant="ghost" className="text-foreground hover:text-primary">
                     Sign In
@@ -77,7 +127,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
               </>
-            }
+            )}
           </div>
 
           {/* Mobile Buttons */}
@@ -85,21 +135,27 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            {user ?
-            <Button
-              onClick={handleLogout}
-              size="sm"
-              variant="ghost">
-
-                <LogOut className="h-4 w-4" />
-              </Button> :
-
-            <Link to="/auth">
+            {isLoading ? (
+              <LoadingSpinner size="sm" />
+            ) : user ? (
+              <Button
+                onClick={handleLogout}
+                size="sm"
+                disabled={isLoggingOut}
+                variant="ghost">
+                {isLoggingOut ? (
+                  <LoadingSpinner size="sm" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
+              </Button>
+            ) : (
+              <Link to="/auth">
                 <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   Join Now
                 </Button>
               </Link>
-            }
+            )}
           </div>
         </div>
       </div>

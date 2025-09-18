@@ -2,11 +2,15 @@ import { useState, useMemo } from "react";
 import { products, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import ProductFilters from "./ProductFilters";
+import LoadingSpinner from "./LoadingSpinner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
 
 const ProductListing = () => {
   const [selectedOperator, setSelectedOperator] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -17,7 +21,16 @@ const ProductListing = () => {
   }, [selectedOperator, selectedCategory]);
 
   const handleProductSelect = (product: Product) => {
-    setSelectedProduct(selectedProduct?.id === product.id ? null : product);
+    try {
+      setSelectedProduct(selectedProduct?.id === product.id ? null : product);
+    } catch (error) {
+      console.error('Error selecting product:', error);
+      toast({
+        title: "Error selecting product",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
