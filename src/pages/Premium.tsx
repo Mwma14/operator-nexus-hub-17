@@ -145,22 +145,24 @@ const Premium = () => {
         </div>
       </div>
 
-      {/* Main Content Area - takes remaining space */}
-      <div className="flex-1 container mx-auto px-4 pb-8 flex flex-col">
+      {/* Main Content Area */}
+      <div className="container mx-auto px-4 pb-16">
         {/* Premium Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-          {premiumProducts.map((product) =>
-          <ProductCard
-            key={product.id}
-            product={product} />
+        {premiumProducts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            {premiumProducts.map((product) =>
+            <ProductCard
+              key={product.id}
+              product={product} />
 
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* No premium products fallback */}
-        {premiumProducts.length === 0 &&
-        <div className="text-center py-16 flex-1 flex items-center justify-center">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+        {premiumProducts.length === 0 && (
+          <div className="text-center py-16">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 max-w-md mx-auto">
               <h3 className="text-2xl font-semibold text-white mb-4">
                 No Premium Products Available
               </h3>
@@ -175,10 +177,7 @@ const Premium = () => {
               </Button>
             </div>
           </div>
-        }
-        
-        {/* Spacer to push content up when needed */}
-        <div className="flex-1 min-h-[200px]"></div>
+        )}
       </div>
 
       {/* Credit Purchase Dialog */}
