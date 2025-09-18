@@ -22,19 +22,19 @@ const ProductFilters = ({
         <div className="flex flex-wrap gap-4">
           <button
             className={`filter-btn ${selectedOperator === null ? 'active' : ''}`}
-            onClick={() => onOperatorChange(null)}
-          >
+            onClick={() => onOperatorChange(null)}>
+
             All Networks
           </button>
-          {operators.map((operator) => (
-            <button
-              key={operator}
-              className={`filter-btn ${selectedOperator === operator ? 'active' : ''}`}
-              onClick={() => onOperatorChange(operator)}
-            >
+          {operators.map((operator) =>
+          <button
+            key={operator}
+            className={`filter-btn ${selectedOperator === operator ? 'active' : ''}`}
+            onClick={() => onOperatorChange(operator)}>
+
               {operator}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -44,23 +44,23 @@ const ProductFilters = ({
         <div className="flex flex-wrap gap-4">
           <button
             className={`filter-btn ${selectedCategory === null ? 'active' : ''}`}
-            onClick={() => onCategoryChange(null)}
-          >
+            onClick={() => onCategoryChange(null)}>
+
             All Categories
           </button>
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
-              onClick={() => onCategoryChange(category)}
-            >
+          {categories.map((category) =>
+          <button
+            key={category}
+            className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
+            onClick={() => onCategoryChange(category)}>
+
               {category}
             </button>
-          ))}
+          )}
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ProductFilters;

@@ -46,7 +46,7 @@ const Auth = () => {
       toast({
         title: "Error",
         description: "Please fill in all fields",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -60,7 +60,7 @@ const Auth = () => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          name: name,
+          name: name
         }
       }
     });
@@ -69,12 +69,12 @@ const Auth = () => {
       toast({
         title: "Sign Up Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } else {
       toast({
         title: "Success",
-        description: "Please check your email to confirm your account",
+        description: "Please check your email to confirm your account"
       });
     }
     setLoading(false);
@@ -86,7 +86,7 @@ const Auth = () => {
       toast({
         title: "Error",
         description: "Please fill in all fields",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -94,14 +94,14 @@ const Auth = () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password,
+      password
     });
 
     if (error) {
       toast({
         title: "Sign In Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
     setLoading(false);
@@ -113,7 +113,7 @@ const Auth = () => {
       toast({
         title: "Error",
         description: "Please enter your email address",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -122,19 +122,19 @@ const Auth = () => {
     const redirectUrl = `${window.location.origin}/auth`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
+      redirectTo: redirectUrl
     });
 
     if (error) {
       toast({
         title: "Reset Password Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } else {
       toast({
         title: "Reset Email Sent",
-        description: "Please check your email for password reset instructions",
+        description: "Please check your email for password reset instructions"
       });
       setIsResetMode(false);
     }
@@ -157,8 +157,8 @@ const Auth = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsResetMode(false)}
-                className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10"
-              >
+                className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10">
+
                 <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary font-space-grotesk leading-tight">
@@ -181,8 +181,8 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-10 sm:h-11"
-                />
+                  className="h-10 sm:h-11" />
+
               </div>
               <Button type="submit" className="w-full btn-premium h-10 sm:h-11" disabled={loading}>
                 {loading ? "Sending..." : "Send Reset Email"}
@@ -190,8 +190,8 @@ const Auth = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -237,8 +237,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 sm:h-11"
-                  />
+                    className="h-10 sm:h-11" />
+
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signin-password" className="text-sm">Password</Label>
@@ -250,20 +250,20 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-10 sm:h-11 pr-10"
-                    />
+                      className="h-10 sm:h-11 pr-10" />
+
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
+                      onClick={() => setShowPassword(!showPassword)}>
+
+                      {showPassword ?
+                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      }
                     </Button>
                   </div>
                 </div>
@@ -274,8 +274,8 @@ const Auth = () => {
                   type="button"
                   variant="link"
                   className="w-full text-muted-foreground text-sm h-8"
-                  onClick={() => setIsResetMode(true)}
-                >
+                  onClick={() => setIsResetMode(true)}>
+
                   Forgot your password?
                 </Button>
               </form>
@@ -292,8 +292,8 @@ const Auth = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-10 sm:h-11"
-                  />
+                    className="h-10 sm:h-11" />
+
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signup-email" className="text-sm">Email</Label>
@@ -304,8 +304,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 sm:h-11"
-                  />
+                    className="h-10 sm:h-11" />
+
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signup-password" className="text-sm">Password</Label>
@@ -317,20 +317,20 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-10 sm:h-11 pr-10"
-                    />
+                      className="h-10 sm:h-11 pr-10" />
+
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
+                      onClick={() => setShowPassword(!showPassword)}>
+
+                      {showPassword ?
+                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      }
                     </Button>
                   </div>
                 </div>
@@ -342,8 +342,8 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Auth;

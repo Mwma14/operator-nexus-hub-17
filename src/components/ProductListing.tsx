@@ -38,8 +38,8 @@ const ProductListing = () => {
           selectedOperator={selectedOperator}
           selectedCategory={selectedCategory}
           onOperatorChange={setSelectedOperator}
-          onCategoryChange={setSelectedCategory}
-        />
+          onCategoryChange={setSelectedCategory} />
+
 
         {/* Results Count */}
         <div className="mb-8">
@@ -52,38 +52,38 @@ const ProductListing = () => {
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              isSelected={selectedProduct?.id === product.id}
-              onSelect={handleProductSelect}
-            />
-          ))}
+          {filteredProducts.map((product) =>
+          <ProductCard
+            key={product.id}
+            product={product}
+            isSelected={selectedProduct?.id === product.id}
+            onSelect={handleProductSelect} />
+
+          )}
         </div>
 
         {/* No Results */}
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-20">
+        {filteredProducts.length === 0 &&
+        <div className="text-center py-20">
             <div className="glass-card rounded-3xl p-12 max-w-md mx-auto">
               <p className="text-xl text-white/80 mb-4">
                 No products found matching your criteria
               </p>
               <button
-                onClick={() => {
-                  setSelectedOperator(null);
-                  setSelectedCategory(null);
-                }}
-                className="btn-premium px-8 py-3 rounded-xl font-semibold"
-              >
+              onClick={() => {
+                setSelectedOperator(null);
+                setSelectedCategory(null);
+              }}
+              className="btn-premium px-8 py-3 rounded-xl font-semibold">
+
                 Clear all filters
               </button>
             </div>
           </div>
-        )}
+        }
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default ProductListing;

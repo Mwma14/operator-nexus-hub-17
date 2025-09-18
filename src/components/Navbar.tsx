@@ -48,24 +48,24 @@ const Navbar = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search products..."
-                className="pl-10 w-full bg-card border-border"
-              />
+                className="pl-10 w-full bg-card border-border" />
+
             </div>
           </div>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            {user ? (
-              <Button 
-                onClick={handleLogout}
-                variant="ghost" 
-                className="text-foreground hover:text-primary"
-              >
+            {user ?
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="text-foreground hover:text-primary">
+
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
-              </Button>
-            ) : (
-              <>
+              </Button> :
+
+            <>
                 <Link to="/auth">
                   <Button variant="ghost" className="text-foreground hover:text-primary">
                     Sign In
@@ -77,7 +77,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
               </>
-            )}
+            }
           </div>
 
           {/* Mobile Buttons */}
@@ -85,26 +85,26 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            {user ? (
-              <Button 
-                onClick={handleLogout}
-                size="sm" 
-                variant="ghost"
-              >
+            {user ?
+            <Button
+              onClick={handleLogout}
+              size="sm"
+              variant="ghost">
+
                 <LogOut className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Link to="/auth">
+              </Button> :
+
+            <Link to="/auth">
                 <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   Join Now
                 </Button>
               </Link>
-            )}
+            }
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>);
+
 };
 
 export default Navbar;

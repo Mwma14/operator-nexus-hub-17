@@ -37,17 +37,17 @@ const HeroBanner = () => {
 
         {/* Premium CTA Button */}
         <div className="relative">
-          <Button 
-            size="lg" 
-            className="btn-premium text-xl px-12 py-8 rounded-2xl font-semibold group"
-          >
+          <Button
+            size="lg"
+            className="btn-premium text-xl px-12 py-8 rounded-2xl font-semibold group">
+
             Buy Now
             <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default HeroBanner;

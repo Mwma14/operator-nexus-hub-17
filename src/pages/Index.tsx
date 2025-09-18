@@ -8,8 +8,8 @@ const Index = () => {
       <Navbar />
       <HeroBanner />
       <ProductListing />
-    </div>
-  );
+    </div>);
+
 };
 
 export default Index;

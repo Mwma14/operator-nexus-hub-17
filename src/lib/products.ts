@@ -10,149 +10,149 @@ export interface Product {
 }
 
 export const products: Product[] = [
-  // MPT Products
-  {
-    id: "mpt-data-1gb",
-    name: "1GB Data Pack",
-    description: "High-speed internet for 30 days",
-    price: 3000,
-    currency: "MMK",
-    operator: "MPT",
-    category: "Data"
-  },
-  {
-    id: "mpt-data-5gb",
-    name: "5GB Data Pack",
-    description: "Extended data bundle for heavy users",
-    price: 12000,
-    currency: "MMK",
-    operator: "MPT",
-    category: "Data"
-  },
-  {
-    id: "mpt-minutes-100",
-    name: "100 Minutes Pack",
-    description: "Talk time for local calls",
-    price: 2500,
-    currency: "MMK",
-    operator: "MPT",
-    category: "Minutes"
-  },
-  {
-    id: "mpt-combo-package",
-    name: "Combo Package",
-    description: "2GB data + 50 minutes + 100 SMS",
-    price: 8000,
-    currency: "MMK",
-    operator: "MPT",
-    category: "Packages"
-  },
+// MPT Products
+{
+  id: "mpt-data-1gb",
+  name: "1GB Data Pack",
+  description: "High-speed internet for 30 days",
+  price: 3000,
+  currency: "MMK",
+  operator: "MPT",
+  category: "Data"
+},
+{
+  id: "mpt-data-5gb",
+  name: "5GB Data Pack",
+  description: "Extended data bundle for heavy users",
+  price: 12000,
+  currency: "MMK",
+  operator: "MPT",
+  category: "Data"
+},
+{
+  id: "mpt-minutes-100",
+  name: "100 Minutes Pack",
+  description: "Talk time for local calls",
+  price: 2500,
+  currency: "MMK",
+  operator: "MPT",
+  category: "Minutes"
+},
+{
+  id: "mpt-combo-package",
+  name: "Combo Package",
+  description: "2GB data + 50 minutes + 100 SMS",
+  price: 8000,
+  currency: "MMK",
+  operator: "MPT",
+  category: "Packages"
+},
 
-  // OOREDOO Products
-  {
-    id: "ooredoo-data-2gb",
-    name: "2GB SuperNet",
-    description: "Fast 4G data for streaming",
-    price: 5500,
-    currency: "MMK",
-    operator: "OOREDOO",
-    category: "Data"
-  },
-  {
-    id: "ooredoo-data-10gb",
-    name: "10GB Ultimate",
-    description: "Ultimate data experience",
-    price: 20000,
-    currency: "MMK",
-    operator: "OOREDOO",
-    category: "Data"
-  },
-  {
-    id: "ooredoo-minutes-200",
-    name: "200 Minutes Plus",
-    description: "Extended talk time package",
-    price: 4500,
-    currency: "MMK",
-    operator: "OOREDOO",
-    category: "Minutes"
-  },
-  {
-    id: "ooredoo-beautiful-1",
-    name: "09-123-456-789",
-    description: "Premium number with easy pattern",
-    price: 150000,
-    currency: "MMK",
-    operator: "OOREDOO",
-    category: "Beautiful Numbers"
-  },
+// OOREDOO Products
+{
+  id: "ooredoo-data-2gb",
+  name: "2GB SuperNet",
+  description: "Fast 4G data for streaming",
+  price: 5500,
+  currency: "MMK",
+  operator: "OOREDOO",
+  category: "Data"
+},
+{
+  id: "ooredoo-data-10gb",
+  name: "10GB Ultimate",
+  description: "Ultimate data experience",
+  price: 20000,
+  currency: "MMK",
+  operator: "OOREDOO",
+  category: "Data"
+},
+{
+  id: "ooredoo-minutes-200",
+  name: "200 Minutes Plus",
+  description: "Extended talk time package",
+  price: 4500,
+  currency: "MMK",
+  operator: "OOREDOO",
+  category: "Minutes"
+},
+{
+  id: "ooredoo-beautiful-1",
+  name: "09-123-456-789",
+  description: "Premium number with easy pattern",
+  price: 150000,
+  currency: "MMK",
+  operator: "OOREDOO",
+  category: "Beautiful Numbers"
+},
 
-  // ATOM Products
-  {
-    id: "atom-data-3gb",
-    name: "3GB Speed Pack",
-    description: "Perfect for social media",
-    price: 7000,
-    currency: "MMK",
-    operator: "ATOM",
-    category: "Data"
-  },
-  {
-    id: "atom-points-1000",
-    name: "1000 Reward Points",
-    description: "Redeem for exclusive offers",
-    price: 5000,
-    currency: "MMK",
-    operator: "ATOM",
-    category: "Points"
-  },
-  {
-    id: "atom-beautiful-2",
-    name: "09-888-888-888",
-    description: "VIP number with lucky 8s",
-    price: 500000,
-    currency: "MMK",
-    operator: "ATOM",
-    category: "Beautiful Numbers"
-  },
+// ATOM Products
+{
+  id: "atom-data-3gb",
+  name: "3GB Speed Pack",
+  description: "Perfect for social media",
+  price: 7000,
+  currency: "MMK",
+  operator: "ATOM",
+  category: "Data"
+},
+{
+  id: "atom-points-1000",
+  name: "1000 Reward Points",
+  description: "Redeem for exclusive offers",
+  price: 5000,
+  currency: "MMK",
+  operator: "ATOM",
+  category: "Points"
+},
+{
+  id: "atom-beautiful-2",
+  name: "09-888-888-888",
+  description: "VIP number with lucky 8s",
+  price: 500000,
+  currency: "MMK",
+  operator: "ATOM",
+  category: "Beautiful Numbers"
+},
 
-  // MYTEL Products
-  {
-    id: "mytel-data-1.5gb",
-    name: "1.5GB Smart Pack",
-    description: "Affordable data solution",
-    price: 3500,
-    currency: "MMK",
-    operator: "MYTEL",
-    category: "Data"
-  },
-  {
-    id: "mytel-minutes-150",
-    name: "150 Minutes Value",
-    description: "Great value talk time",
-    price: 3000,
-    currency: "MMK",
-    operator: "MYTEL",
-    category: "Minutes"
-  },
-  {
-    id: "mytel-points-500",
-    name: "500 Bonus Points",
-    description: "Loyalty rewards program",
-    price: 2500,
-    currency: "MMK",
-    operator: "MYTEL",
-    category: "Points"
-  },
-  {
-    id: "mytel-family-package",
-    name: "Family Package",
-    description: "5GB shared + unlimited family calls",
-    price: 15000,
-    currency: "MMK",
-    operator: "MYTEL",
-    category: "Packages"
-  }
-];
+// MYTEL Products
+{
+  id: "mytel-data-1.5gb",
+  name: "1.5GB Smart Pack",
+  description: "Affordable data solution",
+  price: 3500,
+  currency: "MMK",
+  operator: "MYTEL",
+  category: "Data"
+},
+{
+  id: "mytel-minutes-150",
+  name: "150 Minutes Value",
+  description: "Great value talk time",
+  price: 3000,
+  currency: "MMK",
+  operator: "MYTEL",
+  category: "Minutes"
+},
+{
+  id: "mytel-points-500",
+  name: "500 Bonus Points",
+  description: "Loyalty rewards program",
+  price: 2500,
+  currency: "MMK",
+  operator: "MYTEL",
+  category: "Points"
+},
+{
+  id: "mytel-family-package",
+  name: "Family Package",
+  description: "5GB shared + unlimited family calls",
+  price: 15000,
+  currency: "MMK",
+  operator: "MYTEL",
+  category: "Packages"
+}];
+
 
 export const operators = ["MPT", "OOREDOO", "ATOM", "MYTEL"] as const;
 export const categories = ["Data", "Minutes", "Points", "Packages", "Beautiful Numbers"] as const;

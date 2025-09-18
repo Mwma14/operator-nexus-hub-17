@@ -12,19 +12,19 @@ interface ProductCardProps {
 const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps) => {
   const operatorColors = {
     MPT: "bg-blue-600",
-    OOREDOO: "bg-red-600", 
+    OOREDOO: "bg-red-600",
     ATOM: "bg-green-600",
     MYTEL: "bg-purple-600"
   };
 
   return (
-    <div 
+    <div
       className={`
         product-card rounded-2xl p-6 cursor-pointer group
         ${isSelected ? 'selected' : ''}
       `}
-      onClick={() => onSelect?.(product)}
-    >
+      onClick={() => onSelect?.(product)}>
+
       {/* Header with operator badge */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
@@ -59,19 +59,19 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
           </span>
         </div>
         
-        <Button 
+        <Button
           className="btn-premium px-6 py-3 rounded-xl font-semibold group-hover:shadow-md transition-all"
           onClick={(e) => {
             e.stopPropagation();
             // Handle purchase logic here
-          }}
-        >
+          }}>
+
           <ShoppingCart className="mr-2 h-4 w-4" />
           Purchase
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ProductCard;
