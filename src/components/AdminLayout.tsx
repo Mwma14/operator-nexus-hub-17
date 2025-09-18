@@ -54,6 +54,6 @@ export default function AdminLayout() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>);
+
 }

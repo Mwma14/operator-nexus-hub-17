@@ -8,6 +8,8 @@ import Auth from "./pages/Auth";
 import Premium from "./pages/Premium";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import AdminSetup from "./pages/AdminSetup";
+import QuickAdminSetup from "./pages/QuickAdminSetup";
 import NotFound from "./pages/NotFound";
 import SupabaseTest from "./components/SupabaseTest";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -56,6 +58,8 @@ const App = () =>
             <Route path="/premium" element={<Premium />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin-setup" element={<AdminSetup />} />
+            <Route path="/quick-admin-setup" element={<QuickAdminSetup />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

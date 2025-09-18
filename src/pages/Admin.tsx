@@ -35,8 +35,8 @@ const Admin = () => {
   return (
     <AdminGuard>
       <AdminLayout />
-    </AdminGuard>
-  );
+    </AdminGuard>);
+
 };
 
 export default Admin;
