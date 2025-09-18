@@ -129,8 +129,11 @@ const Premium = () => {
                     {isBalanceLoading ?
                     <LoadingSpinner size="sm" /> :
 
-                    `${userBalance.toLocaleString()} MMK`
+                    `${userBalance.toLocaleString()} Credits`
                     }
+                  </div>
+                  <div className="text-xs text-white/60 mt-1">
+                    ({(userBalance * 100).toLocaleString()} MMK equivalent)
                   </div>
                 </div>
                 <Button

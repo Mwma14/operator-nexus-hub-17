@@ -1,7 +1,16 @@
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Zap, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import CreditPurchaseDialog from "@/components/CreditPurchaseDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const HeroBanner = () => {
+  const [isCreditDialogOpen, setIsCreditDialogOpen] = useState(false);
+  const [userBalance, setUserBalance] = useState(0);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   const handleBuyNow = () => {
     const premiumSection = document.getElementById('premium-products');
     if (premiumSection) {
@@ -9,6 +18,29 @@ const HeroBanner = () => {
         behavior: 'smooth',
         block: 'start'
       });
+    }
+  };
+
+  const handleBuyCreditClick = async () => {
+    try {
+      const userResponse = await window.ezsite.apis.getUserInfo();
+      if (userResponse.error) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to purchase credits.",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
+      setIsCreditDialogOpen(true);
+    } catch (error) {
+      toast({
+        title: "Authentication Required", 
+        description: "Please sign in to purchase credits.",
+        variant: "destructive"
+      });
+      navigate('/auth');
     }
   };
 
@@ -45,18 +77,47 @@ const HeroBanner = () => {
           </div>
         </div>
 
-        {/* Premium CTA Button */}
-        <div className="relative">
-          <Button
-            size="lg"
-            onClick={handleBuyNow}
-            className="btn-premium text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 rounded-xl md:rounded-2xl font-semibold group">
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6">
+          {/* Buy Credit Button */}
+          <div className="relative">
+            <Button
+              size="lg"
+              onClick={handleBuyCreditClick}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 rounded-xl md:rounded-2xl font-semibold group shadow-2xl">
 
-            Buy Now
-            <ArrowRight className="ml-2 md:ml-3 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
-          </Button>
+              <CreditCard className="mr-2 md:mr-3 h-5 w-5 md:h-6 md:w-6" />
+              Buy Credit
+            </Button>
+            
+            {/* Feature badge */}
+            <div className="absolute -top-2 -right-2 bg-amber-500 text-black text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+              100 MMK = 1 Credit
+            </div>
+          </div>
+
+          {/* Browse Products Button */}
+          <div className="relative">
+            <Button
+              size="lg"
+              onClick={handleBuyNow}
+              className="btn-premium text-lg md:text-xl px-8 md:px-12 py-6 md:py-8 rounded-xl md:rounded-2xl font-semibold group">
+
+              Browse Products
+              <ArrowRight className="ml-2 md:ml-3 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Credit Purchase Dialog */}
+      <CreditPurchaseDialog
+        isOpen={isCreditDialogOpen}
+        onClose={() => setIsCreditDialogOpen(false)}
+        currentBalance={userBalance}
+        onBalanceUpdate={(newBalance) => {
+          setUserBalance(newBalance);
+        }} />
     </section>);
 
 };
