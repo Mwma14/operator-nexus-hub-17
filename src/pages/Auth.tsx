@@ -41,10 +41,10 @@ const Auth = () => {
 
 
 
-        // User not authenticated, stay on auth page
-      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;
-    }
 
+
+        // User not authenticated, stay on auth page
+      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}
     setLoading(true);
     try {
       const response = await window.ezsite.apis.register({

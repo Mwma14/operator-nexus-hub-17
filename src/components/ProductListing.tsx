@@ -30,9 +30,9 @@ const ProductListing = () => {
     if (selectedOperator || selectedCategory) {
       const productsSection = document.getElementById('products-grid');
       if (productsSection) {
-        productsSection.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
+        productsSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
         });
       }
     }
