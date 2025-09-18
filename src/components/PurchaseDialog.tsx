@@ -97,7 +97,7 @@ export default function PurchaseDialog({
       const userId = userResponse.data.ID;
 
       // Check user profile exists, create if not
-      let userProfileResponse = await window.ezsite.apis.tablePage(44094, {
+      let userProfileResponse = await window.ezsite.apis.tablePage(44173, {
         PageNo: 1,
         PageSize: 1,
         Filters: [
@@ -117,7 +117,7 @@ export default function PurchaseDialog({
 
       if (userProfileResponse.data.List.length === 0) {
         // Create user profile
-        const createProfileResponse = await window.ezsite.apis.tableCreate(44094, {
+        const createProfileResponse = await window.ezsite.apis.tableCreate(44173, {
           user_id: userId,
           email: userResponse.data.Email,
           full_name: userResponse.data.Name || '',
@@ -142,7 +142,7 @@ export default function PurchaseDialog({
       const newBalance = currentBalance - product.price;
 
       // Update user balance
-      const updateProfileResponse = await window.ezsite.apis.tableUpdate(44094, {
+      const updateProfileResponse = await window.ezsite.apis.tableUpdate(44173, {
         ID: userProfileResponse.data.List.length > 0 ? userProfileResponse.data.List[0].id : null,
         user_id: userId,
         credits_balance: newBalance,
@@ -157,7 +157,7 @@ export default function PurchaseDialog({
       // Create order record
       const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      const createOrderResponse = await window.ezsite.apis.tableCreate(44095, {
+      const createOrderResponse = await window.ezsite.apis.tableCreate(44175, {
         user_id: userId,
         product_id: product.id,
         product_name: product.name,

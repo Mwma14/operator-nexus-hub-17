@@ -5,6 +5,7 @@ import ProductFilters from "./ProductFilters";
 import LoadingSpinner from "./LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PurchaseDialog from "./PurchaseDialog";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ const ProductListing = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -44,6 +46,7 @@ const ProductListing = () => {
   const fetchProducts = async () => {
     try {
       setLoadingProducts(true);
+      setProductsError(null);
       const { data, error } = await window.ezsite.apis.tablePage(44172, {
         PageNo: 1,
         PageSize: 1000,
@@ -60,11 +63,17 @@ const ProductListing = () => {
 
       if (error) throw new Error(error);
       setProducts(data?.List || []);
+      
+      if ((data?.List || []).length === 0) {
+        setProductsError("No products found in the database. Please add some products through the admin panel or initialize sample data.");
+      }
     } catch (error) {
       console.error('Failed to fetch products:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load products';
+      setProductsError(errorMessage);
       toast({
         title: 'Error',
-        description: 'Failed to load products',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
@@ -217,35 +226,73 @@ const ProductListing = () => {
           onOperatorChange={setSelectedOperator}
           onCategoryChange={setSelectedCategory} />
 
-        {/* Results Count */}
-        <div className="mb-8">
+        {/* Results Count and Refresh */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-white/60 text-lg">
             Showing {filteredProducts.length} premium product{filteredProducts.length !== 1 ? 's' : ''}
             {selectedOperator && ` from ${selectedOperator}`}
             {selectedCategory && ` in ${selectedCategory}`}
           </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchProducts}
+            disabled={loadingProducts}
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 w-fit"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loadingProducts ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
 
         {/* Product Grid */}
         <div id="products-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {loadingProducts ?
+          {loadingProducts ? (
           <div className="col-span-full flex justify-center py-12">
               <LoadingSpinner size="lg" />
-            </div> :
-
-          filteredProducts.map((product) =>
-          <ProductCard
-            key={product.id}
-            product={product}
-            isSelected={selectedProduct?.id === product.id}
-            onSelect={handleProductSelect}
-            onPurchase={handlePurchase} />
-          )
-          }
+            </div>
+          ) : productsError ? (
+            <div className="col-span-full text-center py-20">
+              <div className="glass-card rounded-3xl p-12 max-w-2xl mx-auto">
+                <Alert className="mb-6">
+                  <AlertDescription className="text-white">
+                    {productsError}
+                  </AlertDescription>
+                </Alert>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    onClick={fetchProducts}
+                    className="btn-premium px-8 py-3 rounded-xl font-semibold"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry Loading
+                  </Button>
+                  {isAuthenticated && (
+                    <Button
+                      onClick={() => navigate('/admin')}
+                      variant="outline"
+                      className="px-8 py-3 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10"
+                    >
+                      Go to Admin Panel
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            filteredProducts.map((product) =>
+            <ProductCard
+              key={product.id}
+              product={product}
+              isSelected={selectedProduct?.id === product.id}
+              onSelect={handleProductSelect}
+              onPurchase={handlePurchase} />
+            )
+          )}
         </div>
 
         {/* No Results */}
-        {filteredProducts.length === 0 &&
+        {!loadingProducts && !productsError && filteredProducts.length === 0 && products.length > 0 && (
         <div className="text-center py-20">
             <div className="glass-card rounded-3xl p-12 max-w-md mx-auto">
               <p className="text-xl text-white/80 mb-4">
@@ -261,7 +308,7 @@ const ProductListing = () => {
               </button>
             </div>
           </div>
-        }
+        )}
 
         <PurchaseDialog
           isOpen={isPurchaseDialogOpen}

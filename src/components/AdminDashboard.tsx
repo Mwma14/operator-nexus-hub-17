@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import SampleDataInitializer from '@/components/SampleDataInitializer';
 import { Users, Package, CreditCard, AlertCircle, TrendingUp, DollarSign } from 'lucide-react';
 
 interface DashboardStats {
@@ -232,6 +233,12 @@ export default function AdminDashboard() {
           }
         </CardContent>
       </Card>
+
+      {/* Sample Data Section */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Database Management</h2>
+        <SampleDataInitializer />
+      </div>
     </div>);
 
 }
