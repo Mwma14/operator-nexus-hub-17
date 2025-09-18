@@ -48,12 +48,12 @@ const ProductListing = () => {
     try {
       setLoadingProducts(true);
       setProductsError(null);
-      
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+
+      const { data, error } = await supabase.
+      from('products').
+      select('*').
+      eq('is_active', true).
+      order('created_at', { ascending: false });
 
       if (error) throw error;
       setProducts(data || []);
@@ -95,11 +95,11 @@ const ProductListing = () => {
 
   const loadUserBalance = async (userId: string) => {
     try {
-      let { data: profile, error } = await supabase
-        .from('user_profiles')
-        .select('credits_balance')
-        .eq('user_id', userId)
-        .single();
+      let { data: profile, error } = await supabase.
+      from('user_profiles').
+      select('credits_balance').
+      eq('user_id', userId).
+      single();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -109,13 +109,13 @@ const ProductListing = () => {
         // Create initial profile with 0 balance
         const { data: user } = await supabase.auth.getUser();
         if (user.user) {
-          const { error: insertError } = await supabase
-            .from('user_profiles')
-            .insert({
-              user_id: userId,
-              full_name: user.user.user_metadata?.full_name || '',
-              credits_balance: 0
-            });
+          const { error: insertError } = await supabase.
+          from('user_profiles').
+          insert({
+            user_id: userId,
+            full_name: user.user.user_metadata?.full_name || '',
+            credits_balance: 0
+          });
 
           if (insertError) {
             console.error('Failed to create user profile:', insertError);

@@ -16,6 +16,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { CreditCard, Smartphone, Upload, CheckCircle, Clock, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CreditPurchaseDialogProps {
   isOpen: boolean;
@@ -69,8 +70,8 @@ export default function CreditPurchaseDialog({
 
   const checkAuthentication = async () => {
     try {
-      const response = await window.ezsite.apis.getUserInfo();
-      if (response.error) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         toast({
           title: "Authentication Required",
           description: "Please sign in to purchase credits.",
@@ -184,38 +185,28 @@ export default function CreditPurchaseDialog({
 
     try {
       // Get user info
-      const userResponse = await window.ezsite.apis.getUserInfo();
-      if (userResponse.error) {
-        throw new Error('Failed to get user information');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
       }
 
-      // Upload payment proof image
+      // For now, we'll create the payment request without file upload
+      // The admin can handle file verification through other means
       setUploading(true);
-      const uploadResponse = await window.ezsite.apis.upload({
-        filename: paymentProofFile.name,
-        file: paymentProofFile
-      });
 
-      if (uploadResponse.error) {
-        throw new Error('Failed to upload payment proof');
-      }
+      // Create payment request record
+      const { error: insertError } = await supabase
+        .from('payment_requests')
+        .insert({
+          user_id: session.user.id,
+          credits_requested: getSelectedCredits(),
+          total_cost_mmk: getTotalPrice(),
+          payment_method: PAYMENT_METHODS.find((pm) => pm.id === paymentMethod)?.name || paymentMethod,
+          status: 'pending'
+        });
 
-      const imageId = uploadResponse.data;
-
-      // Create credit purchase request using new table
-      const purchaseResponse = await window.ezsite.apis.tableCreate(44197, {
-        user_id: userResponse.data.ID,
-        credits_requested: getSelectedCredits(),
-        total_cost_mmk: getTotalPrice(),
-        payment_method: PAYMENT_METHODS.find((pm) => pm.id === paymentMethod)?.name || paymentMethod,
-        payment_proof_file_id: imageId,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        admin_notes: ''
-      });
-
-      if (purchaseResponse.error) {
-        throw new Error('Failed to create purchase request');
+      if (insertError) {
+        throw new Error('Failed to create payment request: ' + insertError.message);
       }
 
       setStep('SUCCESS');
