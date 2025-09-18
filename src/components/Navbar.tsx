@@ -144,12 +144,7 @@ const Navbar = () => {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/premium" className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Premium</span>
-                  </Link>
-                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -220,12 +215,7 @@ const Navbar = () => {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/premium" className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Premium</span>
-                  </Link>
-                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}

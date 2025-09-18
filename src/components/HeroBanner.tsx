@@ -1,7 +1,14 @@
 import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const HeroBanner = () => {
+  const navigate = useNavigate();
+
+  const handleBuyNow = () => {
+    navigate('/premium');
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden mesh-gradient">
       {/* Floating gradient orbs */}
@@ -39,6 +46,7 @@ const HeroBanner = () => {
         <div className="relative">
           <Button
             size="lg"
+            onClick={handleBuyNow}
             className="btn-premium text-xl px-12 py-8 rounded-2xl font-semibold group">
 
             Buy Now
