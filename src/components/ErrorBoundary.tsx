@@ -49,17 +49,17 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               </AlertDescription>
             </Alert>
-            <Button 
+            <Button
               onClick={this.handleReset}
               className="w-full"
-              variant="outline"
-            >
+              variant="outline">
+
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
           </div>
-        </div>
-      );
+        </div>);
+
     }
 
     return this.props.children;

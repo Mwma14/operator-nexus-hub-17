@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Premium from "./pages/Premium";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SupabaseTest from "./components/SupabaseTest";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -24,7 +26,7 @@ const queryClient = new QueryClient({
       },
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: false
     },
     mutations: {
       onError: (error) => {
@@ -32,15 +34,15 @@ const queryClient = new QueryClient({
         toast({
           title: "Something went wrong",
           description: error instanceof Error ? error.message : "Please try again later",
-          variant: "destructive",
+          variant: "destructive"
         });
-      },
-    },
-  },
+      }
+    }
+  }
 });
 
-const App = () => (
-  <ErrorBoundary>
+const App = () =>
+<ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
@@ -50,14 +52,16 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/test-supabase" element={<SupabaseTest />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
-  </ErrorBoundary>
-);
+  </ErrorBoundary>;
+
 
 
 export default App;

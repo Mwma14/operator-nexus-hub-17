@@ -28,7 +28,7 @@ const ProductListing = () => {
       toast({
         title: "Error selecting product",
         description: "Please try again",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
