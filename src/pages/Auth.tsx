@@ -49,10 +49,10 @@ const Auth = () => {
 
 
 
-        // User not authenticated, stay on auth page
-      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name
-        });
 
+
+        // User not authenticated, stay on auth page
+      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });
       if (response.error) {
         throw new Error(response.error);
       }
@@ -156,15 +156,15 @@ const Auth = () => {
 
   if (isResetMode) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-3 sm:p-4 lg:p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="absolute inset-0 mesh-gradient">
           <div className="floating-orb"></div>
           <div className="floating-orb"></div>
           <div className="floating-orb"></div>
         </div>
         
-        <Card className="w-full max-w-sm sm:max-w-md glass-card relative z-10">
-          <CardHeader className="space-y-1 px-4 sm:px-6 pt-4 sm:pt-6">
+        <Card className="w-full max-w-md sm:max-w-lg lg:max-w-xl glass-card relative z-10">
+          <CardHeader className="space-y-1 px-6 sm:px-8 pt-6 sm:pt-8">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <Button
                 variant="ghost"
@@ -183,7 +183,7 @@ const Auth = () => {
               Enter your email address and we'll send you a link to reset your password
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          <CardContent className="px-6 sm:px-8 pb-6 sm:pb-8">
             <form onSubmit={handleResetPassword} className="space-y-3 sm:space-y-4">
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="reset-email" className="text-sm">Email</Label>
@@ -208,7 +208,7 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="absolute inset-0 mesh-gradient">
         <div className="floating-orb"></div>
         <div className="floating-orb"></div>
