@@ -87,23 +87,23 @@ const Admin = () => {
 
       // Load orders (mock data for now)
       const mockOrders = [
-        {
-          id: 1,
-          user_email: 'user1@example.com',
-          product_name: 'MPT 1GB Data Pack',
-          amount: 2000,
-          status: 'completed',
-          created_at: new Date().toISOString()
-        },
-        {
-          id: 2,
-          user_email: 'user2@example.com',
-          product_name: 'Ooredoo Minutes',
-          amount: 1500,
-          status: 'pending',
-          created_at: new Date().toISOString()
-        }
-      ];
+      {
+        id: 1,
+        user_email: 'user1@example.com',
+        product_name: 'MPT 1GB Data Pack',
+        amount: 2000,
+        status: 'completed',
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 2,
+        user_email: 'user2@example.com',
+        product_name: 'Ooredoo Minutes',
+        amount: 1500,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }];
+
       setOrders(mockOrders);
 
       // Calculate stats
@@ -111,8 +111,8 @@ const Admin = () => {
       const mockStats: AdminStats = {
         total_users: totalUsers,
         total_orders: mockOrders.length,
-        total_revenue: mockOrders.reduce((sum, order) => 
-          order.status === 'completed' ? sum + order.amount : sum, 0),
+        total_revenue: mockOrders.reduce((sum, order) =>
+        order.status === 'completed' ? sum + order.amount : sum, 0),
         active_products: 15
       };
       setStats(mockStats);
@@ -129,9 +129,9 @@ const Admin = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter((user) =>
+  user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  user.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -142,15 +142,15 @@ const Admin = () => {
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
+              {[1, 2, 3, 4].map((i) =>
+              <Skeleton key={i} className="h-32" />
+              )}
             </div>
             <Skeleton className="h-96 w-full" />
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -238,23 +238,23 @@ const Admin = () => {
                           placeholder="Search users..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-10 w-64"
-                        />
+                          className="pl-10 w-64" />
+
                       </div>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {filteredUsers.length === 0 ? (
-                    <div className="text-center py-8">
+                  {filteredUsers.length === 0 ?
+                  <div className="text-center py-8">
                       <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <h3 className="text-lg font-medium mb-2">No users found</h3>
                       <p className="text-muted-foreground">
                         No users match your search criteria.
                       </p>
-                    </div>
-                  ) : (
-                    <Table>
+                    </div> :
+
+                  <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>User</TableHead>
@@ -266,8 +266,8 @@ const Admin = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredUsers.map((user) => (
-                          <TableRow key={user.id}>
+                        {filteredUsers.map((user) =>
+                      <TableRow key={user.id}>
                             <TableCell>
                               <div>
                                 <div className="font-medium">{user.name || 'N/A'}</div>
@@ -301,10 +301,10 @@ const Admin = () => {
                               </div>
                             </TableCell>
                           </TableRow>
-                        ))}
+                      )}
                       </TableBody>
                     </Table>
-                  )}
+                  }
                 </CardContent>
               </Card>
             </TabsContent>
@@ -331,8 +331,8 @@ const Admin = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {orders.map((order) => (
-                        <TableRow key={order.id}>
+                      {orders.map((order) =>
+                      <TableRow key={order.id}>
                           <TableCell>#{order.id}</TableCell>
                           <TableCell>{order.user_email}</TableCell>
                           <TableCell>{order.product_name}</TableCell>
@@ -351,7 +351,7 @@ const Admin = () => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -389,8 +389,8 @@ const Admin = () => {
           </Tabs>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Admin;
