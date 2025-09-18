@@ -51,10 +51,10 @@ const Auth = () => {
 
 
 
+
+
         // User not authenticated, stay on auth page
-      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });
-      if (response.error) {
-        throw new Error(response.error);
+      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });if (response.error) {throw new Error(response.error);
       }
 
       toast({
@@ -156,14 +156,14 @@ const Auth = () => {
 
   if (isResetMode) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 mesh-gradient">
-          <div className="floating-orb"></div>
-          <div className="floating-orb"></div>
-          <div className="floating-orb"></div>
-        </div>
+      <div className="min-h-[85vh] md:min-h-[90vh] w-full bg-background flex items-center justify-center overflow-hidden mesh-gradient py-8 md:py-12">
+        <div className="floating-orb"></div>
+        <div className="floating-orb"></div>
+        <div className="floating-orb"></div>
         
-        <Card className="w-full max-w-md sm:max-w-lg lg:max-w-xl glass-card relative z-10">
+        <div className="container mx-auto px-4 flex items-center justify-center relative z-10">
+          <Card className="w-full max-w-sm sm:max-w-md glass-card">
+    
           <CardHeader className="space-y-1 px-6 sm:px-8 pt-6 sm:pt-8">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <Button
@@ -203,19 +203,19 @@ const Auth = () => {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="absolute inset-0 mesh-gradient">
-        <div className="floating-orb"></div>
-        <div className="floating-orb"></div>
-        <div className="floating-orb"></div>
-      </div>
+    <div className="min-h-[85vh] md:min-h-[90vh] w-full bg-background flex items-center justify-center overflow-hidden mesh-gradient py-8 md:py-12">
+      <div className="floating-orb"></div>
+      <div className="floating-orb"></div>
+      <div className="floating-orb"></div>
       
-      <Card className="w-full max-w-sm sm:max-w-md glass-card relative z-10">
+      <div className="container mx-auto px-4 flex items-center justify-center relative z-10">
+        <Card className="w-full max-w-sm sm:max-w-md glass-card">
         <CardHeader className="space-y-1 px-4 sm:px-6 pt-4 sm:pt-6">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <Link to="/">
@@ -354,7 +354,8 @@ const Auth = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>);
 
 };

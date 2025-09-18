@@ -65,9 +65,18 @@
     @apply border-border;
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground;
     font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  #root {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 }
 
@@ -76,6 +85,7 @@
   .mesh-gradient {
     background: var(--gradient-mesh);
     position: relative;
+    overflow: hidden;
   }
   
   .mesh-gradient::before {
@@ -92,44 +102,45 @@
     border-radius: 50%;
     filter: blur(40px);
     animation: float 6s ease-in-out infinite;
+    pointer-events: none;
   }
   
   .floating-orb:nth-child(1) {
-    width: 300px;
-    height: 300px;
+    width: 280px;
+    height: 280px;
     background: var(--gradient-primary);
-    top: -150px;
-    left: -150px;
+    top: -140px;
+    left: -140px;
     animation-delay: 0s;
   }
   
   .floating-orb:nth-child(2) {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     background: linear-gradient(135deg, #8B5CF6, #EC4899);
-    top: 50%;
-    right: -100px;
+    top: 20%;
+    right: -90px;
     animation-delay: 2s;
   }
   
   .floating-orb:nth-child(3) {
-    width: 250px;
-    height: 250px;
+    width: 220px;
+    height: 220px;
     background: linear-gradient(135deg, #06B6D4, #3B82F6);
-    bottom: -125px;
-    left: 30%;
+    bottom: -110px;
+    left: 25%;
     animation-delay: 4s;
   }
   
   @keyframes float {
     0%, 100% { 
-      transform: translateY(0px) rotate(0deg) scale(1);
+      transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
     }
     33% { 
-      transform: translateY(-20px) rotate(2deg) scale(1.05);
+      transform: translateY(-15px) translateX(5px) rotate(2deg) scale(1.02);
     }
     66% { 
-      transform: translateY(10px) rotate(-1deg) scale(0.95);
+      transform: translateY(8px) translateX(-3px) rotate(-1deg) scale(0.98);
     }
   }
   
