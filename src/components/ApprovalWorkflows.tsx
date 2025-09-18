@@ -272,22 +272,26 @@ export default function ApprovalWorkflows() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <CheckSquare className="h-5 w-5" />
+          <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+            <CheckSquare className="h-5 w-5 md:h-6 md:w-6" />
             <span>Approval Workflows</span>
           </CardTitle>
-          <CardDescription>Review and approve pending credit purchases and orders</CardDescription>
+          <CardDescription className="text-sm md:text-base">Review and approve pending credit purchases and orders</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="credits" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="credits" className="flex items-center space-x-2">
+          <Tabs defaultValue="credits" className="space-y-4 md:space-y-6">
+            <TabsList className="grid w-full grid-cols-2 md:w-auto md:grid-cols-none md:flex">
+              <TabsTrigger value="credits" className="flex items-center space-x-2 text-sm">
                 <CreditCard className="h-4 w-4" />
-                <span>Credit Requests ({creditRequests.length})</span>
+                <span className="hidden sm:inline">Credit Requests</span>
+                <span className="sm:hidden">Credits</span>
+                <span>({creditRequests.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="orders" className="flex items-center space-x-2">
+              <TabsTrigger value="orders" className="flex items-center space-x-2 text-sm">
                 <ShoppingCart className="h-4 w-4" />
-                <span>Order Approvals ({orderRequests.length})</span>
+                <span className="hidden sm:inline">Order Approvals</span>
+                <span className="sm:hidden">Orders</span>
+                <span>({orderRequests.length})</span>
               </TabsTrigger>
             </TabsList>
 
@@ -347,20 +351,24 @@ export default function ApprovalWorkflows() {
                             </span>
                           </TableCell>
                           <TableCell>
-                            <div className="flex space-x-2">
+                            <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
                               <Button
                             variant="default"
                             size="sm"
-                            onClick={() => openApprovalDialog(request, 'credit', 'approve')}>
+                            onClick={() => openApprovalDialog(request, 'credit', 'approve')}
+                            className="w-full md:w-auto">
 
-                                <Check className="h-4 w-4" />
+                                <Check className="h-4 w-4 md:mr-0" />
+                                <span className="md:hidden ml-2">Approve</span>
                               </Button>
                               <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => openApprovalDialog(request, 'credit', 'reject')}>
+                            onClick={() => openApprovalDialog(request, 'credit', 'reject')}
+                            className="w-full md:w-auto">
 
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 md:mr-0" />
+                                <span className="md:hidden ml-2">Reject</span>
                               </Button>
                             </div>
                           </TableCell>
@@ -429,20 +437,24 @@ export default function ApprovalWorkflows() {
                             </span>
                           </TableCell>
                           <TableCell>
-                            <div className="flex space-x-2">
+                            <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
                               <Button
                             variant="default"
                             size="sm"
-                            onClick={() => openApprovalDialog(order, 'order', 'approve')}>
+                            onClick={() => openApprovalDialog(order, 'order', 'approve')}
+                            className="w-full md:w-auto">
 
-                                <Check className="h-4 w-4" />
+                                <Check className="h-4 w-4 md:mr-0" />
+                                <span className="md:hidden ml-2">Approve</span>
                               </Button>
                               <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => openApprovalDialog(order, 'order', 'reject')}>
+                            onClick={() => openApprovalDialog(order, 'order', 'reject')}
+                            className="w-full md:w-auto">
 
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 md:mr-0" />
+                                <span className="md:hidden ml-2">Reject</span>
                               </Button>
                             </div>
                           </TableCell>

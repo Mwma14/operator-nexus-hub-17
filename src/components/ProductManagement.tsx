@@ -296,31 +296,31 @@ export default function ProductManagement() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
             <div>
-              <CardTitle className="flex items-center space-x-2">
-                <Package className="h-5 w-5" />
+              <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+                <Package className="h-5 w-5 md:h-6 md:w-6" />
                 <span>Product Management</span>
               </CardTitle>
-              <CardDescription>Manage products, pricing, and availability</CardDescription>
+              <CardDescription className="text-sm md:text-base">Manage products, pricing, and availability</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => {resetForm();setIsDialogOpen(true);}}>
+                <Button onClick={() => {resetForm();setIsDialogOpen(true);}} className="w-full md:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>
+                  <DialogTitle className="text-lg md:text-xl">
                     {editingProduct ? 'Edit Product' : 'Create New Product'}
                   </DialogTitle>
-                  <DialogDescription>
+                  <DialogDescription className="text-sm md:text-base">
                     {editingProduct ? 'Update product information' : 'Add a new product to the catalog'}
                   </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-2 gap-4 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Product Name</Label>
                     <Input
@@ -385,7 +385,7 @@ export default function ProductManagement() {
                       onChange={(e) => setFormData({ ...formData, validity_days: Number(e.target.value) })} />
 
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="col-span-1 md:col-span-2 space-y-2">
                     <Label htmlFor="description">Description</Label>
                     <Textarea
                       id="description"
@@ -394,7 +394,7 @@ export default function ProductManagement() {
                       placeholder="Enter product description" />
 
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="col-span-1 md:col-span-2 space-y-2">
                     <Label htmlFor="admin-notes">Admin Notes</Label>
                     <Textarea
                       id="admin-notes"
@@ -403,7 +403,7 @@ export default function ProductManagement() {
                       placeholder="Internal notes for administrators" />
 
                   </div>
-                  <div className="col-span-2 flex items-center space-x-2">
+                  <div className="col-span-1 md:col-span-2 flex items-center space-x-2">
                     <Checkbox
                       id="active"
                       checked={formData.is_active}
@@ -412,11 +412,11 @@ export default function ProductManagement() {
                     <Label htmlFor="active">Product is active</Label>
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <DialogFooter className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full md:w-auto">
                     Cancel
                   </Button>
-                  <Button onClick={handleSave} disabled={isCreating}>
+                  <Button onClick={handleSave} disabled={isCreating} className="w-full md:w-auto">
                     {isCreating ? <LoadingSpinner size="sm" /> : null}
                     {editingProduct ? 'Update' : 'Create'}
                   </Button>
@@ -427,7 +427,7 @@ export default function ProductManagement() {
         </CardHeader>
         <CardContent>
           {/* Search and Bulk Actions */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex flex-col gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -438,24 +438,26 @@ export default function ProductManagement() {
 
             </div>
             {selectedProducts.length > 0 &&
-            <div className="flex space-x-2">
+            <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                 <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleBulkToggleStatus(true)}>
+                onClick={() => handleBulkToggleStatus(true)}
+                className="w-full md:w-auto">
 
                   Activate Selected ({selectedProducts.length})
                 </Button>
                 <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleBulkToggleStatus(false)}>
+                onClick={() => handleBulkToggleStatus(false)}
+                className="w-full md:w-auto">
 
                   Deactivate Selected
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
+                    <Button variant="destructive" size="sm" className="w-full md:w-auto">
                       Delete Selected
                     </Button>
                   </AlertDialogTrigger>
