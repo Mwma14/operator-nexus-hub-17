@@ -13,7 +13,7 @@ const HeroBanner = () => {
   };
 
   return (
-    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden mesh-gradient py-8 md:py-16">
+    <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden mesh-gradient py-12 md:py-16">
       {/* Floating gradient orbs */}
       <div className="floating-orb"></div>
       <div className="floating-orb"></div>
@@ -21,7 +21,7 @@ const HeroBanner = () => {
       
       <div className="container mx-auto px-4 text-center relative z-10">
         {/* Main Title */}
-        <div className="mb-6 md:mb-8">
+        <div className="mb-8 md:mb-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-white mb-3 md:mb-4 font-space-grotesk leading-tight">
             Discover Operator
             <br />
@@ -32,13 +32,13 @@ const HeroBanner = () => {
         </div>
 
         {/* Premium description card */}
-        <div className="relative mx-auto max-w-2xl mb-8 md:mb-12">
-          <div className="glass-card rounded-2xl md:rounded-3xl p-4 md:p-8">
-            <div className="flex items-center justify-center mb-3 md:mb-4">
+        <div className="relative mx-auto max-w-2xl mb-10 md:mb-14">
+          <div className="glass-card rounded-2xl md:rounded-3xl p-6 md:p-8">
+            <div className="flex items-center justify-center mb-4 md:mb-5">
               <Zap className="h-6 w-6 md:h-8 md:w-8 text-amber-400 mr-2 md:mr-3" />
               <span className="text-amber-400 font-semibold text-base md:text-lg">Premium Network</span>
             </div>
-            <p className="text-base md:text-xl text-gray-200 leading-relaxed">
+            <p className="text-base md:text-xl text-gray-200 leading-relaxed mb-2">
               All your favorite telecom products from MPT, Ooredoo, Atom, and MyTel in one place. 
               Instantly top-up data, minutes, and more.
             </p>
