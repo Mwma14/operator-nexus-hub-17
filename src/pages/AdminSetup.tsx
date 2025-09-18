@@ -30,7 +30,7 @@ export default function AdminSetup() {
       const { data: userInfo, error: userError } = await window.ezsite.apis.getUserInfo();
       if (userError) throw new Error(userError);
       if (!userInfo) throw new Error('Please log in first');
-      
+
       setUser(userInfo);
 
       // Check if user already has admin role
@@ -38,15 +38,15 @@ export default function AdminSetup() {
         PageNo: 1,
         PageSize: 10,
         Filters: [
-          { name: 'user_id', op: 'Equal', value: userInfo.ID },
-          { name: 'role_name', op: 'Equal', value: 'admin' },
-          { name: 'is_active', op: 'Equal', value: true }
-        ]
+        { name: 'user_id', op: 'Equal', value: userInfo.ID },
+        { name: 'role_name', op: 'Equal', value: 'admin' },
+        { name: 'is_active', op: 'Equal', value: true }]
+
       });
 
       if (rolesError) throw new Error(rolesError);
       setHasAdminRole(rolesData?.List && rolesData.List.length > 0);
-      
+
     } catch (error) {
       console.error('Setup check error:', error);
       toast({
@@ -61,7 +61,7 @@ export default function AdminSetup() {
 
   const createAdminRole = async () => {
     if (!user) return;
-    
+
     setCreating(true);
     try {
       const { error } = await window.ezsite.apis.tableCreate(44174, {
@@ -81,7 +81,7 @@ export default function AdminSetup() {
       });
 
       setHasAdminRole(true);
-      
+
     } catch (error) {
       console.error('Create admin role error:', error);
       toast({
@@ -98,8 +98,8 @@ export default function AdminSetup() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -115,23 +115,23 @@ export default function AdminSetup() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {user && (
-            <div className="p-3 bg-gray-50 rounded-lg">
+          {user &&
+          <div className="p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">Current User:</p>
               <p className="font-medium">{user.Name}</p>
               <p className="text-sm text-gray-500">{user.Email}</p>
             </div>
-          )}
+          }
 
-          {hasAdminRole ? (
-            <Alert>
+          {hasAdminRole ?
+          <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
                 You already have admin privileges! You can access the admin panel.
               </AlertDescription>
-            </Alert>
-          ) : (
-            <div className="space-y-4">
+            </Alert> :
+
+          <div className="space-y-4">
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
@@ -139,28 +139,28 @@ export default function AdminSetup() {
                 </AlertDescription>
               </Alert>
 
-              <Button 
-                onClick={createAdminRole}
-                disabled={creating}
-                className="w-full"
-              >
+              <Button
+              onClick={createAdminRole}
+              disabled={creating}
+              className="w-full">
+
                 {creating && <LoadingSpinner size="sm" className="mr-2" />}
                 Create Admin Role
               </Button>
             </div>
-          )}
+          }
 
           <div className="pt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
-              onClick={() => window.location.href = '/'}
-            >
+              onClick={() => window.location.href = '/'}>
+
               Back to Home
             </Button>
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 }

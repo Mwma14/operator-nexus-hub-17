@@ -126,102 +126,102 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-amber-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
+            <div className="text-2xl font-bold text-white">{stats?.totalUsers || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Active Users</CardTitle>
+            <TrendingUp className="h-4 w-4 text-green-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeUsers || 0}</div>
+            <div className="text-2xl font-bold text-green-400">{stats?.activeUsers || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Total Products</CardTitle>
+            <Package className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalProducts || 0}</div>
+            <div className="text-2xl font-bold text-white">{stats?.totalProducts || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-amber-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalRevenue || 0} MMK</div>
+            <div className="text-2xl font-bold text-amber-400">{stats?.totalRevenue || 0} MMK</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-white">Pending Orders</CardTitle>
+            <AlertCircle className="h-4 w-4 text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-500">{stats?.pendingOrders || 0}</div>
+            <div className="text-2xl font-bold text-orange-400">{stats?.pendingOrders || 0}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card border-white/10 bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Credit Requests</CardTitle>
-            <CreditCard className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium text-white">Credit Requests</CardTitle>
+            <CreditCard className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-500">{stats?.pendingCreditRequests || 0}</div>
+            <div className="text-2xl font-bold text-blue-400">{stats?.pendingCreditRequests || 0}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activities */}
-      <Card>
+      <Card className="glass-card border-white/10 bg-transparent">
         <CardHeader>
-          <CardTitle>Recent Admin Activities</CardTitle>
-          <CardDescription>Latest administrative actions performed</CardDescription>
+          <CardTitle className="text-white">Recent Admin Activities</CardTitle>
+          <CardDescription className="text-white/70">Latest administrative actions performed</CardDescription>
         </CardHeader>
         <CardContent>
           {recentActivities.length === 0 ?
-          <p className="text-center text-gray-500 py-8">No recent activities found</p> :
+          <p className="text-center text-white/60 py-8">No recent activities found</p> :
 
           <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Target</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Date</TableHead>
+                  <TableRow className="border-white/10">
+                    <TableHead className="text-white">Action</TableHead>
+                    <TableHead className="text-white">Target</TableHead>
+                    <TableHead className="text-white">Notes</TableHead>
+                    <TableHead className="text-white">Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentActivities.map((activity) =>
-                <TableRow key={activity.id}>
+                <TableRow key={activity.id} className="border-white/10">
                       <TableCell>
-                        <Badge variant="outline">{activity.action_type}</Badge>
+                        <Badge variant="outline" className="border-amber-400/30 text-amber-400">{activity.action_type}</Badge>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">
+                        <span className="text-sm text-white/80">
                           {activity.target_type} #{activity.target_id}
                         </span>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">
+                      <TableCell className="max-w-xs truncate text-white/70">
                         {activity.notes || 'No notes'}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-500">
+                      <TableCell className="text-sm text-white/50">
                         {new Date(activity.created_at).toLocaleDateString()}
                       </TableCell>
                     </TableRow>

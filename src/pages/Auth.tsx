@@ -65,13 +65,13 @@ const Auth = () => {
 
 
 
+
+
         // User not authenticated, stay on auth page
       }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });if (response.error) {throw new Error(response.error);}toast({ title: "Success", description: "Please check your email to confirm your account" }); // Clear form
-      setEmail("");setPassword("");setName("");} catch (error: any) {toast({
-        title: "Sign Up Error",
-        description: error.message || "An error occurred during registration",
-        variant: "destructive"
-      });
+      setEmail("");setPassword("");setName("");} catch (error: any) {toast({ title: "Sign Up Error", description: error.message || "An error occurred during registration",
+          variant: "destructive"
+        });
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@
 async function grantAdminAccess() {
   try {
     console.log('Starting admin setup...');
-    
+
     // Get current user
     const { data: userInfo, error: userError } = await window.ezsite.apis.getUserInfo();
     if (userError) {
@@ -13,33 +13,33 @@ async function grantAdminAccess() {
       alert('Please log in first: ' + userError);
       return;
     }
-    
+
     if (!userInfo) {
       alert('Please log in first');
       return;
     }
-    
+
     console.log('Current user:', userInfo);
-    
+
     // Check if admin role already exists
     const { data: existingRole, error: checkError } = await window.ezsite.apis.tablePage(44174, {
       PageNo: 1,
       PageSize: 10,
       Filters: [
-        { name: 'user_id', op: 'Equal', value: userInfo.ID },
-        { name: 'role_name', op: 'Equal', value: 'admin' }
-      ]
+      { name: 'user_id', op: 'Equal', value: userInfo.ID },
+      { name: 'role_name', op: 'Equal', value: 'admin' }]
+
     });
-    
+
     if (checkError) {
       console.error('Check role error:', checkError);
       alert('Error checking existing role: ' + checkError);
       return;
     }
-    
+
     if (existingRole && existingRole.List && existingRole.List.length > 0) {
       console.log('Admin role already exists:', existingRole.List[0]);
-      
+
       // Update to make sure it's active
       const role = existingRole.List[0];
       const { error: updateError } = await window.ezsite.apis.tableUpdate(44174, {
@@ -51,13 +51,13 @@ async function grantAdminAccess() {
         granted_at: new Date().toISOString(),
         is_active: true
       });
-      
+
       if (updateError) {
         console.error('Update role error:', updateError);
         alert('Error updating admin role: ' + updateError);
         return;
       }
-      
+
       alert('Admin role updated successfully! You can now access the admin panel.');
     } else {
       // Create new admin role
@@ -70,21 +70,21 @@ async function grantAdminAccess() {
         granted_at: new Date().toISOString(),
         is_active: true
       });
-      
+
       if (createError) {
         console.error('Create role error:', createError);
         alert('Error creating admin role: ' + createError);
         return;
       }
-      
+
       alert('Admin role created successfully! You can now access the admin panel.');
     }
-    
+
     // Redirect to admin panel
     setTimeout(() => {
       window.location.href = '/admin';
     }, 1000);
-    
+
   } catch (error) {
     console.error('Admin setup error:', error);
     alert('Error during admin setup: ' + error.message);

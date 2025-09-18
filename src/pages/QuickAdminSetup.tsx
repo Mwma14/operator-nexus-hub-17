@@ -26,10 +26,10 @@ export default function QuickAdminSetup() {
         PageNo: 1,
         PageSize: 10,
         Filters: [
-          { name: 'user_id', op: 'Equal', value: userInfo.ID },
-          { name: 'role_name', op: 'Equal', value: 'admin' },
-          { name: 'is_active', op: 'Equal', value: true }
-        ]
+        { name: 'user_id', op: 'Equal', value: userInfo.ID },
+        { name: 'role_name', op: 'Equal', value: 'admin' },
+        { name: 'is_active', op: 'Equal', value: true }]
+
       });
 
       if (checkError) throw new Error(checkError);
@@ -83,15 +83,15 @@ export default function QuickAdminSetup() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {status === 'loading' && (
-            <div className="text-center py-8">
+          {status === 'loading' &&
+          <div className="text-center py-8">
               <LoadingSpinner size="lg" className="mx-auto mb-4" />
               <p className="text-gray-600">Setting up admin privileges...</p>
             </div>
-          )}
+          }
 
-          {status === 'success' && (
-            <div className="space-y-4">
+          {status === 'success' &&
+          <div className="space-y-4">
               <Alert>
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>{message}</AlertDescription>
@@ -105,10 +105,10 @@ export default function QuickAdminSetup() {
                 </Button>
               </div>
             </div>
-          )}
+          }
 
-          {status === 'already_admin' && (
-            <div className="space-y-4">
+          {status === 'already_admin' &&
+          <div className="space-y-4">
               <Alert>
                 <CheckCircle className="h-4 w-4" />
                 <AlertDescription>{message}</AlertDescription>
@@ -117,10 +117,10 @@ export default function QuickAdminSetup() {
                 Go to Admin Panel <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
-          )}
+          }
 
-          {status === 'error' && (
-            <div className="space-y-4">
+          {status === 'error' &&
+          <div className="space-y-4">
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{message}</AlertDescription>
@@ -134,9 +134,9 @@ export default function QuickAdminSetup() {
                 </Button>
               </div>
             </div>
-          )}
+          }
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 }
