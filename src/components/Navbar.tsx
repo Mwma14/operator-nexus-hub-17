@@ -1,73 +1,60 @@
-import { Search, LogOut, User as UserIcon, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
-import { toast } from "@/hooks/use-toast";
-import LoadingSpinner from "./LoadingSpinner";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import React, { useState, useEffect } from 'react';
+import LoadingSpinner from './LoadingSpinner';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+
+interface UserInfo {
+  ID: number;
+  Name: string;
+  Email: string;
+  CreateTime: string;
+  Roles: string;
+}
 
 const Navbar = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // Get initial session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Error getting session:', error);
-          toast({
-            title: "Authentication Error",
-            description: "Failed to check authentication status",
-            variant: "destructive"
-          });
-        } else {
-          setUser(session?.user ?? null);
-        }
-      } catch (error) {
-        console.error('Unexpected auth error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        setIsLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    checkAuthStatus();
   }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await window.ezsite.apis.getUserInfo();
+      if (!response.error) {
+        setUser(response.data);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
+      const response = await window.ezsite.apis.logout();
+      if (!response.error) {
+        setUser(null);
+        toast({
+          title: "Signed Out",
+          description: "You have been successfully signed out."
+        });
+        navigate('/');
+      } else {
+        throw new Error(response.error);
       }
+    } catch (error: any) {
       toast({
-        title: "Logged out successfully",
-        description: "You have been signed out of your account"
-      });
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Logout failed",
-        description: error instanceof Error ? error.message : "Please try again",
+        title: "Sign Out Failed",
+        description: error.message || "Failed to sign out",
         variant: "destructive"
       });
     } finally {

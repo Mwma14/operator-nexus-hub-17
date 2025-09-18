@@ -1,24 +1,84 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { products, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import ProductFilters from "./ProductFilters";
 import LoadingSpinner from "./LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
+import PurchaseDialog from "./PurchaseDialog";
+import { useNavigate } from "react-router-dom";
 
 const ProductListing = () => {
   const [selectedOperator, setSelectedOperator] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+  const [userBalance, setUserBalance] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesOperator = !selectedOperator || product.operator === selectedOperator;
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
-      return matchesOperator && matchesCategory;
-    });
-  }, [selectedOperator, selectedCategory]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const userResponse = await window.ezsite.apis.getUserInfo();
+      if (userResponse.error) {
+        setIsAuthenticated(false);
+        setUserBalance(0);
+      } else {
+        setIsAuthenticated(true);
+        await loadUserBalance(userResponse.data.ID);
+      }
+    } catch (error) {
+      setIsAuthenticated(false);
+      setUserBalance(0);
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
+
+  const loadUserBalance = async (userId: number) => {
+    try {
+      const profileResponse = await window.ezsite.apis.tablePage(44094, {
+        PageNo: 1,
+        PageSize: 1,
+        Filters: [
+          {
+            name: "user_id",
+            op: "Equal",
+            value: userId
+          }
+        ]
+      });
+
+      if (!profileResponse.error && profileResponse.data.List.length > 0) {
+        setUserBalance(profileResponse.data.List[0].credits_balance || 0);
+      } else {
+        // Create initial profile with 0 balance
+        const userInfoResponse = await window.ezsite.apis.getUserInfo();
+        if (!userInfoResponse.error) {
+          await window.ezsite.apis.tableCreate(44094, {
+            user_id: userId,
+            email: userInfoResponse.data.Email,
+            full_name: userInfoResponse.data.Name || '',
+            credits_balance: 0,
+            phone_number: '',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+          setUserBalance(0);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user balance:', error);
+      setUserBalance(0);
+    }
+  };
 
   const handleProductSelect = (product: Product) => {
     try {
@@ -33,6 +93,43 @@ const ProductListing = () => {
     }
   };
 
+  const handlePurchase = async (product: Product) => {
+    if (checkingAuth) {
+      toast({
+        title: "Please wait",
+        description: "Checking authentication status...",
+      });
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to purchase products.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    setSelectedProduct(product);
+    setIsPurchaseDialogOpen(true);
+  };
+
+  const handlePurchaseComplete = (newBalance: number) => {
+    setUserBalance(newBalance);
+    setIsPurchaseDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesOperator = !selectedOperator || product.operator === selectedOperator;
+      const matchesCategory = !selectedCategory || product.category === selectedCategory;
+      return matchesOperator && matchesCategory;
+    });
+  }, [selectedOperator, selectedCategory]);
+
   return (
     <section id="premium-products" className="py-20 bg-gradient-to-b from-slate-900 to-slate-800 relative">
       <div className="container mx-auto px-4">
@@ -44,6 +141,12 @@ const ProductListing = () => {
           <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
             Choose from our curated selection of telecom products from Myanmar's leading network operators
           </p>
+          {isAuthenticated && (
+            <div className="mt-6 inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
+              <span className="text-sm font-medium">Current Balance:</span>
+              <span className="font-bold">{userBalance.toLocaleString()} MMK</span>
+            </div>
+          )}
         </div>
 
         {/* Filters */}
@@ -52,7 +155,6 @@ const ProductListing = () => {
           selectedCategory={selectedCategory}
           onOperatorChange={setSelectedOperator}
           onCategoryChange={setSelectedCategory} />
-
 
         {/* Results Count */}
         <div className="mb-8">
@@ -70,8 +172,8 @@ const ProductListing = () => {
             key={product.id}
             product={product}
             isSelected={selectedProduct?.id === product.id}
-            onSelect={handleProductSelect} />
-
+            onSelect={handleProductSelect}
+            onPurchase={handlePurchase} />
           )}
         </div>
 
@@ -88,12 +190,22 @@ const ProductListing = () => {
                 setSelectedCategory(null);
               }}
               className="btn-premium px-8 py-3 rounded-xl font-semibold">
-
                 Clear all filters
               </button>
             </div>
           </div>
         }
+
+        <PurchaseDialog
+          isOpen={isPurchaseDialogOpen}
+          onClose={() => {
+            setIsPurchaseDialogOpen(false);
+            setSelectedProduct(null);
+          }}
+          product={selectedProduct}
+          userBalance={userBalance}
+          onPurchaseComplete={handlePurchaseComplete}
+        />
       </div>
     </section>);
 

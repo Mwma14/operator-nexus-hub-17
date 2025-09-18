@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,23 +20,18 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
+      try {
+        const userResponse = await window.ezsite.apis.getUserInfo();
+        if (!userResponse.error) {
+          navigate("/");
+        }
+      } catch (error) {
+        // User not authenticated, stay on auth page
       }
     };
+
     checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/");
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -52,32 +46,35 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const redirectUrl = `${window.location.origin}/`;
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          name: name
-        }
-      }
-    });
-
-    if (error) {
-      toast({
-        title: "Sign Up Error",
-        description: error.message,
-        variant: "destructive"
+    try {
+      const response = await window.ezsite.apis.register({
+        email,
+        password,
+        name
       });
-    } else {
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
       toast({
         title: "Success",
         description: "Please check your email to confirm your account"
       });
+      
+      // Clear form
+      setEmail("");
+      setPassword("");
+      setName("");
+    } catch (error: any) {
+      toast({
+        title: "Sign Up Error",
+        description: error.message || "An error occurred during registration",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -92,19 +89,32 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    try {
+      const response = await window.ezsite.apis.login({
+        email,
+        password,
+      });
 
-    if (error) {
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      toast({
+        title: "Success",
+        description: "You have been successfully signed in"
+      });
+
+      // Navigate to home page
+      navigate("/");
+    } catch (error: any) {
       toast({
         title: "Sign In Error",
-        description: error.message,
+        description: error.message || "Invalid email or password",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -119,26 +129,29 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const redirectUrl = `${window.location.origin}/auth`;
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl
-    });
-
-    if (error) {
-      toast({
-        title: "Reset Password Error",
-        description: error.message,
-        variant: "destructive"
+    try {
+      const response = await window.ezsite.apis.sendResetPwdEmail({
+        email,
       });
-    } else {
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
       toast({
         title: "Reset Email Sent",
         description: "Please check your email for password reset instructions"
       });
       setIsResetMode(false);
+    } catch (error: any) {
+      toast({
+        title: "Reset Password Error",
+        description: error.message || "Failed to send reset email",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (isResetMode) {

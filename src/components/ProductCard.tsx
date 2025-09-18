@@ -10,12 +10,28 @@ interface ProductCardProps {
   onSelect?: (product: Product) => void;
 }
 
-const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps) => {
+const ProductCard = ({ product, isSelected = false, onSelect, onPurchase }: ProductCardProps) => {
   const operatorColors = {
     MPT: "bg-blue-600",
     OOREDOO: "bg-red-600",
     ATOM: "bg-green-600",
     MYTEL: "bg-purple-600"
+  };
+
+  const handlePurchase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onPurchase) {
+      onPurchase(product);
+    } else {
+      // Fallback: scroll to premium products section
+      const premiumSection = document.getElementById('premium-products');
+      if (premiumSection) {
+        premiumSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }
   };
 
   return (
@@ -62,17 +78,7 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
         
         <Button
           className="btn-premium px-6 py-3 rounded-xl font-semibold group-hover:shadow-md transition-all"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Scroll to premium products section
-            const premiumSection = document.getElementById('premium-products');
-            if (premiumSection) {
-              premiumSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-              });
-            }
-          }}>
+          onClick={handlePurchase}>
 
           <ShoppingCart className="mr-2 h-4 w-4" />
           Purchase
