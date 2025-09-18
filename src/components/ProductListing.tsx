@@ -142,25 +142,25 @@ const ProductListing = () => {
           <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
             Choose from our curated selection of telecom products from Myanmar's leading network operators
           </p>
-          {isAuthenticated && (
-            <div className="mt-6 flex flex-col items-center gap-3">
+          {isAuthenticated &&
+          <div className="mt-6 flex flex-col items-center gap-3">
               <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
                 <span className="text-sm font-medium">Current Balance:</span>
                 <span className="font-bold">{userBalance.toLocaleString()} MMK</span>
               </div>
               <Button
-                onClick={() => {
-                  toast({
-                    title: "Buy Credit",
-                    description: "Credit purchase feature coming soon!"
-                  });
-                }}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
+              onClick={() => {
+                toast({
+                  title: "Buy Credit",
+                  description: "Credit purchase feature coming soon!"
+                });
+              }}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
+
                 Buy Credit
               </Button>
             </div>
-          )}
+          }
         </div>
 
         {/* Filters */}

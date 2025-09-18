@@ -31,10 +31,10 @@ const Auth = () => {
 
 
 
-        // User not authenticated, stay on auth page
-      }};checkUser();}, [navigate]);
 
-  const handleSignUp = async (e: React.FormEvent) => {
+
+        // User not authenticated, stay on auth page
+      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !name) {
       toast({
