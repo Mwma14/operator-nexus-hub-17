@@ -67,9 +67,9 @@ const ProductCard = ({ product, isSelected = false, onSelect }: ProductCardProps
             // Scroll to premium products section
             const premiumSection = document.getElementById('premium-products');
             if (premiumSection) {
-              premiumSection.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
+              premiumSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
               });
             }
           }}>

@@ -1,12 +1,15 @@
 import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 const HeroBanner = () => {
-  const navigate = useNavigate();
-
   const handleBuyNow = () => {
-    navigate('/premium');
+    const premiumSection = document.getElementById('premium-products');
+    if (premiumSection) {
+      premiumSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
   return (
