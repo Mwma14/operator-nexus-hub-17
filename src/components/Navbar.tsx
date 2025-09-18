@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, UserIcon, LogOut } from 'lucide-react';
+import { Search, UserIcon, LogOut, Shield } from 'lucide-react';
 
 interface UserInfo {
   ID: number;
@@ -136,7 +136,16 @@ const Navbar = () => {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-
+                {user?.email === 'thewayofthedragg@gmail.com' && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -207,7 +216,16 @@ const Navbar = () => {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-
+                {user?.email === 'thewayofthedragg@gmail.com' && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}

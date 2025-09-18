@@ -53,10 +53,10 @@ const Auth = () => {
 
 
 
-        // User not authenticated, stay on auth page
-      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });if (response.error) {throw new Error(response.error);
-      }
 
+
+        // User not authenticated, stay on auth page
+      }};checkUser();}, [navigate]);const handleSignUp = async (e: React.FormEvent) => {e.preventDefault();if (!email || !password || !name) {toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });return;}setLoading(true);try {const response = await window.ezsite.apis.register({ email, password, name });if (response.error) {throw new Error(response.error);}
       toast({
         title: "Success",
         description: "Please check your email to confirm your account"
@@ -167,10 +167,10 @@ const Auth = () => {
           <CardHeader className="space-y-1 px-6 sm:px-8 pt-6 sm:pt-8">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsResetMode(false)}
-                className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10">
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsResetMode(false)}
+                  className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10">
 
                 <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
@@ -188,13 +188,13 @@ const Auth = () => {
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="reset-email" className="text-sm">Email</Label>
                 <Input
-                  id="reset-email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-10 sm:h-11" />
+                    id="reset-email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-10 sm:h-11" />
 
               </div>
               <Button type="submit" className="w-full btn-premium h-10 sm:h-11" disabled={loading}>
@@ -244,39 +244,39 @@ const Auth = () => {
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signin-email" className="text-sm">Email</Label>
                   <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="h-10 sm:h-11" />
+                      id="signin-email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-10 sm:h-11" />
 
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signin-password" className="text-sm">Password</Label>
                   <div className="relative">
                     <Input
-                      id="signin-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="h-10 sm:h-11 pr-10" />
+                        id="signin-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="h-10 sm:h-11 pr-10" />
 
                     <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}>
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}>
 
                       {showPassword ?
-                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+                        <EyeOff className="h-4 w-4 text-muted-foreground" /> :
 
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                      }
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        }
                     </Button>
                   </div>
                 </div>
@@ -284,10 +284,10 @@ const Auth = () => {
                   {loading ? "Signing In..." : "Sign In"}
                 </Button>
                 <Button
-                  type="button"
-                  variant="link"
-                  className="w-full text-muted-foreground text-sm h-8"
-                  onClick={() => setIsResetMode(true)}>
+                    type="button"
+                    variant="link"
+                    className="w-full text-muted-foreground text-sm h-8"
+                    onClick={() => setIsResetMode(true)}>
 
                   Forgot your password?
                 </Button>
@@ -299,51 +299,51 @@ const Auth = () => {
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signup-name" className="text-sm">Full Name</Label>
                   <Input
-                    id="signup-name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="h-10 sm:h-11" />
+                      id="signup-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="h-10 sm:h-11" />
 
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signup-email" className="text-sm">Email</Label>
                   <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="h-10 sm:h-11" />
+                      id="signup-email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-10 sm:h-11" />
 
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="signup-password" className="text-sm">Password</Label>
                   <div className="relative">
                     <Input
-                      id="signup-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="h-10 sm:h-11 pr-10" />
+                        id="signup-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="h-10 sm:h-11 pr-10" />
 
                     <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}>
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-10 sm:h-11 w-10 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}>
 
                       {showPassword ?
-                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+                        <EyeOff className="h-4 w-4 text-muted-foreground" /> :
 
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                      }
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        }
                     </Button>
                   </div>
                 </div>
