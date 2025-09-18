@@ -1,6 +1,7 @@
 import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -27,12 +28,16 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Sign In
-            </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Join Now
-            </Button>
+            <Link to="/auth">
+              <Button variant="ghost" className="text-foreground hover:text-primary">
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Join Now
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Buttons */}
@@ -40,9 +45,11 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Join Now
-            </Button>
+            <Link to="/auth">
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Join Now
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
