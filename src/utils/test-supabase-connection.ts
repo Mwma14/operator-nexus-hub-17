@@ -4,8 +4,8 @@ export async function testSupabaseConnection() {
   try {
     console.log('Testing Supabase connection...');
 
-    // Test 1: Basic connection test
-    const { data, error } = await supabase.from('users').select('count').limit(1);
+    // Test 1: Basic connection test using products table
+    const { data, error } = await supabase.from('products').select('count').limit(1);
 
     if (error) {
       console.error('Connection test failed:', error.message);
@@ -55,7 +55,7 @@ export async function listTables() {
     }
 
     // Let's try to check each expected table
-    const tables = ['users', 'products', 'categories', 'operators', 'orders', 'credit_requests'];
+    const tables = ['products', 'user_profiles', 'orders', 'credit_transactions', 'payment_requests', 'admin_audit_logs', 'approval_workflows'];
     const tableStatus = {};
 
     for (const table of tables) {

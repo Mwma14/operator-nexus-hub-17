@@ -9,6 +9,7 @@ import { RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PurchaseDialog from "./PurchaseDialog";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProductListing = () => {
   const [selectedOperator, setSelectedOperator] = useState<string | null>(null);
@@ -47,24 +48,17 @@ const ProductListing = () => {
     try {
       setLoadingProducts(true);
       setProductsError(null);
-      const { data, error } = await window.ezsite.apis.tablePage(44172, {
-        PageNo: 1,
-        PageSize: 1000,
-        OrderByField: 'created_at',
-        IsAsc: false,
-        Filters: [
-        {
-          name: 'is_active',
-          op: 'Equal',
-          value: true
-        }]
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
-      });
+      if (error) throw error;
+      setProducts(data || []);
 
-      if (error) throw new Error(error);
-      setProducts(data?.List || []);
-
-      if ((data?.List || []).length === 0) {
+      if ((data || []).length === 0) {
         setProductsError("No products found in the database. Please add some products through the admin panel or initialize sample data.");
       }
     } catch (error) {
@@ -83,13 +77,13 @@ const ProductListing = () => {
 
   const checkAuthStatus = async () => {
     try {
-      const userResponse = await window.ezsite.apis.getUserInfo();
-      if (userResponse.error) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsAuthenticated(true);
+        await loadUserBalance(session.user.id);
+      } else {
         setIsAuthenticated(false);
         setUserBalance(0);
-      } else {
-        setIsAuthenticated(true);
-        await loadUserBalance(userResponse.data.ID);
       }
     } catch (error) {
       setIsAuthenticated(false);
@@ -99,37 +93,37 @@ const ProductListing = () => {
     }
   };
 
-  const loadUserBalance = async (userId: number) => {
+  const loadUserBalance = async (userId: string) => {
     try {
-      const profileResponse = await window.ezsite.apis.tablePage(44173, {
-        PageNo: 1,
-        PageSize: 1,
-        Filters: [
-        {
-          name: "user_id",
-          op: "Equal",
-          value: userId
-        }]
+      let { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('credits_balance')
+        .eq('user_id', userId)
+        .single();
 
-      });
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
 
-      if (!profileResponse.error && profileResponse.data.List.length > 0) {
-        setUserBalance(profileResponse.data.List[0].credits_balance || 0);
-      } else {
+      if (!profile) {
         // Create initial profile with 0 balance
-        const userInfoResponse = await window.ezsite.apis.getUserInfo();
-        if (!userInfoResponse.error) {
-          await window.ezsite.apis.tableCreate(44173, {
-            user_id: userId,
-            email: userInfoResponse.data.Email,
-            full_name: userInfoResponse.data.Name || '',
-            credits_balance: 0,
-            phone_number: '',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+        const { data: user } = await supabase.auth.getUser();
+        if (user.user) {
+          const { error: insertError } = await supabase
+            .from('user_profiles')
+            .insert({
+              user_id: userId,
+              full_name: user.user.user_metadata?.full_name || '',
+              credits_balance: 0
+            });
+
+          if (insertError) {
+            console.error('Failed to create user profile:', insertError);
+          }
           setUserBalance(0);
         }
+      } else {
+        setUserBalance(profile.credits_balance || 0);
       }
     } catch (error) {
       console.error('Failed to load user balance:', error);
@@ -202,7 +196,7 @@ const ProductListing = () => {
           <div className="mt-6 flex flex-col items-center gap-3">
               <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
                 <span className="text-sm font-medium">Current Balance:</span>
-                <span className="font-bold">{userBalance.toLocaleString()} MMK</span>
+                <span className="font-bold">{(userBalance || 0).toLocaleString()} MMK</span>
               </div>
               <Button
               onClick={() => {

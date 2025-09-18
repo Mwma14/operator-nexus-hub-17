@@ -7,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Search, UserIcon, LogOut, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserInfo {
-  ID: number;
-  Name: string;
-  Email: string;
-  CreateTime: string;
-  Roles: string;
+  id: string;
+  email?: string;
+  user_metadata?: {
+    full_name?: string;
+  };
 }
 
 const Navbar = () => {
@@ -29,9 +30,9 @@ const Navbar = () => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await window.ezsite.apis.getUserInfo();
-      if (!response.error) {
-        setUser(response.data);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
       } else {
         setUser(null);
       }
@@ -45,8 +46,8 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      const response = await window.ezsite.apis.logout();
-      if (!response.error) {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
         setUser(null);
         toast({
           title: "Signed Out",
@@ -54,7 +55,7 @@ const Navbar = () => {
         });
         navigate('/');
       } else {
-        throw new Error(response.error);
+        throw error;
       }
     } catch (error: any) {
       toast({
@@ -77,8 +78,10 @@ const Navbar = () => {
   };
 
   const getUserDisplayName = () => {
-    return user?.Name || user?.Email?.split('@')[0] || 'User';
+    return user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
   };
+
+  const isAdmin = user?.email === 'thewayofthedragg@gmail.com';
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -125,7 +128,7 @@ const Navbar = () => {
                         {getUserDisplayName()}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {user.Email}
+                        {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -136,7 +139,7 @@ const Navbar = () => {
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  {user?.Email === 'thewayofthedragg@gmail.com' &&
+                  {isAdmin &&
                 <>
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
@@ -205,7 +208,7 @@ const Navbar = () => {
                         {getUserDisplayName()}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {user.Email}
+                        {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -216,7 +219,7 @@ const Navbar = () => {
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  {user?.Email === 'thewayofthedragg@gmail.com' &&
+                  {isAdmin &&
                 <>
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
