@@ -115,31 +115,39 @@ ALTER TABLE public.payment_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_profiles
-CREATE POLICY IF NOT EXISTS "Users can view own profile" ON public.user_profiles
+DROP POLICY IF EXISTS "Users can view own profile" ON public.user_profiles;
+CREATE POLICY "Users can view own profile" ON public.user_profiles
     FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can update own profile" ON public.user_profiles
+DROP POLICY IF EXISTS "Users can update own profile" ON public.user_profiles;
+CREATE POLICY "Users can update own profile" ON public.user_profiles
     FOR UPDATE USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can insert own profile" ON public.user_profiles
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.user_profiles;
+CREATE POLICY "Users can insert own profile" ON public.user_profiles
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Create policies for credit_transactions
-CREATE POLICY IF NOT EXISTS "Users can view own transactions" ON public.credit_transactions
+DROP POLICY IF EXISTS "Users can view own transactions" ON public.credit_transactions;
+CREATE POLICY "Users can view own transactions" ON public.credit_transactions
     FOR SELECT USING (auth.uid() = user_id);
 
 -- Create policies for payment_requests
-CREATE POLICY IF NOT EXISTS "Users can view own payment requests" ON public.payment_requests
+DROP POLICY IF EXISTS "Users can view own payment requests" ON public.payment_requests;
+CREATE POLICY "Users can view own payment requests" ON public.payment_requests
     FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can create payment requests" ON public.payment_requests
+DROP POLICY IF EXISTS "Users can create payment requests" ON public.payment_requests;
+CREATE POLICY "Users can create payment requests" ON public.payment_requests
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Create policies for orders
-CREATE POLICY IF NOT EXISTS "Users can view own orders" ON public.orders
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
+CREATE POLICY "Users can view own orders" ON public.orders
     FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY IF NOT EXISTS "Users can create orders" ON public.orders
+DROP POLICY IF EXISTS "Users can create orders" ON public.orders;
+CREATE POLICY "Users can create orders" ON public.orders
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Create indexes for better performance
