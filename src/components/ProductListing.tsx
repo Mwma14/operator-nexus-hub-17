@@ -63,7 +63,7 @@ const ProductListing = () => {
 
       if (error) throw new Error(error);
       setProducts(data?.List || []);
-      
+
       if ((data?.List || []).length === 0) {
         setProductsError("No products found in the database. Please add some products through the admin panel or initialize sample data.");
       }
@@ -185,7 +185,7 @@ const ProductListing = () => {
       const matchesCategory = !selectedCategory || product.category === selectedCategory;
       return matchesOperator && matchesCategory;
     });
-  }, [selectedOperator, selectedCategory]);
+  }, [products, selectedOperator, selectedCategory]);
 
   return (
     <section id="premium-products" className="py-20 bg-gradient-to-b from-slate-900 to-slate-800 relative">
@@ -238,8 +238,8 @@ const ProductListing = () => {
             size="sm"
             onClick={fetchProducts}
             disabled={loadingProducts}
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20 w-fit"
-          >
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 w-fit">
+
             <RefreshCw className={`h-4 w-4 mr-2 ${loadingProducts ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
@@ -247,12 +247,12 @@ const ProductListing = () => {
 
         {/* Product Grid */}
         <div id="products-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {loadingProducts ? (
+          {loadingProducts ?
           <div className="col-span-full flex justify-center py-12">
               <LoadingSpinner size="lg" />
-            </div>
-          ) : productsError ? (
-            <div className="col-span-full text-center py-20">
+            </div> :
+          productsError ?
+          <div className="col-span-full text-center py-20">
               <div className="glass-card rounded-3xl p-12 max-w-2xl mx-auto">
                 <Alert className="mb-6">
                   <AlertDescription className="text-white">
@@ -261,38 +261,38 @@ const ProductListing = () => {
                 </Alert>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
-                    onClick={fetchProducts}
-                    className="btn-premium px-8 py-3 rounded-xl font-semibold"
-                  >
+                  onClick={fetchProducts}
+                  className="btn-premium px-8 py-3 rounded-xl font-semibold">
+
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Retry Loading
                   </Button>
-                  {isAuthenticated && (
-                    <Button
-                      onClick={() => navigate('/admin')}
-                      variant="outline"
-                      className="px-8 py-3 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10"
-                    >
+                  {isAuthenticated &&
+                <Button
+                  onClick={() => navigate('/admin')}
+                  variant="outline"
+                  className="px-8 py-3 rounded-xl font-semibold border-white/20 text-white hover:bg-white/10">
+
                       Go to Admin Panel
                     </Button>
-                  )}
+                }
                 </div>
               </div>
-            </div>
-          ) : (
-            filteredProducts.map((product) =>
-            <ProductCard
-              key={product.id}
-              product={product}
-              isSelected={selectedProduct?.id === product.id}
-              onSelect={handleProductSelect}
-              onPurchase={handlePurchase} />
-            )
-          )}
+            </div> :
+
+          filteredProducts.map((product) =>
+          <ProductCard
+            key={product.id}
+            product={product}
+            isSelected={selectedProduct?.id === product.id}
+            onSelect={handleProductSelect}
+            onPurchase={handlePurchase} />
+          )
+          }
         </div>
 
         {/* No Results */}
-        {!loadingProducts && !productsError && filteredProducts.length === 0 && products.length > 0 && (
+        {!loadingProducts && !productsError && filteredProducts.length === 0 && products.length > 0 &&
         <div className="text-center py-20">
             <div className="glass-card rounded-3xl p-12 max-w-md mx-auto">
               <p className="text-xl text-white/80 mb-4">
@@ -308,7 +308,7 @@ const ProductListing = () => {
               </button>
             </div>
           </div>
-        )}
+        }
 
         <PurchaseDialog
           isOpen={isPurchaseDialogOpen}
