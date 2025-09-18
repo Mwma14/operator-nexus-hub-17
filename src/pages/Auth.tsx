@@ -27,10 +27,10 @@ const Auth = () => {
           navigate("/");
         }
       } catch (error) {
+
+
         // User not authenticated, stay on auth page
-      }
-    };
-    checkUser();
+      }};checkUser();
   }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -150,7 +150,7 @@ const Auth = () => {
 
   if (isResetMode) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-screen h-screen overflow-x-hidden bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="absolute inset-0 mesh-gradient">
           <div className="floating-orb"></div>
           <div className="floating-orb"></div>
@@ -164,8 +164,8 @@ const Auth = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsResetMode(false)}
-                className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10"
-              >
+                className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10">
+
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-primary font-space-grotesk">
@@ -192,25 +192,25 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-10 sm:h-12 text-base"
-                />
+                  className="h-10 sm:h-12 text-base" />
+
               </div>
-              <Button 
-                type="submit" 
-                className="w-full btn-premium h-10 sm:h-12 text-base font-medium" 
-                disabled={loading}
-              >
+              <Button
+                type="submit"
+                className="w-full btn-premium h-10 sm:h-12 text-base font-medium"
+                disabled={loading}>
+
                 {loading ? "Sending..." : "Send Reset Email"}
               </Button>
             </form>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="w-screen h-screen overflow-x-hidden bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="absolute inset-0 mesh-gradient">
         <div className="floating-orb"></div>
         <div className="floating-orb"></div>
@@ -260,8 +260,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 sm:h-12 text-base"
-                  />
+                    className="h-10 sm:h-12 text-base" />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signin-password" className="text-sm font-medium">
@@ -275,36 +275,36 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-10 sm:h-12 pr-12 text-base"
-                    />
+                      className="h-10 sm:h-12 pr-12 text-base" />
+
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-10 w-10 sm:h-12 sm:w-12 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
+                      onClick={() => setShowPassword(!showPassword)}>
+
+                      {showPassword ?
+                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      }
                     </Button>
                   </div>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full btn-premium h-10 sm:h-12 text-base font-medium" 
-                  disabled={loading}
-                >
+                <Button
+                  type="submit"
+                  className="w-full btn-premium h-10 sm:h-12 text-base font-medium"
+                  disabled={loading}>
+
                   {loading ? "Signing In..." : "Sign In"}
                 </Button>
                 <Button
                   type="button"
                   variant="link"
                   className="w-full text-muted-foreground text-sm h-10"
-                  onClick={() => setIsResetMode(true)}
-                >
+                  onClick={() => setIsResetMode(true)}>
+
                   Forgot your password?
                 </Button>
               </form>
@@ -323,8 +323,8 @@ const Auth = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-10 sm:h-12 text-base"
-                  />
+                    className="h-10 sm:h-12 text-base" />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="text-sm font-medium">
@@ -337,8 +337,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-10 sm:h-12 text-base"
-                  />
+                    className="h-10 sm:h-12 text-base" />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="text-sm font-medium">
@@ -352,28 +352,28 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-10 sm:h-12 pr-12 text-base"
-                    />
+                      className="h-10 sm:h-12 pr-12 text-base" />
+
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-10 w-10 sm:h-12 sm:w-12 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      )}
+                      onClick={() => setShowPassword(!showPassword)}>
+
+                      {showPassword ?
+                      <EyeOff className="h-4 w-4 text-muted-foreground" /> :
+
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      }
                     </Button>
                   </div>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full btn-premium h-10 sm:h-12 text-base font-medium" 
-                  disabled={loading}
-                >
+                <Button
+                  type="submit"
+                  className="w-full btn-premium h-10 sm:h-12 text-base font-medium"
+                  disabled={loading}>
+
                   {loading ? "Creating Account..." : "Create Account"}
                 </Button>
               </form>
@@ -381,8 +381,8 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Auth;
