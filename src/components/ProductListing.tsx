@@ -50,12 +50,12 @@ const ProductListing = () => {
         OrderByField: 'created_at',
         IsAsc: false,
         Filters: [
-          {
-            name: 'is_active',
-            op: 'Equal',
-            value: true
-          }
-        ]
+        {
+          name: 'is_active',
+          op: 'Equal',
+          value: true
+        }]
+
       });
 
       if (error) throw new Error(error);
@@ -92,7 +92,7 @@ const ProductListing = () => {
 
   const loadUserBalance = async (userId: number) => {
     try {
-      const profileResponse = await window.ezsite.apis.tablePage(44094, {
+      const profileResponse = await window.ezsite.apis.tablePage(44173, {
         PageNo: 1,
         PageSize: 1,
         Filters: [
@@ -110,7 +110,7 @@ const ProductListing = () => {
         // Create initial profile with 0 balance
         const userInfoResponse = await window.ezsite.apis.getUserInfo();
         if (!userInfoResponse.error) {
-          await window.ezsite.apis.tableCreate(44094, {
+          await window.ezsite.apis.tableCreate(44173, {
             user_id: userId,
             email: userInfoResponse.data.Email,
             full_name: userInfoResponse.data.Name || '',
@@ -228,20 +228,20 @@ const ProductListing = () => {
 
         {/* Product Grid */}
         <div id="products-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {loadingProducts ? (
-            <div className="col-span-full flex justify-center py-12">
+          {loadingProducts ?
+          <div className="col-span-full flex justify-center py-12">
               <LoadingSpinner size="lg" />
-            </div>
-          ) : (
-            filteredProducts.map((product) =>
-              <ProductCard
-                key={product.id}
-                product={product}
-                isSelected={selectedProduct?.id === product.id}
-                onSelect={handleProductSelect}
-                onPurchase={handlePurchase} />
-            )
-          )}
+            </div> :
+
+          filteredProducts.map((product) =>
+          <ProductCard
+            key={product.id}
+            product={product}
+            isSelected={selectedProduct?.id === product.id}
+            onSelect={handleProductSelect}
+            onPurchase={handlePurchase} />
+          )
+          }
         </div>
 
         {/* No Results */}

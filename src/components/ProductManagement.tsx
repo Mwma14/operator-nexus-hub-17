@@ -311,105 +311,105 @@ export default function ProductManagement() {
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
                 <DialogHeader>
-                  <DialogTitle className="text-lg md:text-xl">
+                  <DialogTitle className="text-lg md:text-xl text-white">
                     {editingProduct ? 'Edit Product' : 'Create New Product'}
                   </DialogTitle>
-                  <DialogDescription className="text-sm md:text-base">
+                  <DialogDescription className="text-sm md:text-base text-slate-300">
                     {editingProduct ? 'Update product information' : 'Add a new product to the catalog'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-gray-900 font-medium">Product Name</Label>
+                    <Label htmlFor="name" className="text-white font-medium">Product Name</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Enter product name (e.g. 5GB Data Pack)"
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price" className="text-gray-900 font-medium">Price (MMK)</Label>
+                    <Label htmlFor="price" className="text-white font-medium">Price (MMK)</Label>
                     <Input
                       id="price"
                       type="number"
                       value={formData.price || ''}
                       placeholder="Enter price (e.g. 5000)"
                       onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="operator" className="text-gray-900 font-medium">Operator</Label>
+                    <Label htmlFor="operator" className="text-white font-medium">Operator</Label>
                     <select
                       id="operator"
                       value={formData.operator}
                       onChange={(e) => setFormData({ ...formData, operator: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option value="" className="text-gray-500">Select Operator</option>
+                      className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option value="" className="text-slate-400">Select Operator</option>
                       {operators.map((op) =>
-                      <option key={op} value={op} className="text-gray-900">{op}</option>
+                      <option key={op} value={op} className="text-white">{op}</option>
                       )}
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="category" className="text-gray-900 font-medium">Category</Label>
+                    <Label htmlFor="category" className="text-white font-medium">Category</Label>
                     <select
                       id="category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option value="" className="text-gray-500">Select Category</option>
+                      className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option value="" className="text-slate-400">Select Category</option>
                       {categories.map((cat) =>
-                      <option key={cat} value={cat} className="text-gray-900">{cat}</option>
+                      <option key={cat} value={cat} className="text-white">{cat}</option>
                       )}
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stock" className="text-gray-900 font-medium">Stock Quantity</Label>
+                    <Label htmlFor="stock" className="text-white font-medium">Stock Quantity</Label>
                     <Input
                       id="stock"
                       type="number"
                       value={formData.stock_quantity || ''}
                       placeholder="Enter stock quantity (e.g. 100)"
                       onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) || 0 })}
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="validity" className="text-gray-900 font-medium">Validity (Days)</Label>
+                    <Label htmlFor="validity" className="text-white font-medium">Validity (Days)</Label>
                     <Input
                       id="validity"
                       type="number"
                       value={formData.validity_days || ''}
                       placeholder="Enter validity in days (e.g. 30)"
-                      onChange={(e) => setFormData({ ...formData, validity_days: Number(e.target.value) || 30 })}
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      onChange={(e) => setFormData({ ...formData, validity_days: Number(e.target.value) || 0 })}
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="description" className="text-gray-900 font-medium">Description</Label>
+                    <Label htmlFor="description" className="text-white font-medium">Description</Label>
                     <Textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       placeholder="Enter detailed product description..."
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="admin-notes" className="text-gray-900 font-medium">Admin Notes</Label>
+                    <Label htmlFor="admin-notes" className="text-white font-medium">Admin Notes</Label>
                     <Textarea
                       id="admin-notes"
                       value={formData.admin_notes}
                       onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
                       placeholder="Internal notes for administrators (not visible to customers)..."
-                      className="bg-white border-gray-300 text-gray-900 placeholder-gray-500" />
+                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
                   </div>
                   <div className="col-span-1 md:col-span-2 flex items-center space-x-2">
                     <Checkbox
                       id="active"
                       checked={formData.is_active}
                       onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked === true })} />
-                    <Label htmlFor="active" className="text-gray-900 font-medium">Product is active and available for purchase</Label>
+                    <Label htmlFor="active" className="text-white font-medium">Product is active and available for purchase</Label>
                   </div>
                 </div>
                 <DialogFooter className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
