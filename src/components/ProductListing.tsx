@@ -25,6 +25,19 @@ const ProductListing = () => {
     checkAuthStatus();
   }, []);
 
+  // Scroll to products section when filters are applied
+  useEffect(() => {
+    if (selectedOperator || selectedCategory) {
+      const productsSection = document.getElementById('products-grid');
+      if (productsSection) {
+        productsSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }
+  }, [selectedOperator, selectedCategory]);
+
   const checkAuthStatus = async () => {
     try {
       const userResponse = await window.ezsite.apis.getUserInfo();
@@ -180,7 +193,7 @@ const ProductListing = () => {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div id="products-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) =>
           <ProductCard
             key={product.id}
