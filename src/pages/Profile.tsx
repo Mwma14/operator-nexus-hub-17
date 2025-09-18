@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -11,14 +9,42 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
-import { UserProfile, Order, OrderStats } from '@/types/profile';
 import Navbar from '@/components/Navbar';
 import { CreditCard, Package, TrendingUp, Calendar, Eye, RefreshCw } from 'lucide-react';
-import { format } from 'date-fns';
+
+interface UserInfo {
+  ID: number;
+  Name: string;
+  Email: string;
+  CreateTime: string;
+  Roles: string;
+}
+
+interface Order {
+  id: string;
+  user_id: string;
+  product_id: string;
+  product_name: string;
+  product_description: string;
+  amount: number;
+  currency: string;
+  status: 'completed' | 'pending' | 'failed' | 'cancelled';
+  operator: string;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  transaction_id?: string;
+}
+
+interface OrderStats {
+  total_orders: number;
+  successful_orders: number;
+  pending_orders: number;
+  total_spent: number;
+}
 
 const Profile = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,39 +58,30 @@ const Profile = () => {
 
   const checkUser = async () => {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
+      const response = await window.ezsite.apis.getUserInfo();
+      if (response.error || !response.data) {
         navigate('/auth');
         return;
       }
-      setUser(user);
-      await loadProfileData(user.id);
+      setUser(response.data);
+      await loadProfileData();
     } catch (error) {
       console.error('Error checking user:', error);
       navigate('/auth');
     }
   };
 
-  const loadProfileData = async (userId: string) => {
+  const loadProfileData = async () => {
     try {
       setIsLoading(true);
 
-      // Mock profile data - in real app, this would come from Supabase
-      const mockProfile: UserProfile = {
-        id: userId,
-        email: user?.email || '',
-        full_name: user?.user_metadata?.full_name || null,
-        avatar_url: user?.user_metadata?.avatar_url || null,
-        credits_balance: 15000, // Mock balance in MMK
-        created_at: user?.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      if (!user) return;
 
       // Mock orders data
       const mockOrders: Order[] = [
       {
         id: '1',
-        user_id: userId,
+        user_id: user.ID.toString(),
         product_id: 'mpt-data-1gb',
         product_name: 'MPT 1GB Data Pack',
         product_description: 'High-speed data for 30 days',
@@ -79,7 +96,7 @@ const Profile = () => {
       },
       {
         id: '2',
-        user_id: userId,
+        user_id: user.ID.toString(),
         product_id: 'ooredoo-minutes-100',
         product_name: 'Ooredoo 100 Minutes',
         product_description: '100 minutes to all networks',
@@ -94,7 +111,7 @@ const Profile = () => {
       },
       {
         id: '3',
-        user_id: userId,
+        user_id: user.ID.toString(),
         product_id: 'mytel-package',
         product_name: 'MyTel Combo Package',
         product_description: 'Data + Minutes package',
@@ -136,7 +153,7 @@ const Profile = () => {
   const refreshData = async () => {
     if (!user) return;
     setIsRefreshing(true);
-    await loadProfileData(user.id);
+    await loadProfileData();
     setIsRefreshing(false);
     toast({
       title: "Data refreshed",
@@ -210,7 +227,7 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-primary">
-                  {profile?.credits_balance?.toLocaleString()} MMK
+                  15,000 MMK
                 </div>
               </CardContent>
             </Card>
@@ -268,21 +285,21 @@ const Profile = () => {
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src={profile?.avatar_url} />
+                      <AvatarImage src="" />
                       <AvatarFallback className="text-lg">
-                        {profile?.full_name ? getInitials(profile.full_name) :
-                        profile?.email ? getInitials(profile.email) : 'U'}
+                        {user?.Name ? getInitials(user.Name) :
+                        user?.Email ? getInitials(user.Email) : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
                       <h3 className="text-lg font-medium">
-                        {profile?.full_name || 'User'}
+                        {user?.Name || 'User'}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        {profile?.email}
+                        {user?.Email}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Member since {format(new Date(profile?.created_at || ''), 'MMMM yyyy')}
+                        Member since {user?.CreateTime ? new Date(user.CreateTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'N/A'}
                       </p>
                     </div>
                   </div>
