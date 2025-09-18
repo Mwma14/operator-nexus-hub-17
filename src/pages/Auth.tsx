@@ -29,10 +29,10 @@ const Auth = () => {
       } catch (error) {
 
 
+
+
         // User not authenticated, stay on auth page
-      }};
-    checkUser();
-  }, [navigate]);
+      }};checkUser();}, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
