@@ -5,7 +5,7 @@ const HeroBanner = () => {
   const handleBuyNow = () => {
     const premiumSection = document.getElementById('premium-products');
     if (premiumSection) {
-      premiumSection.scrollIntoView({ 
+      premiumSection.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
