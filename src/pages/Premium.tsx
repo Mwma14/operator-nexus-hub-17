@@ -18,10 +18,10 @@ const Premium = () => {
   const [isBalanceLoading, setIsBalanceLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
-  // Filter premium products (price >= 50,000 MMK OR Beautiful Numbers category)
+  // Filter premium products (price >= 50,000 MMK, excluding Beautiful Numbers)
   const premiumProducts = useMemo(() => {
     return products.filter((product) =>
-    product.price >= 50000 || product.category === 'Beautiful Numbers'
+    product.price >= 50000 && product.category !== 'Beautiful Numbers'
     );
   }, []);
 
