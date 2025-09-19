@@ -65,7 +65,7 @@ export default function PurchaseDialog({
   const handleConfirmPurchase = async () => {
     if (!product) return;
 
-    if (userBalance < product.price) {
+    if (userBalanceInMMK < product.price) {
       toast({
         title: "Insufficient Balance",
         description: "Your current balance is not enough for this purchase.",
@@ -127,12 +127,15 @@ export default function PurchaseDialog({
 
       currentBalance = userProfile?.credits_balance || 0;
 
-      // Double-check balance
-      if (currentBalance < product.price) {
+      // Double-check balance (convert credits to MMK for comparison)
+      const currentBalanceInMMK = currentBalance * 100;
+      if (currentBalanceInMMK < product.price) {
         throw new Error('Insufficient balance for this purchase');
       }
 
-      const newBalance = currentBalance - product.price;
+      // Calculate new balance in credits (price is in MMK, so divide by 100)
+      const creditsToDeduct = Math.ceil(product.price / 100);
+      const newBalance = currentBalance - creditsToDeduct;
 
       // Update user balance
       const { error: updateError } = await supabase
@@ -155,7 +158,7 @@ export default function PurchaseDialog({
           product_id: product.id,
           quantity: 1,
           total_price: product.price,
-          credits_used: product.price,
+          credits_used: creditsToDeduct,
           currency: product.currency,
           operator: product.operator,
           phone_number: phoneNumber,
@@ -198,7 +201,9 @@ export default function PurchaseDialog({
     }
   };
 
-  const balanceAfterPurchase = product ? userBalance - product.price : userBalance;
+  // Convert credits to MMK for display (1 credit = 100 MMK)
+  const userBalanceInMMK = userBalance * 100;
+  const balanceAfterPurchase = product ? userBalanceInMMK - product.price : userBalanceInMMK;
 
   const getStepTitle = () => {
     switch (step) {
@@ -278,7 +283,7 @@ export default function PurchaseDialog({
               <div className="glass-card rounded-xl p-5 space-y-4 border border-white/20 bg-gradient-to-r from-slate-900/50 to-gray-900/50">
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-gray-200">Current Balance:</span>
-                  <span className="font-bold text-white text-lg">{userBalance.toLocaleString()} MMK</span>
+                  <span className="font-bold text-white text-lg">{userBalanceInMMK.toLocaleString()} MMK</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-gray-200">Balance After Purchase:</span>
