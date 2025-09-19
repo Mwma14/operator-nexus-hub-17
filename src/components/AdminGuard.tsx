@@ -41,7 +41,8 @@ export default function AdminGuard({ children }: AdminGuardProps) {
         const userEmail = profile?.email || user.email || '';
         const isAdminUser = userEmail.toLowerCase().includes('admin') ||
         userEmail.toLowerCase() === 'admin@example.com' ||
-        userEmail.toLowerCase() === 'admin@admin.com';
+        userEmail.toLowerCase() === 'admin@admin.com' ||
+        userEmail.toLowerCase() === 'thewayofthedragg@gmail.com';
 
         if (!isAdminUser) {
           throw new Error('Access denied. Admin privileges required. Only users with admin email addresses can access this panel.');

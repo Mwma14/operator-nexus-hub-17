@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { supabase } from '@/integrations/supabase/client';
 
 const Premium = () => {
   const navigate = useNavigate();
@@ -31,34 +32,27 @@ const Premium = () => {
   const loadUserBalance = async () => {
     try {
       setIsBalanceLoading(true);
-      const userResponse = await window.ezsite.apis.getUserInfo();
-      if (userResponse.error) {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
         setUser(null);
         setUserBalance(0);
         return;
       }
 
-      setUser(userResponse.data);
+      setUser(user);
 
       // Get user profile to get balance
-      const profileResponse = await window.ezsite.apis.tablePage(44173, {
-        PageNo: 1,
-        PageSize: 1,
-        Filters: [{
-          name: "user_id",
-          op: "Equal",
-          value: userResponse.data.ID
-        }]
-      });
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('credits_balance')
+        .eq('user_id', user.id)
+        .single();
 
-      if (profileResponse.error) {
-        console.error('Error loading profile:', profileResponse.error);
+      if (profileError) {
+        console.error('Error loading profile:', profileError);
         setUserBalance(0);
-      } else if (profileResponse.data.List.length > 0) {
-        const balance = profileResponse.data.List[0].credits_balance || 0;
-        setUserBalance(balance);
       } else {
-        setUserBalance(0);
+        setUserBalance(profile?.credits_balance || 0);
       }
     } catch (error) {
       console.error('Error loading user balance:', error);
@@ -71,8 +65,8 @@ const Premium = () => {
 
   const handleBuyCreditClick = async () => {
     try {
-      const userResponse = await window.ezsite.apis.getUserInfo();
-      if (userResponse.error) {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
         // User not authenticated, redirect to auth
         toast({
           title: "Authentication Required",
