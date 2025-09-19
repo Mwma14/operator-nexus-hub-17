@@ -269,7 +269,10 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-primary">
-                  {profile?.credits_balance?.toLocaleString() || 0} MMK
+                  {((profile?.credits_balance || 0) * 100).toLocaleString()} MMK
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {(profile?.credits_balance || 0).toLocaleString()} credits
                 </div>
               </CardContent>
             </Card>

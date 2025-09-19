@@ -202,7 +202,7 @@ const ProductListing = () => {
           <div className="mt-6 flex flex-col items-center gap-3">
               <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-6 py-3 rounded-xl border border-blue-500/30">
                 <span className="text-sm font-medium">Current Balance:</span>
-                <span className="font-bold">{(userBalance || 0).toLocaleString()} MMK</span>
+                <span className="font-bold">{((userBalance || 0) * 100).toLocaleString()} MMK</span>
               </div>
               <Button
               onClick={() => {
