@@ -45,35 +45,59 @@ export default function ApprovalWorkflows() {
     try {
       setLoading(true);
 
-      // Fetch products directly and derive approval status
-      const { data: products, error: productsError } = await supabase
-        .from('products')
-        .select('*')
-        .order('updated_at', { ascending: false });
+      // Fetch order outcomes (completed/rejected) and credit requests in parallel
+      const [
+        { data: orders, error: ordersError },
+        { data: payments, error: paymentError }
+      ] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('*')
+          .in('status', ['completed', 'rejected'])
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('payment_requests')
+          .select('*')
+          .in('status', ['approved', 'rejected'])
+          .order('created_at', { ascending: false }),
+      ]);
 
-      if (productsError) throw productsError;
-
-      // Fetch payment requests (credit approvals)
-      const { data: payments, error: paymentError } = await supabase
-        .from('payment_requests')
-        .select('*')
-        .in('status', ['approved', 'rejected'])
-        .order('created_at', { ascending: false });
-
+      if (ordersError) throw ordersError;
       if (paymentError) throw paymentError;
 
-      const transformedProducts = (products || []).map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        status: p.is_active ? 'approved' : 'rejected',
-        admin_notes: p.admin_notes || '',
-        category: p.category,
-        operator: p.operator,
-        price: p.price || 0,
-        is_active: p.is_active ?? false,
-        created_at: p.created_at,
-        updated_at: p.updated_at,
-      })) as ProductApproval[];
+      // Fetch related products for these orders
+      const productIds = Array.from(
+        new Set((orders || []).map((o: any) => o.product_id).filter(Boolean))
+      );
+
+      let productsById: Record<number, any> = {};
+      if (productIds.length > 0) {
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', productIds as number[]);
+        if (productsError) throw productsError;
+        productsById = (productsData || []).reduce((acc: any, p: any) => {
+          acc[p.id] = p;
+          return acc;
+        }, {} as Record<number, any>);
+      }
+
+      const transformedProducts = (orders || []).map((o: any) => {
+        const p = productsById[o.product_id] || {};
+        return {
+          id: o.id, // order id for traceability
+          name: p.name || `Product #${o.product_id}`,
+          status: o.status, // 'completed' or 'rejected'
+          admin_notes: o.admin_notes || '',
+          category: p.category || '-',
+          operator: p.operator || o.operator || '-',
+          price: p.price ?? Number(o.total_price) ?? 0,
+          is_active: Boolean(p.is_active),
+          created_at: o.created_at,
+          updated_at: o.processed_at || o.created_at,
+        } as ProductApproval;
+      });
 
       setProductApprovals(transformedProducts);
       setCreditRequests(payments || []);
@@ -85,7 +109,10 @@ export default function ApprovalWorkflows() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variant = status === 'approved' ? 'default' : 'destructive';
+    const normalized = (status || '').toLowerCase();
+    const positive = normalized === 'approved' || normalized === 'completed';
+    const negative = normalized === 'rejected' || normalized === 'denied' || normalized === 'failed';
+    const variant = positive ? 'default' : negative ? 'destructive' : 'secondary';
     return (
       <Badge variant={variant} className="capitalize">
         {status}
