@@ -95,7 +95,32 @@ export default function ApprovalWorkflows() {
         } as ProductApproval;
       });
 
-      setProductApprovals(transformedProducts);
+      // Fallback: if no workflows exist yet, derive from products with admin notes
+      let finalProducts = transformedProducts;
+      if (finalProducts.length === 0) {
+        const { data: productsWithNotes, error: productsFallbackError } = await supabase
+          .from('products')
+          .select('*')
+          .not('admin_notes', 'is', null)
+          .order('updated_at', { ascending: false })
+          .limit(100);
+        if (!productsFallbackError && productsWithNotes) {
+          finalProducts = productsWithNotes.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            status: p.is_active ? 'approved' : 'rejected',
+            admin_notes: p.admin_notes || '',
+            category: p.category,
+            operator: p.operator,
+            price: p.price,
+            is_active: p.is_active,
+            created_at: p.created_at,
+            updated_at: p.updated_at,
+          }));
+        }
+      }
+
+      setProductApprovals(finalProducts);
       setCreditRequests(payments || []);
     } catch (error) {
       console.error('Error fetching approval data:', error);
