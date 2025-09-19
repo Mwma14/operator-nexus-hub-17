@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard } from 'lucide-react';
+import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard, ShoppingCart } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
 import ProductManagementTemp from '@/components/ProductManagementTemp';
 import UserManagementTemp from '@/components/UserManagementTemp';
 import PaymentRequestManagement from '@/components/PaymentRequestManagement';
+import PendingOrdersManagement from '@/components/PendingOrdersManagement';
 import ApprovalWorkflowsTemp from '@/components/ApprovalWorkflowsTemp';
 
-type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'approvals';
+type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'orders' | 'approvals';
 
 interface NavItem {
   value: TabValue;
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
 { value: 'products', label: 'Products', icon: Package, component: ProductManagementTemp },
 { value: 'users', label: 'Users', icon: Users, component: UserManagementTemp },
 { value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
+{ value: 'orders', label: 'Pending Orders', icon: ShoppingCart, component: PendingOrdersManagement },
 { value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflowsTemp }];
 
 
@@ -150,7 +152,7 @@ export default function AdminLayout() {
           // Desktop: Tabs interface
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)} className="space-y-6 mt-6">
               <div className="glass-card rounded-2xl p-1">
-                <TabsList className="grid w-full grid-cols-4 bg-transparent border-none">
+                <TabsList className="grid w-full grid-cols-6 bg-transparent border-none">
                   {navItems.map((item) => {
                   const Icon = item.icon;
                   return (

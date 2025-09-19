@@ -162,9 +162,8 @@ export default function PurchaseDialog({
           currency: product.currency,
           operator: product.operator,
           phone_number: phoneNumber,
-          status: 'completed',
-          created_at: new Date().toISOString(),
-          processed_at: new Date().toISOString()
+          status: 'pending',
+          created_at: new Date().toISOString()
         });
 
       if (orderError) throw new Error('Failed to create order record');
@@ -173,8 +172,8 @@ export default function PurchaseDialog({
       onPurchaseComplete(newBalance);
 
       toast({
-        title: "Purchase Successful!",
-        description: `${product.name} has been purchased for ${phoneNumber}`
+        title: "Order Submitted Successfully!",
+        description: `Your order for ${product.name} is pending admin approval. You will be notified once processed.`
       });
 
       // Auto-close after 3 seconds
@@ -350,9 +349,9 @@ export default function PurchaseDialog({
             <div className="flex flex-col items-center justify-center py-12 space-y-6">
               <CheckCircle className="h-20 w-20 text-green-400" />
               <div className="text-center space-y-3">
-                <p className="font-semibold text-xl text-white">Purchase completed successfully!</p>
+                <p className="font-semibold text-xl text-white">Order submitted successfully!</p>
                 <p className="text-gray-300">
-                  {product.name} has been delivered to <span className="text-white font-medium">{phoneNumber}</span>
+                  Your order for {product.name} to <span className="text-white font-medium">{phoneNumber}</span> is pending admin approval.
                 </p>
                 <p className="text-gray-400 text-sm">
                   This dialog will close automatically in a few seconds.
