@@ -10,7 +10,7 @@ import ProductManagement from '@/components/ProductManagement';
 import UserManagement from '@/components/UserManagement';
 import PaymentRequestManagement from '@/components/PaymentRequestManagement';
 import PendingOrdersManagement from '@/components/PendingOrdersManagement';
-import ApprovalWorkflowsTemp from '@/components/ApprovalWorkflowsTemp';
+import ApprovalWorkflows from '@/components/ApprovalWorkflows';
 
 type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'orders' | 'approvals';
 
@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
 { value: 'users', label: 'Users', icon: Users, component: UserManagement },
 { value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
 { value: 'orders', label: 'Pending Orders', icon: ShoppingCart, component: PendingOrdersManagement },
-{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflowsTemp }];
+{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflows }];
 
 
 export default function AdminLayout() {
