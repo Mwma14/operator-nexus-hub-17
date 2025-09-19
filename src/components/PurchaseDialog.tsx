@@ -5,8 +5,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle } from
-'@/components/ui/dialog';
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/lib/products';
 import { Smartphone, CreditCard, CheckCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PurchaseDialogProps {
   isOpen: boolean;
@@ -88,51 +89,43 @@ export default function PurchaseDialog({
     setStep('PROCESSING');
 
     try {
-      // Get current user info
-      const userResponse = await window.ezsite.apis.getUserInfo();
-      if (userResponse.error) {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
         throw new Error('Failed to get user information');
       }
 
-      const userId = userResponse.data.ID;
-
       // Check user profile exists, create if not
-      let userProfileResponse = await window.ezsite.apis.tablePage(44173, {
-        PageNo: 1,
-        PageSize: 1,
-        Filters: [
-        {
-          name: "user_id",
-          op: "Equal",
-          value: userId
-        }]
-
-      });
+      let { data: userProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
       let currentBalance = userBalance;
 
-      if (userProfileResponse.error) {
-        throw new Error('Failed to check user profile');
+      if (profileError && profileError.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || '',
+            credits_balance: userBalance,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (createError) throw new Error('Failed to create user profile');
+        userProfile = newProfile;
+      } else if (profileError) {
+        throw new Error('Failed to get user profile');
       }
 
-      if (userProfileResponse.data.List.length === 0) {
-        // Create user profile
-        const createProfileResponse = await window.ezsite.apis.tableCreate(44173, {
-          user_id: userId,
-          email: userResponse.data.Email,
-          full_name: userResponse.data.Name || '',
-          credits_balance: userBalance,
-          phone_number: phoneNumber,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-        if (createProfileResponse.error) {
-          throw new Error('Failed to create user profile');
-        }
-      } else {
-        currentBalance = userProfileResponse.data.List[0].credits_balance;
-      }
+      currentBalance = userProfile?.credits_balance || 0;
 
       // Double-check balance
       if (currentBalance < product.price) {
@@ -142,39 +135,36 @@ export default function PurchaseDialog({
       const newBalance = currentBalance - product.price;
 
       // Update user balance
-      const updateProfileResponse = await window.ezsite.apis.tableUpdate(44173, {
-        ID: userProfileResponse.data.List.length > 0 ? userProfileResponse.data.List[0].id : null,
-        user_id: userId,
-        credits_balance: newBalance,
-        phone_number: phoneNumber,
-        updated_at: new Date().toISOString()
-      });
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({
+          credits_balance: newBalance,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userProfile.id);
 
-      if (updateProfileResponse.error) {
-        throw new Error('Failed to update user balance');
-      }
+      if (updateError) throw new Error('Failed to update user balance');
 
       // Create order record
       const transactionId = `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      const createOrderResponse = await window.ezsite.apis.tableCreate(44175, {
-        user_id: userId,
-        product_id: product.id,
-        product_name: product.name,
-        product_description: product.description,
-        amount: product.price,
-        operator: product.operator,
-        category: product.category,
-        phone_number: phoneNumber,
-        status: 'completed',
-        transaction_id: transactionId,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
+      const { error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          product_id: product.id,
+          quantity: 1,
+          total_price: product.price,
+          credits_used: product.price,
+          currency: product.currency,
+          operator: product.operator,
+          phone_number: phoneNumber,
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          processed_at: new Date().toISOString()
+        });
 
-      if (createOrderResponse.error) {
-        throw new Error('Failed to create order record');
-      }
+      if (orderError) throw new Error('Failed to create order record');
 
       setStep('SUCCESS');
       onPurchaseComplete(newBalance);
@@ -258,8 +248,8 @@ export default function PurchaseDialog({
         </DialogHeader>
 
         <div className="space-y-6">
-          {step === 'DETAILS' &&
-          <>
+          {step === 'DETAILS' && (
+            <>
               {/* Product Details Card */}
               <div className="glass-card rounded-xl p-5 space-y-4 border border-white/10">
                 <div className="flex justify-between items-center">
@@ -275,16 +265,16 @@ export default function PurchaseDialog({
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-gray-300">Operator:</span>
                   <span className={`px-3 py-1.5 rounded-full text-white text-sm font-semibold ${
-                product.operator === 'MPT' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
-                product.operator === 'OOREDOO' ? 'bg-gradient-to-r from-red-500 to-red-600' :
-                product.operator === 'ATOM' ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-purple-500 to-purple-600'}`
-                }>
+                    product.operator === 'MPT' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                    product.operator === 'OOREDOO' ? 'bg-gradient-to-r from-red-500 to-red-600' :
+                    product.operator === 'ATOM' ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-purple-500 to-purple-600'
+                  }`}>
                     {product.operator}
                   </span>
                 </div>
               </div>
 
-              {/* Balance Information Card - Fixed visibility */}
+              {/* Balance Information Card */}
               <div className="glass-card rounded-xl p-5 space-y-4 border border-white/20 bg-gradient-to-r from-slate-900/50 to-gray-900/50">
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-gray-200">Current Balance:</span>
@@ -299,8 +289,8 @@ export default function PurchaseDialog({
               </div>
 
               {/* Insufficient Balance Warning */}
-              {balanceAfterPurchase < 0 &&
-            <div className="glass-card rounded-xl p-4 border border-red-400/30 bg-gradient-to-r from-red-900/20 to-red-800/20">
+              {balanceAfterPurchase < 0 && (
+                <div className="glass-card rounded-xl p-4 border border-red-400/30 bg-gradient-to-r from-red-900/20 to-red-800/20">
                   <p className="text-red-300 font-medium flex items-center gap-2">
                     <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -308,32 +298,32 @@ export default function PurchaseDialog({
                     Insufficient balance! You need {Math.abs(balanceAfterPurchase).toLocaleString()} MMK more.
                   </p>
                 </div>
-            }
+              )}
             </>
-          }
+          )}
 
-          {step === 'PHONE_INPUT' &&
-          <div className="space-y-4">
+          {step === 'PHONE_INPUT' && (
+            <div className="space-y-4">
               <div className="space-y-3">
                 <Label htmlFor="phone" className="text-gray-200 font-medium">Phone Number *</Label>
                 <Input
-                id="phone"
-                type="tel"
-                placeholder="09123456789"
-                value={phoneNumber}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                className={`glass-card border-white/20 bg-slate-900/50 text-white placeholder:text-gray-400 focus:border-amber-400/50 focus:ring-amber-400/20 ${
-                phoneError ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20' : ''}`
-                } />
-
-                {phoneError &&
-              <p className="text-red-400 text-sm flex items-center gap-2">
+                  id="phone"
+                  type="tel"
+                  placeholder="09123456789"
+                  value={phoneNumber}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  className={`glass-card border-white/20 bg-slate-900/50 text-white placeholder:text-gray-400 focus:border-amber-400/50 focus:ring-amber-400/20 ${
+                    phoneError ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20' : ''
+                  }`}
+                />
+                {phoneError && (
+                  <p className="text-red-400 text-sm flex items-center gap-2">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                     {phoneError}
                   </p>
-              }
+                )}
               </div>
               <div className="glass-card rounded-xl p-4 border border-blue-400/30 bg-gradient-to-r from-blue-900/20 to-cyan-800/20">
                 <p className="text-blue-200 flex items-center gap-2">
@@ -342,17 +332,17 @@ export default function PurchaseDialog({
                 </p>
               </div>
             </div>
-          }
+          )}
 
-          {step === 'PROCESSING' &&
-          <div className="flex flex-col items-center justify-center py-12 space-y-6">
+          {step === 'PROCESSING' && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-6">
               <LoadingSpinner />
               <p className="text-gray-300 text-lg">Processing your purchase...</p>
             </div>
-          }
+          )}
 
-          {step === 'SUCCESS' &&
-          <div className="flex flex-col items-center justify-center py-12 space-y-6">
+          {step === 'SUCCESS' && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-6">
               <CheckCircle className="h-20 w-20 text-green-400" />
               <div className="text-center space-y-3">
                 <p className="font-semibold text-xl text-white">Purchase completed successfully!</p>
@@ -364,47 +354,47 @@ export default function PurchaseDialog({
                 </p>
               </div>
             </div>
-          }
+          )}
         </div>
 
-        {step === 'DETAILS' &&
-        <DialogFooter className="flex gap-3 pt-2">
+        {step === 'DETAILS' && (
+          <DialogFooter className="flex gap-3 pt-2">
             <Button
-            variant="outline"
-            onClick={onClose}
-            className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40">
-
+              variant="outline"
+              onClick={onClose}
+              className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40"
+            >
               Cancel
             </Button>
             <Button
-            onClick={handleConfirmPurchase}
-            disabled={balanceAfterPurchase < 0}
-            className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed">
-
+              onClick={handleConfirmPurchase}
+              disabled={balanceAfterPurchase < 0}
+              className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Confirm Purchase
             </Button>
           </DialogFooter>
-        }
+        )}
 
-        {step === 'PHONE_INPUT' &&
-        <DialogFooter className="flex gap-3 pt-2">
+        {step === 'PHONE_INPUT' && (
+          <DialogFooter className="flex gap-3 pt-2">
             <Button
-            variant="outline"
-            onClick={() => setStep('DETAILS')}
-            className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40">
-
+              variant="outline"
+              onClick={() => setStep('DETAILS')}
+              className="glass-card border-white/20 text-gray-300 hover:text-white hover:border-white/40"
+            >
               Back
             </Button>
             <Button
-            onClick={handlePhoneSubmit}
-            disabled={!phoneNumber || !!phoneError || loading}
-            className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed">
-
+              onClick={handlePhoneSubmit}
+              disabled={!phoneNumber || !!phoneError || loading}
+              className="btn-premium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {loading ? 'Processing...' : 'Complete Purchase'}
             </Button>
           </DialogFooter>
-        }
+        )}
       </DialogContent>
-    </Dialog>);
-
+    </Dialog>
+  );
 }

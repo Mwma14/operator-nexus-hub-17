@@ -46,33 +46,33 @@ export async function testSupabaseAuth() {
 export async function listTables() {
   try {
     // This will show us what tables actually exist
-    const { data, error } = await supabase.
-    rpc('get_current_user_role').
-    limit(1);
+    const { data, error } = await supabase
+      .rpc('is_admin')
+      .limit(1);
 
     if (error) {
       console.log('RPC call failed, but connection might still work:', error.message);
     }
 
     // Let's try to check each expected table
-    const tables = ['products', 'user_profiles', 'orders', 'credit_transactions', 'payment_requests', 'admin_audit_logs', 'approval_workflows'];
-    const tableStatus = {};
+    const tables = ['products', 'user_profiles', 'orders', 'credit_transactions', 'payment_requests', 'admin_audit_logs', 'approval_workflows'] as const;
+    const tableStatus: Record<string, string> = {};
 
     for (const table of tables) {
       try {
-        const { error: tableError } = await supabase.
-        from(table).
-        select('count').
-        limit(1);
+        const { error: tableError } = await supabase
+          .from(table)
+          .select('count')
+          .limit(1);
 
         tableStatus[table] = tableError ? `Error: ${tableError.message}` : 'Exists';
-      } catch (err) {
+      } catch (err: any) {
         tableStatus[table] = `Error: ${err.message}`;
       }
     }
 
     return tableStatus;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Table listing failed:', error);
     return { error: error.message };
   }

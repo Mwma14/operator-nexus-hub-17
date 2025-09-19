@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Search, Package } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Product {
   id: number;
@@ -64,9 +65,9 @@ export default function ProductManagement() {
 
   useEffect(() => {
     const filtered = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
   }, [products, searchTerm]);
@@ -74,15 +75,14 @@ export default function ProductManagement() {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await window.ezsite.apis.tablePage(44172, {
-        PageNo: 1,
-        PageSize: 1000,
-        OrderByField: 'created_at',
-        IsAsc: false
-      });
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
-      if (error) throw new Error(error);
-      setProducts(data?.List || []);
+      if (error) throw new Error(error.message);
+      setProducts(data || []);
     } catch (error) {
       console.error('Failed to fetch products:', error);
       toast({
@@ -97,18 +97,21 @@ export default function ProductManagement() {
 
   const logAdminAction = async (actionType: string, targetId: string, notes: string, oldValues?: any, newValues?: any) => {
     try {
-      await window.ezsite.apis.tableCreate(44177, {
-        admin_user_id: 1, // This should be the current admin's ID
-        action_type: actionType,
-        target_type: 'product',
-        target_id: targetId,
-        old_values: oldValues ? JSON.stringify(oldValues) : '',
-        new_values: newValues ? JSON.stringify(newValues) : '',
-        ip_address: '',
-        user_agent: navigator.userAgent,
-        notes,
-        created_at: new Date().toISOString()
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('admin_audit_logs')
+        .insert({
+          admin_user_id: user?.id || null,
+          action_type: actionType,
+          target_type: 'product',
+          target_id: targetId,
+          old_values: oldValues ? JSON.stringify(oldValues) : '',
+          new_values: newValues ? JSON.stringify(newValues) : '',
+          ip_address: '',
+          user_agent: navigator.userAgent,
+          notes,
+          created_at: new Date().toISOString()
+        });
     } catch (error) {
       console.error('Failed to log admin action:', error);
     }
@@ -121,13 +124,15 @@ export default function ProductManagement() {
 
       if (editingProduct) {
         // Update existing product
-        const { error } = await window.ezsite.apis.tableUpdate(44172, {
-          id: editingProduct.id,
-          ...formData,
-          updated_at: now
-        });
+        const { error } = await supabase
+          .from('products')
+          .update({
+            ...formData,
+            updated_at: now
+          })
+          .eq('id', editingProduct.id);
 
-        if (error) throw new Error(error);
+        if (error) throw new Error(error.message);
 
         await logAdminAction('update', editingProduct.id.toString(), `Updated product: ${formData.name}`, editingProduct, formData);
 
@@ -137,13 +142,15 @@ export default function ProductManagement() {
         });
       } else {
         // Create new product
-        const { error } = await window.ezsite.apis.tableCreate(44172, {
-          ...formData,
-          created_at: now,
-          updated_at: now
-        });
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            ...formData,
+            created_at: now,
+            updated_at: now
+          });
 
-        if (error) throw new Error(error);
+        if (error) throw new Error(error.message);
 
         await logAdminAction('create', 'new', `Created product: ${formData.name}`, null, formData);
 
@@ -170,9 +177,12 @@ export default function ProductManagement() {
 
   const handleDelete = async (productId: number, productName: string) => {
     try {
-      const { error } = await window.ezsite.apis.tableDelete(44172, { id: productId });
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
 
-      if (error) throw new Error(error);
+      if (error) throw new Error(error.message);
 
       await logAdminAction('delete', productId.toString(), `Deleted product: ${productName}`);
 
@@ -196,7 +206,12 @@ export default function ProductManagement() {
     try {
       for (const productId of selectedProducts) {
         const product = products.find((p) => p.id === productId);
-        await window.ezsite.apis.tableDelete(44172, { id: productId });
+        const { error } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', productId);
+        
+        if (error) throw new Error(error.message);
         await logAdminAction('bulk_delete', productId.toString(), `Bulk deleted product: ${product?.name}`);
       }
 
@@ -222,12 +237,15 @@ export default function ProductManagement() {
       for (const productId of selectedProducts) {
         const product = products.find((p) => p.id === productId);
         if (product) {
-          await window.ezsite.apis.tableUpdate(44172, {
-            id: productId,
-            ...product,
-            is_active: isActive,
-            updated_at: new Date().toISOString()
-          });
+          const { error } = await supabase
+            .from('products')
+            .update({
+              is_active: isActive,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', productId);
+          
+          if (error) throw new Error(error.message);
           await logAdminAction('bulk_status_update', productId.toString(), `Bulk ${isActive ? 'activated' : 'deactivated'} product: ${product.name}`);
         }
       }
@@ -288,8 +306,8 @@ export default function ProductManagement() {
     return (
       <div className="flex justify-center py-12">
         <LoadingSpinner size="lg" />
-      </div>);
-
+      </div>
+    );
   }
 
   return (
@@ -306,110 +324,113 @@ export default function ProductManagement() {
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={() => {resetForm();setIsDialogOpen(true);}} className="w-full md:w-auto">
+                <Button onClick={() => { resetForm(); setIsDialogOpen(true); }} className="w-full md:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="text-lg md:text-xl text-white">
+                  <DialogTitle className="text-lg md:text-xl">
                     {editingProduct ? 'Edit Product' : 'Create New Product'}
                   </DialogTitle>
-                  <DialogDescription className="text-sm md:text-base text-slate-300">
+                  <DialogDescription className="text-sm md:text-base">
                     {editingProduct ? 'Update product information' : 'Add a new product to the catalog'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-white font-medium">Product Name</Label>
+                    <Label htmlFor="name">Product Name</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Enter product name (e.g. 5GB Data Pack)"
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price" className="text-white font-medium">Price (MMK)</Label>
+                    <Label htmlFor="price">Price (MMK)</Label>
                     <Input
                       id="price"
                       type="number"
                       value={formData.price || ''}
                       placeholder="Enter price (e.g. 5000)"
                       onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) || 0 })}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="operator" className="text-white font-medium">Operator</Label>
+                    <Label htmlFor="operator">Operator</Label>
                     <select
                       id="operator"
                       value={formData.operator}
                       onChange={(e) => setFormData({ ...formData, operator: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option value="" className="text-slate-400">Select Operator</option>
-                      {operators.map((op) =>
-                      <option key={op} value={op} className="text-white">{op}</option>
-                      )}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      <option value="">Select Operator</option>
+                      {operators.map((op) => (
+                        <option key={op} value={op}>{op}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="category" className="text-white font-medium">Category</Label>
+                    <Label htmlFor="category">Category</Label>
                     <select
                       id="category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option value="" className="text-slate-400">Select Category</option>
-                      {categories.map((cat) =>
-                      <option key={cat} value={cat} className="text-white">{cat}</option>
-                      )}
+                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stock" className="text-white font-medium">Stock Quantity</Label>
+                    <Label htmlFor="stock">Stock Quantity</Label>
                     <Input
                       id="stock"
                       type="number"
                       value={formData.stock_quantity || ''}
                       placeholder="Enter stock quantity (e.g. 100)"
                       onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) || 0 })}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="validity" className="text-white font-medium">Validity (Days)</Label>
+                    <Label htmlFor="validity">Validity (Days)</Label>
                     <Input
                       id="validity"
                       type="number"
                       value={formData.validity_days || ''}
                       placeholder="Enter validity in days (e.g. 30)"
                       onChange={(e) => setFormData({ ...formData, validity_days: Number(e.target.value) || 0 })}
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="description" className="text-white font-medium">Description</Label>
+                    <Label htmlFor="description">Description</Label>
                     <Textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       placeholder="Enter detailed product description..."
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="admin-notes" className="text-white font-medium">Admin Notes</Label>
+                    <Label htmlFor="admin-notes">Admin Notes</Label>
                     <Textarea
                       id="admin-notes"
                       value={formData.admin_notes}
                       onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
                       placeholder="Internal notes for administrators (not visible to customers)..."
-                      className="bg-slate-800 border-slate-600 text-white placeholder-slate-400" />
+                    />
                   </div>
                   <div className="col-span-1 md:col-span-2 flex items-center space-x-2">
                     <Checkbox
                       id="active"
                       checked={formData.is_active}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked === true })} />
-                    <Label htmlFor="active" className="text-white font-medium">Product is active and available for purchase</Label>
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked === true })}
+                    />
+                    <Label htmlFor="active">Product is active and available for purchase</Label>
                   </div>
                 </div>
                 <DialogFooter className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
@@ -434,151 +455,175 @@ export default function ProductManagement() {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10" />
-
+                className="pl-10"
+              />
             </div>
-            {selectedProducts.length > 0 &&
-            <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+            {selectedProducts.length > 0 && (
+              <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                 <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkToggleStatus(true)}
-                className="w-full md:w-auto">
-
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkToggleStatus(true)}
+                  className="w-full md:w-auto"
+                >
                   Activate Selected ({selectedProducts.length})
                 </Button>
                 <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkToggleStatus(false)}
-                className="w-full md:w-auto">
-
-                  Deactivate Selected
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkToggleStatus(false)}
+                  className="w-full md:w-auto"
+                >
+                  Deactivate Selected ({selectedProducts.length})
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm" className="w-full md:w-auto">
-                      Delete Selected
+                      Delete Selected ({selectedProducts.length})
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Confirm Bulk Delete</AlertDialogTitle>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete {selectedProducts.length} selected products? This action cannot be undone.
+                        This will permanently delete {selectedProducts.length} selected products. This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleBulkDelete}>
-                        Delete Products
-                      </AlertDialogAction>
+                      <AlertDialogAction onClick={handleBulkDelete}>Delete</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
-            }
+            )}
           </div>
 
           {/* Products Table */}
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedProducts(filteredProducts.map((p) => p.id));
-                        } else {
-                          setSelectedProducts([]);
-                        }
-                      }} />
-
-                  </TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Operator</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.map((product) =>
-                <TableRow key={product.id}>
-                    <TableCell>
-                      <Checkbox
-                      checked={selectedProducts.includes(product.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedProducts([...selectedProducts, product.id]);
-                        } else {
-                          setSelectedProducts(selectedProducts.filter((id) => id !== product.id));
-                        }
-                      }} />
-
-                    </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.operator}</TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.price} {product.currency}</TableCell>
-                    <TableCell>{product.stock_quantity}</TableCell>
-                    <TableCell>
-                      <Badge variant={product.is_active ? "default" : "secondary"}>
-                        {product.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(product)}>
-
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{product.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                              onClick={() => handleDelete(product.id, product.name)}>
-
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {filteredProducts.length === 0 &&
-          <div className="text-center py-12">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-12">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No products found</p>
             </div>
-          }
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedProducts.length === filteredProducts.length}
+                        onCheckedChange={(checked) =>
+                          setSelectedProducts(
+                            checked ? filteredProducts.map((p) => p.id) : []
+                          )
+                        }
+                      />
+                    </TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Operator</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedProducts.includes(product.id)}
+                          onCheckedChange={(checked) =>
+                            setSelectedProducts(
+                              checked
+                                ? [...selectedProducts, product.id]
+                                : selectedProducts.filter((id) => id !== product.id)
+                            )
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{product.name}</div>
+                          <div className="text-sm text-gray-500 line-clamp-2">
+                            {product.description}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{product.operator}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{product.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-mono">
+                          {product.price.toLocaleString()} {product.currency}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`font-medium ${
+                          product.stock_quantity === 0 
+                            ? 'text-red-600' 
+                            : product.stock_quantity < 10 
+                            ? 'text-yellow-600' 
+                            : 'text-green-600'
+                        }`}>
+                          {product.stock_quantity}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={product.is_active ? 'default' : 'secondary'}
+                          className={product.is_active ? 'bg-green-100 text-green-800' : ''}
+                        >
+                          {product.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="text-red-600">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{product.name}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(product.id, product.name)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
-    </div>);
-
+    </div>
+  );
 }

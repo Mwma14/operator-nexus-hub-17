@@ -10,19 +10,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
 import { CheckSquare, X, Check, CreditCard, ShoppingCart, Eye } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CreditTransaction {
   id: number;
-  user_id: number;
+  user_id: string;
   transaction_type: string;
-  amount: number;
+  credit_amount: number;
   currency: string;
   status: string;
   payment_method: string;
   payment_reference: string;
-  payment_proof: string;
-  approved_by: number;
-  approval_notes: string;
+  mmk_amount: number;
   previous_balance: number;
   new_balance: number;
   processed_at: string;
@@ -32,24 +31,17 @@ interface CreditTransaction {
 
 interface Order {
   id: number;
-  user_id: number;
-  product_id: string;
-  product_name: string;
-  product_description: string;
-  amount: number;
+  user_id: string;
+  product_id: number;
+  quantity: number;
+  total_price: number;
   currency: string;
   status: string;
-  payment_status: string;
-  approval_status: string;
   operator: string;
-  category: string;
-  customer_phone: string;
-  transaction_id: string;
-  approved_by: number;
-  approval_notes: string;
-  processed_at: string;
+  phone_number: string;
+  admin_notes: string;
   created_at: string;
-  notes: string;
+  processed_at: string;
 }
 
 type ApprovalItem = CreditTransaction | Order;
@@ -76,28 +68,26 @@ export default function ApprovalWorkflows() {
       setIsLoading(true);
 
       // Fetch pending credit transactions
-      const { data: creditData, error: creditError } = await window.ezsite.apis.tablePage(44176, {
-        PageNo: 1,
-        PageSize: 1000,
-        Filters: [{ name: 'status', op: 'Equal', value: 'pending' }],
-        OrderByField: 'created_at',
-        IsAsc: false
-      });
+      const { data: creditData, error: creditError } = await supabase
+        .from('credit_transactions')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
-      if (creditError) throw new Error(creditError);
-      setCreditRequests(creditData?.List || []);
+      if (creditError) throw new Error(creditError.message);
+      setCreditRequests(creditData || []);
 
       // Fetch pending orders
-      const { data: orderData, error: orderError } = await window.ezsite.apis.tablePage(44175, {
-        PageNo: 1,
-        PageSize: 1000,
-        Filters: [{ name: 'approval_status', op: 'Equal', value: 'pending' }],
-        OrderByField: 'created_at',
-        IsAsc: false
-      });
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
-      if (orderError) throw new Error(orderError);
-      setOrderRequests(orderData?.List || []);
+      if (orderError) throw new Error(orderError.message);
+      setOrderRequests(orderData || []);
     } catch (error) {
       console.error('Failed to fetch approval items:', error);
       toast({
@@ -112,18 +102,21 @@ export default function ApprovalWorkflows() {
 
   const logAdminAction = async (actionType: string, targetType: string, targetId: string, notes: string) => {
     try {
-      await window.ezsite.apis.tableCreate(44177, {
-        admin_user_id: 1, // This should be the current admin's ID
-        action_type: actionType,
-        target_type: targetType,
-        target_id: targetId,
-        old_values: '',
-        new_values: '',
-        ip_address: '',
-        user_agent: navigator.userAgent,
-        notes,
-        created_at: new Date().toISOString()
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('admin_audit_logs')
+        .insert({
+          admin_user_id: user?.id || null,
+          action_type: actionType,
+          target_type: targetType,
+          target_id: targetId,
+          old_values: '',
+          new_values: '',
+          ip_address: '',
+          user_agent: navigator.userAgent,
+          notes,
+          created_at: new Date().toISOString()
+        });
     } catch (error) {
       console.error('Failed to log admin action:', error);
     }
@@ -141,53 +134,51 @@ export default function ApprovalWorkflows() {
         const creditTransaction = selectedItem as CreditTransaction;
 
         // Update credit transaction status
-        const { error: updateError } = await window.ezsite.apis.tableUpdate(44176, {
-          id: creditTransaction.id,
-          ...creditTransaction,
-          status: isApproval ? 'approved' : 'rejected',
-          approved_by: 1, // Current admin ID
-          approval_notes: notes,
-          processed_at: now,
-          updated_at: now
-        });
+        const { error: updateError } = await supabase
+          .from('credit_transactions')
+          .update({
+            status: isApproval ? 'approved' : 'rejected',
+            admin_notes: notes,
+            processed_at: now,
+          })
+          .eq('id', creditTransaction.id);
 
-        if (updateError) throw new Error(updateError);
+        if (updateError) throw new Error(updateError.message);
 
         // If approved, update user's credit balance
         if (isApproval) {
-          // First get current user profile
-          const { data: userProfiles, error: userError } = await window.ezsite.apis.tablePage(44173, {
-            PageNo: 1,
-            PageSize: 1,
-            Filters: [{ name: 'user_id', op: 'Equal', value: creditTransaction.user_id }]
-          });
+          const { data: userProfile, error: userError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', creditTransaction.user_id)
+            .single();
 
-          if (userError) throw new Error(userError);
+          if (userError) throw new Error(userError.message);
 
-          const userProfile = userProfiles?.List?.[0];
           if (userProfile) {
             const currentBalance = userProfile.credits_balance || 0;
-            const newBalance = currentBalance + creditTransaction.amount;
+            const newBalance = currentBalance + creditTransaction.credit_amount;
 
-            const { error: balanceError } = await window.ezsite.apis.tableUpdate(44173, {
-              id: userProfile.id,
-              ...userProfile,
-              credits_balance: newBalance,
-              updated_at: now
-            });
+            const { error: balanceError } = await supabase
+              .from('user_profiles')
+              .update({
+                credits_balance: newBalance,
+                updated_at: now
+              })
+              .eq('id', userProfile.id);
 
-            if (balanceError) throw new Error(balanceError);
+            if (balanceError) throw new Error(balanceError.message);
 
             // Update transaction with balance info
-            await window.ezsite.apis.tableUpdate(44176, {
-              id: creditTransaction.id,
-              ...creditTransaction,
-              status: 'completed',
-              previous_balance: currentBalance,
-              new_balance: newBalance,
-              processed_at: now,
-              updated_at: now
-            });
+            await supabase
+              .from('credit_transactions')
+              .update({
+                status: 'completed',
+                previous_balance: currentBalance,
+                new_balance: newBalance,
+                processed_at: now,
+              })
+              .eq('id', creditTransaction.id);
           }
         }
 
@@ -201,19 +192,17 @@ export default function ApprovalWorkflows() {
       } else {
         const order = selectedItem as Order;
 
-        // Update order approval status
-        const { error: updateError } = await window.ezsite.apis.tableUpdate(44175, {
-          id: order.id,
-          ...order,
-          approval_status: isApproval ? 'approved' : 'rejected',
-          status: isApproval ? 'processing' : 'cancelled',
-          approved_by: 1, // Current admin ID
-          approval_notes: notes,
-          processed_at: now,
-          updated_at: now
-        });
+        // Update order status
+        const { error: updateError } = await supabase
+          .from('orders')
+          .update({
+            status: isApproval ? 'processing' : 'cancelled',
+            admin_notes: notes,
+            processed_at: now,
+          })
+          .eq('id', order.id);
 
-        if (updateError) throw new Error(updateError);
+        if (updateError) throw new Error(updateError.message);
 
         await logAdminAction(
           isApproval ? 'approve_order' : 'reject_order',
@@ -264,8 +253,8 @@ export default function ApprovalWorkflows() {
     return (
       <div className="flex justify-center py-12">
         <LoadingSpinner size="lg" />
-      </div>);
-
+      </div>
+    );
   }
 
   return (
@@ -297,13 +286,13 @@ export default function ApprovalWorkflows() {
 
             {/* Credit Requests Tab */}
             <TabsContent value="credits">
-              {creditRequests.length === 0 ?
-              <div className="text-center py-12">
+              {creditRequests.length === 0 ? (
+                <div className="text-center py-12">
                   <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No pending credit requests</p>
-                </div> :
-
-              <div className="overflow-x-auto">
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -311,14 +300,13 @@ export default function ApprovalWorkflows() {
                         <TableHead>Amount</TableHead>
                         <TableHead>Payment Method</TableHead>
                         <TableHead>Reference</TableHead>
-                        <TableHead>Proof</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {creditRequests.map((request) =>
-                    <TableRow key={request.id}>
+                      {creditRequests.map((request) => (
+                        <TableRow key={request.id}>
                           <TableCell>
                             <div>
                               <div className="font-medium">User ID: {request.user_id}</div>
@@ -326,24 +314,13 @@ export default function ApprovalWorkflows() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono">{request.amount} {request.currency}</span>
+                            <span className="font-mono">{request.credit_amount} Credits</span>
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">{request.payment_method}</Badge>
                           </TableCell>
                           <TableCell className="max-w-32 truncate">
                             {request.payment_reference}
-                          </TableCell>
-                          <TableCell>
-                            {request.payment_proof ?
-                        <Button variant="outline" size="sm" asChild>
-                                <a href={request.payment_proof} target="_blank" rel="noopener noreferrer">
-                                  <Eye className="h-4 w-4" />
-                                </a>
-                              </Button> :
-
-                        <span className="text-gray-400">No proof</span>
-                        }
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-gray-500">
@@ -353,42 +330,42 @@ export default function ApprovalWorkflows() {
                           <TableCell>
                             <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
                               <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => openApprovalDialog(request, 'credit', 'approve')}
-                            className="w-full md:w-auto">
-
+                                variant="default"
+                                size="sm"
+                                onClick={() => openApprovalDialog(request, 'credit', 'approve')}
+                                className="w-full md:w-auto"
+                              >
                                 <Check className="h-4 w-4 md:mr-0" />
                                 <span className="md:hidden ml-2">Approve</span>
                               </Button>
                               <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => openApprovalDialog(request, 'credit', 'reject')}
-                            className="w-full md:w-auto">
-
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => openApprovalDialog(request, 'credit', 'reject')}
+                                className="w-full md:w-auto"
+                              >
                                 <X className="h-4 w-4 md:mr-0" />
                                 <span className="md:hidden ml-2">Reject</span>
                               </Button>
                             </div>
                           </TableCell>
                         </TableRow>
-                    )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
-              }
+              )}
             </TabsContent>
 
             {/* Order Requests Tab */}
             <TabsContent value="orders">
-              {orderRequests.length === 0 ?
-              <div className="text-center py-12">
+              {orderRequests.length === 0 ? (
+                <div className="text-center py-12">
                   <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No pending order approvals</p>
-                </div> :
-
-              <div className="overflow-x-auto">
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -403,8 +380,8 @@ export default function ApprovalWorkflows() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {orderRequests.map((order) =>
-                    <TableRow key={order.id}>
+                      {orderRequests.map((order) => (
+                        <TableRow key={order.id}>
                           <TableCell>
                             <div className="font-medium">#{order.id}</div>
                           </TableCell>
@@ -413,23 +390,20 @@ export default function ApprovalWorkflows() {
                           </TableCell>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{order.product_name}</div>
+                              <div className="font-medium">Product #{order.product_id}</div>
                               <div className="text-sm text-gray-500">
-                                {order.operator} • {order.category}
+                                {order.operator}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono">{order.amount} {order.currency}</span>
+                            <span className="font-mono">{order.total_price} {order.currency}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono">{order.customer_phone}</span>
+                            <span className="font-mono">{order.phone_number}</span>
                           </TableCell>
                           <TableCell>
-                            <div className="flex flex-col space-y-1">
-                              <Badge variant="secondary">{order.status}</Badge>
-                              <Badge variant="outline">{order.payment_status}</Badge>
-                            </div>
+                            <Badge variant="secondary">{order.status}</Badge>
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-gray-500">
@@ -439,31 +413,31 @@ export default function ApprovalWorkflows() {
                           <TableCell>
                             <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
                               <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => openApprovalDialog(order, 'order', 'approve')}
-                            className="w-full md:w-auto">
-
+                                variant="default"
+                                size="sm"
+                                onClick={() => openApprovalDialog(order, 'order', 'approve')}
+                                className="w-full md:w-auto"
+                              >
                                 <Check className="h-4 w-4 md:mr-0" />
                                 <span className="md:hidden ml-2">Approve</span>
                               </Button>
                               <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => openApprovalDialog(order, 'order', 'reject')}
-                            className="w-full md:w-auto">
-
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => openApprovalDialog(order, 'order', 'reject')}
+                                className="w-full md:w-auto"
+                              >
                                 <X className="h-4 w-4 md:mr-0" />
                                 <span className="md:hidden ml-2">Reject</span>
                               </Button>
                             </div>
                           </TableCell>
                         </TableRow>
-                    )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
-              }
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -477,65 +451,56 @@ export default function ApprovalWorkflows() {
               {actionType === 'approve' ? 'Approve' : 'Reject'} {approvalType === 'credit' ? 'Credit Request' : 'Order'}
             </DialogTitle>
             <DialogDescription>
-              {actionType === 'approve' ? 'Approve' : 'Reject'} this {approvalType === 'credit' ? 'credit purchase request' : 'order'} and provide a reason.
+              {selectedItem && (
+                <div className="mt-4">
+                  <p>ID: #{selectedItem.id}</p>
+                  {approvalType === 'credit' && (
+                    <p>Credits: {(selectedItem as CreditTransaction).credit_amount}</p>
+                  )}
+                  {approvalType === 'order' && (
+                    <p>Amount: {(selectedItem as Order).total_price} {(selectedItem as Order).currency}</p>
+                  )}
+                </div>
+              )}
             </DialogDescription>
           </DialogHeader>
-
-          <div className="py-4">
-            {selectedItem &&
-            <div className="space-y-4">
-                {/* Request Details */}
-                <div className="p-4 bg-gray-50 rounded-lg space-y-2">
-                  {approvalType === 'credit' ?
-                <>
-                      <div><strong>User ID:</strong> {(selectedItem as CreditTransaction).user_id}</div>
-                      <div><strong>Amount:</strong> {(selectedItem as CreditTransaction).amount} {(selectedItem as CreditTransaction).currency}</div>
-                      <div><strong>Payment Method:</strong> {(selectedItem as CreditTransaction).payment_method}</div>
-                      <div><strong>Reference:</strong> {(selectedItem as CreditTransaction).payment_reference}</div>
-                    </> :
-
-                <>
-                      <div><strong>Order ID:</strong> #{(selectedItem as Order).id}</div>
-                      <div><strong>User ID:</strong> {(selectedItem as Order).user_id}</div>
-                      <div><strong>Product:</strong> {(selectedItem as Order).product_name}</div>
-                      <div><strong>Amount:</strong> {(selectedItem as Order).amount} {(selectedItem as Order).currency}</div>
-                      <div><strong>Phone:</strong> {(selectedItem as Order).customer_phone}</div>
-                    </>
-                }
-                </div>
-
-                {/* Notes Input */}
-                <div>
-                  <Label htmlFor="approval-notes">
-                    {actionType === 'approve' ? 'Approval' : 'Rejection'} Notes
-                  </Label>
-                  <Textarea
-                  id="approval-notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder={`Enter reason for ${actionType === 'approve' ? 'approval' : 'rejection'}...`}
-                  className="mt-1" />
-
-                </div>
-              </div>
-            }
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                placeholder={`Enter notes for ${actionType === 'approve' ? 'approval' : 'rejection'}...`}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="mt-2"
+              />
+            </div>
           </div>
-
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              disabled={isProcessing}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleApproval}
-              disabled={isProcessing || !notes.trim()}
-              variant={actionType === 'approve' ? 'default' : 'destructive'}>
-
-              {isProcessing ? <LoadingSpinner size="sm" /> : null}
+              disabled={isProcessing}
+              variant={actionType === 'approve' ? 'default' : 'destructive'}
+            >
+              {isProcessing ? (
+                <LoadingSpinner className="w-4 h-4 mr-2" />
+              ) : actionType === 'approve' ? (
+                <Check className="w-4 h-4 mr-2" />
+              ) : (
+                <X className="w-4 h-4 mr-2" />
+              )}
               {actionType === 'approve' ? 'Approve' : 'Reject'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>);
-
+    </div>
+  );
 }

@@ -11,29 +11,32 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import Navbar from '@/components/Navbar';
 import { CreditCard, Package, TrendingUp, Calendar, Eye, RefreshCw } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
-interface UserInfo {
-  ID: number;
-  Name: string;
-  Email: string;
-  CreateTime: string;
-  Roles: string;
+interface UserProfile {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  credits_balance: number;
+  avatar_url: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Order {
-  id: string;
+  id: number;
   user_id: string;
-  product_id: string;
-  product_name: string;
-  product_description: string;
-  amount: number;
+  product_id: number;
+  quantity: number;
+  total_price: number;
   currency: string;
   status: 'completed' | 'pending' | 'failed' | 'cancelled';
   operator: string;
-  category: string;
+  phone_number: string;
   created_at: string;
-  updated_at: string;
-  transaction_id?: string;
+  processed_at: string;
 }
 
 interface OrderStats {
@@ -44,7 +47,7 @@ interface OrderStats {
 }
 
 const Profile = () => {
-  const [user, setUser] = useState<UserInfo | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,12 +61,11 @@ const Profile = () => {
 
   const checkUser = async () => {
     try {
-      const response = await window.ezsite.apis.getUserInfo();
-      if (response.error || !response.data) {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
         navigate('/auth');
         return;
       }
-      setUser(response.data);
       await loadProfileData();
     } catch (error) {
       console.error('Error checking user:', error);
@@ -75,69 +77,64 @@ const Profile = () => {
     try {
       setIsLoading(true);
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Mock orders data
-      const mockOrders: Order[] = [
-      {
-        id: '1',
-        user_id: user.ID.toString(),
-        product_id: 'mpt-data-1gb',
-        product_name: 'MPT 1GB Data Pack',
-        product_description: 'High-speed data for 30 days',
-        amount: 2000,
-        currency: 'MMK',
-        status: 'completed',
-        operator: 'MPT',
-        category: 'Data',
-        created_at: '2024-01-15T10:30:00Z',
-        updated_at: '2024-01-15T10:31:00Z',
-        transaction_id: 'TXN123456'
-      },
-      {
-        id: '2',
-        user_id: user.ID.toString(),
-        product_id: 'ooredoo-minutes-100',
-        product_name: 'Ooredoo 100 Minutes',
-        product_description: '100 minutes to all networks',
-        amount: 1500,
-        currency: 'MMK',
-        status: 'completed',
-        operator: 'OOREDOO',
-        category: 'Minutes',
-        created_at: '2024-01-10T14:20:00Z',
-        updated_at: '2024-01-10T14:21:00Z',
-        transaction_id: 'TXN123455'
-      },
-      {
-        id: '3',
-        user_id: user.ID.toString(),
-        product_id: 'mytel-package',
-        product_name: 'MyTel Combo Package',
-        product_description: 'Data + Minutes package',
-        amount: 3000,
-        currency: 'MMK',
-        status: 'pending',
-        operator: 'MYTEL',
-        category: 'Packages',
-        created_at: '2024-01-20T09:15:00Z',
-        updated_at: '2024-01-20T09:15:00Z'
-      }];
+      // Get user profile
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw new Error('Failed to load profile');
+      }
 
-      // Mock order stats
-      const mockOrderStats: OrderStats = {
-        total_orders: mockOrders.length,
-        successful_orders: mockOrders.filter((o) => o.status === 'completed').length,
-        pending_orders: mockOrders.filter((o) => o.status === 'pending').length,
-        total_spent: mockOrders.
-        filter((o) => o.status === 'completed').
-        reduce((sum, o) => sum + o.amount, 0)
+      // If no profile exists, create one
+      if (!userProfile) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+            credits_balance: 15000, // Default balance for demo
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (createError) throw new Error('Failed to create profile');
+        setProfile(newProfile);
+      } else {
+        setProfile(userProfile);
+      }
+
+      // Get user orders
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw new Error('Failed to load orders');
+
+      setOrders(ordersData || []);
+
+      // Calculate order stats
+      const stats: OrderStats = {
+        total_orders: ordersData?.length || 0,
+        successful_orders: ordersData?.filter((o) => o.status === 'completed').length || 0,
+        pending_orders: ordersData?.filter((o) => o.status === 'pending').length || 0,
+        total_spent: ordersData
+          ?.filter((o) => o.status === 'completed')
+          .reduce((sum, o) => sum + o.total_price, 0) || 0
       };
 
-      setProfile(mockProfile);
-      setOrders(mockOrders);
-      setOrderStats(mockOrderStats);
+      setOrderStats(stats);
     } catch (error) {
       console.error('Error loading profile data:', error);
       toast({
@@ -151,7 +148,6 @@ const Profile = () => {
   };
 
   const refreshData = async () => {
-    if (!user) return;
     setIsRefreshing(true);
     await loadProfileData();
     setIsRefreshing(false);
@@ -163,21 +159,21 @@ const Profile = () => {
 
   const getStatusBadgeVariant = (status: Order['status']) => {
     switch (status) {
-      case 'completed':return 'default';
-      case 'pending':return 'secondary';
-      case 'failed':return 'destructive';
-      case 'cancelled':return 'outline';
-      default:return 'secondary';
+      case 'completed': return 'default';
+      case 'pending': return 'secondary';
+      case 'failed': return 'destructive';
+      case 'cancelled': return 'outline';
+      default: return 'secondary';
     }
   };
 
   const getInitials = (name: string) => {
-    return name.
-    split(' ').
-    map((part) => part[0]).
-    join('').
-    toUpperCase().
-    slice(0, 2);
+    return name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   if (isLoading) {
@@ -188,15 +184,15 @@ const Profile = () => {
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) =>
-              <Skeleton key={i} className="h-32" />
-              )}
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-32" />
+              ))}
             </div>
             <Skeleton className="h-96 w-full" />
           </div>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
@@ -227,7 +223,7 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-primary">
-                  15,000 MMK
+                  {profile?.credits_balance?.toLocaleString() || 0} MMK
                 </div>
               </CardContent>
             </Card>
@@ -285,21 +281,21 @@ const Profile = () => {
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src="" />
+                      <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="text-lg">
-                        {user?.Name ? getInitials(user.Name) :
-                        user?.Email ? getInitials(user.Email) : 'U'}
+                        {profile?.full_name ? getInitials(profile.full_name) :
+                        profile?.email ? getInitials(profile.email) : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
                       <h3 className="text-lg font-medium">
-                        {user?.Name || 'User'}
+                        {profile?.full_name || 'User'}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        {user?.Email}
+                        {profile?.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Member since {user?.CreateTime ? new Date(user.CreateTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'N/A'}
+                        Member since {profile?.created_at ? format(new Date(profile.created_at), 'MMMM yyyy') : 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -316,16 +312,16 @@ const Profile = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {orders.length === 0 ?
-                  <div className="text-center py-8">
+                  {orders.length === 0 ? (
+                    <div className="text-center py-8">
                       <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <h3 className="text-lg font-medium mb-2">No orders yet</h3>
                       <p className="text-muted-foreground">
                         Start shopping to see your orders here.
                       </p>
-                    </div> :
-
-                  <Table>
+                    </div>
+                  ) : (
+                    <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Product</TableHead>
@@ -337,13 +333,13 @@ const Profile = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {orders.map((order) =>
-                      <TableRow key={order.id}>
+                        {orders.map((order) => (
+                          <TableRow key={order.id}>
                             <TableCell>
                               <div>
-                                <div className="font-medium">{order.product_name}</div>
+                                <div className="font-medium">Order #{order.id}</div>
                                 <div className="text-sm text-muted-foreground">
-                                  {order.category}
+                                  Product ID: {order.product_id}
                                 </div>
                               </div>
                             </TableCell>
@@ -351,7 +347,7 @@ const Profile = () => {
                               <Badge variant="outline">{order.operator}</Badge>
                             </TableCell>
                             <TableCell>
-                              {order.amount.toLocaleString()} {order.currency}
+                              {order.total_price.toLocaleString()} {order.currency}
                             </TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadgeVariant(order.status)}>
@@ -365,10 +361,10 @@ const Profile = () => {
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedOrder(order)}>
-
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedOrder(order)}
+                                  >
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </DialogTrigger>
@@ -376,8 +372,8 @@ const Profile = () => {
                                   <DialogHeader>
                                     <DialogTitle>Order Details</DialogTitle>
                                   </DialogHeader>
-                                  {selectedOrder &&
-                              <div className="space-y-4">
+                                  {selectedOrder && (
+                                    <div className="space-y-4">
                                       <div className="grid grid-cols-2 gap-4">
                                         <div>
                                           <label className="text-sm font-medium">Order ID</label>
@@ -394,9 +390,9 @@ const Profile = () => {
                                           </div>
                                         </div>
                                         <div>
-                                          <label className="text-sm font-medium">Product</label>
+                                          <label className="text-sm font-medium">Product ID</label>
                                           <p className="text-sm text-muted-foreground">
-                                            {selectedOrder.product_name}
+                                            {selectedOrder.product_id}
                                           </p>
                                         </div>
                                         <div>
@@ -408,7 +404,7 @@ const Profile = () => {
                                         <div>
                                           <label className="text-sm font-medium">Amount</label>
                                           <p className="text-sm text-muted-foreground">
-                                            {selectedOrder.amount.toLocaleString()} {selectedOrder.currency}
+                                            {selectedOrder.total_price.toLocaleString()} {selectedOrder.currency}
                                           </p>
                                         </div>
                                         <div>
@@ -417,39 +413,31 @@ const Profile = () => {
                                             {format(new Date(selectedOrder.created_at), 'PPP')}
                                           </p>
                                         </div>
-                                      </div>
-                                      {selectedOrder.transaction_id &&
-                                <div>
-                                          <label className="text-sm font-medium">Transaction ID</label>
+                                        <div>
+                                          <label className="text-sm font-medium">Phone Number</label>
                                           <p className="text-sm text-muted-foreground">
-                                            {selectedOrder.transaction_id}
+                                            {selectedOrder.phone_number}
                                           </p>
                                         </div>
-                                }
-                                      <div>
-                                        <label className="text-sm font-medium">Description</label>
-                                        <p className="text-sm text-muted-foreground">
-                                          {selectedOrder.product_description}
-                                        </p>
                                       </div>
                                     </div>
-                              }
+                                  )}
                                 </DialogContent>
                               </Dialog>
                             </TableCell>
                           </TableRow>
-                      )}
+                        ))}
                       </TableBody>
                     </Table>
-                  }
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 };
 
 export default Profile;
