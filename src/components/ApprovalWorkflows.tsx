@@ -58,7 +58,7 @@ export default function ApprovalWorkflows() {
       const { data: payments, error: paymentError } = await supabase
         .from('payment_requests')
         .select('*')
-        .in('status', ['approved', 'denied'])
+        .in('status', ['approved', 'rejected'])
         .order('created_at', { ascending: false });
 
       if (paymentError) throw paymentError;
@@ -66,7 +66,7 @@ export default function ApprovalWorkflows() {
       // Transform products to approval format
       const transformedProducts = (products || []).map(product => ({
         ...product,
-        status: product.is_active ? 'approved' : 'denied'
+        status: product.is_active ? 'approved' : 'rejected'
       }));
 
       setProductApprovals(transformedProducts);
