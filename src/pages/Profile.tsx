@@ -81,19 +81,19 @@ const Profile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get user profile
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+        // Get user profile
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw new Error('Failed to load profile');
-      }
+        if (profileError && profileError.code !== 'PGRST116') {
+          throw new Error('Failed to load profile');
+        }
 
-      // If no profile exists, create one
-      if (!userProfile) {
+          // If no profile exists, create one
+          if (!userProfile) {
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
           .insert({
@@ -122,14 +122,29 @@ const Profile = () => {
 
       if (ordersError) throw new Error('Failed to load orders');
 
-      setOrders(ordersData || []);
+      // Map the data to ensure correct types
+      const typedOrders: Order[] = (ordersData || []).map(order => ({
+        id: Number(order.id),
+        user_id: order.user_id,
+        product_id: order.product_id,
+        quantity: order.quantity || 1,
+        total_price: order.total_price,
+        currency: order.currency || 'MMK',
+        status: (order.status as 'completed' | 'pending' | 'failed' | 'cancelled') || 'pending',
+        operator: order.operator || '',
+        phone_number: order.phone_number || '',
+        created_at: order.created_at,
+        processed_at: order.processed_at
+      }));
+
+      setOrders(typedOrders);
 
       // Calculate order stats
       const stats: OrderStats = {
-        total_orders: ordersData?.length || 0,
-        successful_orders: ordersData?.filter((o) => o.status === 'completed').length || 0,
-        pending_orders: ordersData?.filter((o) => o.status === 'pending').length || 0,
-        total_spent: ordersData
+        total_orders: typedOrders?.length || 0,
+        successful_orders: typedOrders?.filter((o) => o.status === 'completed').length || 0,
+        pending_orders: typedOrders?.filter((o) => o.status === 'pending').length || 0,
+        total_spent: typedOrders
           ?.filter((o) => o.status === 'completed')
           .reduce((sum, o) => sum + o.total_price, 0) || 0
       };

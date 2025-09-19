@@ -1,142 +1,166 @@
-
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { Shield, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { Shield, Zap, ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-export default function QuickAdminSetup() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'already_admin'>('loading');
-  const [message, setMessage] = useState('');
+const QuickAdminSetup = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setupAdmin();
+    getCurrentUser();
   }, []);
 
-  const setupAdmin = async () => {
+  const getCurrentUser = async () => {
     try {
-      // Get current user
-      const { data: userInfo, error: userError } = await window.ezsite.apis.getUserInfo();
-      if (userError) throw new Error(userError);
-      if (!userInfo) throw new Error('Please log in first');
-
-      // Check if admin role already exists
-      const { data: existingRole, error: checkError } = await window.ezsite.apis.tablePage(44174, {
-        PageNo: 1,
-        PageSize: 10,
-        Filters: [
-        { name: 'user_id', op: 'Equal', value: userInfo.ID },
-        { name: 'role_name', op: 'Equal', value: 'admin' },
-        { name: 'is_active', op: 'Equal', value: true }]
-
-      });
-
-      if (checkError) throw new Error(checkError);
-
-      if (existingRole && existingRole.List && existingRole.List.length > 0) {
-        setStatus('already_admin');
-        setMessage('You already have admin privileges!');
-        return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setCurrentUserEmail(user.email);
       }
-
-      // Create admin role
-      const { error: createError } = await window.ezsite.apis.tableCreate(44174, {
-        user_id: userInfo.ID,
-        role_name: 'admin',
-        permissions: JSON.stringify(['full_access']),
-        granted_by: userInfo.ID,
-        granted_at: new Date().toISOString(),
-        is_active: true
-      });
-
-      if (createError) throw new Error(createError);
-
-      setStatus('success');
-      setMessage('Admin role created successfully!');
-
-      // Auto-redirect after 3 seconds
-      setTimeout(() => {
-        window.location.href = '/admin';
-      }, 3000);
-
     } catch (error) {
-      setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Setup failed');
+      console.error('Error getting current user:', error);
     }
   };
 
-  const handleGoToAdmin = () => {
-    window.location.href = '/admin';
+  const quickSetupAdmin = async () => {
+    try {
+      setIsLoading(true);
+
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Create admin email by modifying current email
+      const adminEmail = user.email?.includes('admin') 
+        ? user.email 
+        : `admin.${user.email}`;
+
+      // Check if user profile exists and create/update it
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existingProfile) {
+        // Update existing profile with admin email
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({
+            email: adminEmail,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingProfile.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new admin profile
+        const { error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            email: adminEmail,
+            full_name: user.user_metadata?.full_name || adminEmail.split('@')[0],
+            credits_balance: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+
+        if (createError) throw createError;
+      }
+
+      toast({
+        title: 'Success!',
+        description: 'Quick admin setup completed successfully!'
+      });
+
+      // Redirect to admin dashboard
+      setTimeout(() => {
+        navigate('/admin');
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error in quick setup:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to setup admin access',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="max-w-md w-full">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-            <Shield className="w-6 h-6 text-blue-600" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center space-y-3">
+          <div className="mx-auto w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center">
+            <Zap className="w-6 h-6 text-orange-500" />
           </div>
-          <CardTitle>Quick Admin Setup</CardTitle>
-          <CardDescription>
-            Setting up admin access for your account
-          </CardDescription>
+          <CardTitle className="text-2xl">Quick Admin Setup</CardTitle>
+          <p className="text-muted-foreground text-sm">
+            Instantly set up admin access for your current account
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {status === 'loading' &&
-          <div className="text-center py-8">
-              <LoadingSpinner size="lg" className="mx-auto mb-4" />
-              <p className="text-gray-600">Setting up admin privileges...</p>
+          {currentUserEmail && (
+            <div className="bg-muted/50 rounded-lg p-3 text-sm">
+              <p className="font-medium">Current Email:</p>
+              <p className="text-muted-foreground">{currentUserEmail}</p>
             </div>
-          }
+          )}
 
-          {status === 'success' &&
-          <div className="space-y-4">
-              <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-4">
-                  Redirecting to admin panel in 3 seconds...
-                </p>
-                <Button onClick={handleGoToAdmin} className="w-full">
-                  Go to Admin Panel <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <Shield className="w-4 h-4" />
+              <span>Grants full administrative access</span>
             </div>
-          }
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <ArrowRight className="w-4 h-4" />
+              <span>Redirects to admin dashboard</span>
+            </div>
+          </div>
 
-          {status === 'already_admin' &&
-          <div className="space-y-4">
-              <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-              <Button onClick={handleGoToAdmin} className="w-full">
-                Go to Admin Panel <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          }
+          <Button 
+            onClick={quickSetupAdmin} 
+            disabled={isLoading}
+            className="w-full"
+            size="lg"
+          >
+            {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
+            <Zap className="w-4 h-4 mr-2" />
+            Quick Setup Admin Access
+          </Button>
 
-          {status === 'error' &&
-          <div className="space-y-4">
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{message}</AlertDescription>
-              </Alert>
-              <div className="space-y-2">
-                <Button onClick={setupAdmin} className="w-full">
-                  Try Again
-                </Button>
-                <Button variant="outline" onClick={() => window.location.href = '/'} className="w-full">
-                  Back to Home
-                </Button>
-              </div>
-            </div>
-          }
+          <div className="text-center space-y-2">
+            <Button
+              onClick={() => navigate('/admin-setup')}
+              variant="outline"
+              className="w-full"
+            >
+              Custom Admin Setup
+            </Button>
+            <Button
+              onClick={() => navigate('/auth')}
+              variant="link"
+              className="text-sm"
+            >
+              Back to Authentication
+            </Button>
+          </div>
         </CardContent>
       </Card>
-    </div>);
+    </div>
+  );
+};
 
-}
+export default QuickAdminSetup;

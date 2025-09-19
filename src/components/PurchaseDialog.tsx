@@ -95,35 +95,35 @@ export default function PurchaseDialog({
         throw new Error('Failed to get user information');
       }
 
-      // Check user profile exists, create if not
-      let { data: userProfile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+          // Check user profile exists, create if not
+          let { data: userProfile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
 
-      let currentBalance = userBalance;
+          let currentBalance = userBalance;
 
-      if (profileError && profileError.code === 'PGRST116') {
-        // Profile doesn't exist, create it
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({
-            user_id: user.id,
-            email: user.email || '',
-            full_name: user.user_metadata?.full_name || '',
-            credits_balance: userBalance,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+          if (!userProfile) {
+            // Profile doesn't exist, create it
+            const { data: newProfile, error: createError } = await supabase
+              .from('user_profiles')
+              .insert({
+                user_id: user.id,
+                email: user.email || '',
+                full_name: user.user_metadata?.full_name || '',
+                credits_balance: userBalance,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .select()
+              .single();
 
-        if (createError) throw new Error('Failed to create user profile');
-        userProfile = newProfile;
-      } else if (profileError) {
-        throw new Error('Failed to get user profile');
-      }
+            if (createError) throw new Error('Failed to create user profile');
+            userProfile = newProfile;
+          } else if (profileError) {
+            throw new Error('Failed to get user profile');
+          }
 
       currentBalance = userProfile?.credits_balance || 0;
 
