@@ -45,15 +45,13 @@ export default function ApprovalWorkflows() {
     try {
       setLoading(true);
 
-      // Fetch product approval workflows (approved/rejected)
-      const { data: productWorkflows, error: productWfError } = await supabase
-        .from('approval_workflows')
+      // Fetch products directly and derive approval status
+      const { data: products, error: productsError } = await supabase
+        .from('products')
         .select('*')
-        .eq('workflow_type', 'product')
-        .in('status', ['approved', 'rejected'])
-        .order('created_at', { ascending: false });
+        .order('updated_at', { ascending: false });
 
-      if (productWfError) throw productWfError;
+      if (productsError) throw productsError;
 
       // Fetch payment requests (credit approvals)
       const { data: payments, error: paymentError } = await supabase
@@ -64,63 +62,20 @@ export default function ApprovalWorkflows() {
 
       if (paymentError) throw paymentError;
 
-      // Fetch related products and merge with workflows
-      const productIds = Array.from(new Set((productWorkflows || []).map((wf: any) => wf.target_id)));
-      let productsById: Record<number, any> = {};
-      if (productIds.length > 0) {
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*')
-          .in('id', productIds);
-        if (productsError) throw productsError;
-        productsById = (productsData || []).reduce((acc: any, p: any) => {
-          acc[p.id] = p;
-          return acc;
-        }, {});
-      }
+      const transformedProducts = (products || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        status: p.is_active ? 'approved' : 'rejected',
+        admin_notes: p.admin_notes || '',
+        category: p.category,
+        operator: p.operator,
+        price: p.price || 0,
+        is_active: p.is_active ?? false,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+      })) as ProductApproval[];
 
-      const transformedProducts = (productWorkflows || []).map((wf: any) => {
-        const p = productsById[wf.target_id] || {};
-        return {
-          id: wf.id, // workflow id
-          name: p.name || `Product #${wf.target_id}`,
-          status: wf.status,
-          admin_notes: wf.admin_notes || '',
-          category: p.category || '-',
-          operator: p.operator || '-',
-          price: p.price || 0,
-          is_active: p.is_active ?? false,
-          created_at: wf.created_at,
-          updated_at: wf.processed_at || wf.created_at,
-        } as ProductApproval;
-      });
-
-      // Fallback: if no workflows exist yet, derive from products with admin notes
-      let finalProducts = transformedProducts;
-      if (finalProducts.length === 0) {
-        const { data: productsWithNotes, error: productsFallbackError } = await supabase
-          .from('products')
-          .select('*')
-          .not('admin_notes', 'is', null)
-          .order('updated_at', { ascending: false })
-          .limit(100);
-        if (!productsFallbackError && productsWithNotes) {
-          finalProducts = productsWithNotes.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            status: p.is_active ? 'approved' : 'rejected',
-            admin_notes: p.admin_notes || '',
-            category: p.category,
-            operator: p.operator,
-            price: p.price,
-            is_active: p.is_active,
-            created_at: p.created_at,
-            updated_at: p.updated_at,
-          }));
-        }
-      }
-
-      setProductApprovals(finalProducts);
+      setProductApprovals(transformedProducts);
       setCreditRequests(payments || []);
     } catch (error) {
       console.error('Error fetching approval data:', error);
