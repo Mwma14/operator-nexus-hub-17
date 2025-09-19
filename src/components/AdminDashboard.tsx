@@ -4,6 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import SampleDataInitializer from '@/components/SampleDataInitializer';
+import { initializeSampleProducts, setupAdminUser } from '@/utils/init-database';
+import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { Users, Package, CreditCard, AlertCircle, TrendingUp, DollarSign } from 'lucide-react';
 
 interface DashboardStats {
@@ -233,6 +237,24 @@ export default function AdminDashboard() {
           }
         </CardContent>
       </Card>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <Button 
+          onClick={handleInitializeProducts}
+          className="h-20 text-left flex flex-col items-start justify-center bg-blue-600 hover:bg-blue-700"
+        >
+          <span className="font-semibold">Initialize Sample Products</span>
+          <span className="text-sm text-blue-100">Add sample telecom products to the database</span>
+        </Button>
+        <Button 
+          onClick={handleSetupAdmin}
+          className="h-20 text-left flex flex-col items-start justify-center bg-green-600 hover:bg-green-700"
+        >
+          <span className="font-semibold">Setup Admin Account</span>
+          <span className="text-sm text-green-100">Configure current user as admin</span>
+        </Button>
+      </div>
 
       {/* Sample Data Section */}
       <div className="mb-8">

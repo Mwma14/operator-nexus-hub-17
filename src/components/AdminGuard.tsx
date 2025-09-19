@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -15,33 +16,35 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
-        // Get current user info
-        const { data: userInfo, error: userError } = await window.ezsite.apis.getUserInfo();
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) {
-          throw new Error(userError);
+          throw new Error(userError.message);
         }
 
-        if (!userInfo) {
+        if (!user) {
           throw new Error('Please log in to access the admin panel');
         }
 
-        // Check if user has admin role
-        const { data: rolesData, error: rolesError } = await window.ezsite.apis.tablePage(44174, {
-          PageNo: 1,
-          PageSize: 10,
-          Filters: [
-          { name: 'user_id', op: 'Equal', value: userInfo.ID },
-          { name: 'is_active', op: 'Equal', value: true },
-          { name: 'role_name', op: 'Equal', value: 'admin' }]
+        // Check if user has admin privileges by checking email or user_profiles table
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('user_id', user.id)
+          .single();
 
-        });
-
-        if (rolesError) {
-          throw new Error(rolesError);
+        if (profileError && profileError.code !== 'PGRST116') {
+          throw new Error('Failed to check admin status');
         }
 
-        if (!rolesData?.List || rolesData.List.length === 0) {
-          throw new Error('Access denied. Admin privileges required.');
+        // Check if user is admin (either from profile email or auth email)
+        const userEmail = profile?.email || user.email || '';
+        const isAdminUser = userEmail.toLowerCase().includes('admin') || 
+                           userEmail.toLowerCase() === 'admin@example.com' ||
+                           userEmail.toLowerCase() === 'admin@admin.com';
+
+        if (!isAdminUser) {
+          throw new Error('Access denied. Admin privileges required. Only users with admin email addresses can access this panel.');
         }
 
         setIsAdmin(true);
@@ -54,6 +57,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
     checkAdminAccess();
   }, []);
+    
 
   if (isLoading) {
     return (

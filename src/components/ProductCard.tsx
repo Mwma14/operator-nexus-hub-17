@@ -70,7 +70,7 @@ const ProductCard = ({ product, isSelected = false, onSelect, onPurchase }: Prod
       <div className="flex items-center justify-between">
         <div className="flex items-baseline space-x-2">
           <span className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
-            {(product.price || 0).toLocaleString()}
+            {typeof product.price === 'number' ? product.price.toLocaleString() : '0'}
           </span>
           <span className="text-white/60 text-sm font-medium">
             {product.currency}

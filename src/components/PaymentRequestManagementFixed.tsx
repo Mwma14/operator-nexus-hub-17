@@ -4,16 +4,16 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle 
-} from '@/components/ui/card';
+  CardTitle } from
+'@/components/ui/card';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow 
-} from '@/components/ui/table';
+  TableRow } from
+'@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -22,8 +22,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle 
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,8 +35,8 @@ import {
   Clock,
   User,
   CreditCard,
-  RefreshCw 
-} from 'lucide-react';
+  RefreshCw } from
+'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentRequest {
@@ -83,10 +83,10 @@ export function PaymentRequestManagement() {
       setError(null);
 
       // Fetch payment requests using Supabase client
-      const { data: requestsData, error: requestsError } = await supabase
-        .from('payment_requests')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: requestsData, error: requestsError } = await supabase.
+      from('payment_requests').
+      select('*').
+      order('created_at', { ascending: false });
 
       if (requestsError) throw requestsError;
 
@@ -100,11 +100,11 @@ export function PaymentRequestManagement() {
       for (const userId of userIds) {
         try {
           // Fetch user profile
-          const { data: profileData, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
+          const { data: profileData, error: profileError } = await supabase.
+          from('user_profiles').
+          select('*').
+          eq('user_id', userId).
+          single();
 
           if (!profileError && profileData) {
             profiles[userId] = profileData;
@@ -133,14 +133,14 @@ export function PaymentRequestManagement() {
       const now = new Date().toISOString();
 
       // Update the payment request status using Supabase client
-      const { error: updateError } = await supabase
-        .from('payment_requests')
-        .update({
-          status: isApproved ? 'approved' : 'rejected',
-          processed_at: now,
-          admin_notes: adminNotes
-        })
-        .eq('id', selectedRequest.id);
+      const { error: updateError } = await supabase.
+      from('payment_requests').
+      update({
+        status: isApproved ? 'approved' : 'rejected',
+        processed_at: now,
+        admin_notes: adminNotes
+      }).
+      eq('id', selectedRequest.id);
 
       if (updateError) throw updateError;
 
@@ -151,35 +151,35 @@ export function PaymentRequestManagement() {
           const newBalance = userProfile.credits_balance + selectedRequest.credits_requested;
 
           // Update user's credit balance
-          const { error: balanceError } = await supabase
-            .from('user_profiles')
-            .update({
-              credits_balance: newBalance,
-              updated_at: now
-            })
-            .eq('user_id', selectedRequest.user_id);
+          const { error: balanceError } = await supabase.
+          from('user_profiles').
+          update({
+            credits_balance: newBalance,
+            updated_at: now
+          }).
+          eq('user_id', selectedRequest.user_id);
 
           if (balanceError) throw balanceError;
 
           // Create a credit transaction record
-          const { error: transactionError } = await supabase
-            .from('credit_transactions')
-            .insert({
-              user_id: selectedRequest.user_id,
-              transaction_type: 'purchase',
-              mmk_amount: selectedRequest.total_cost_mmk,
-              credit_amount: selectedRequest.credits_requested,
-              currency: 'MMK',
-              status: 'completed',
-              payment_method: selectedRequest.payment_method,
-              payment_reference: `REQ-${selectedRequest.id}`,
-              previous_balance: userProfile.credits_balance,
-              new_balance: newBalance,
-              processed_at: now,
-              created_at: now,
-              admin_notes: `Approved payment request #${selectedRequest.id}`,
-              approval_notes: adminNotes
-            });
+          const { error: transactionError } = await supabase.
+          from('credit_transactions').
+          insert({
+            user_id: selectedRequest.user_id,
+            transaction_type: 'purchase',
+            mmk_amount: selectedRequest.total_cost_mmk,
+            credit_amount: selectedRequest.credits_requested,
+            currency: 'MMK',
+            status: 'completed',
+            payment_method: selectedRequest.payment_method,
+            payment_reference: `REQ-${selectedRequest.id}`,
+            previous_balance: userProfile.credits_balance,
+            new_balance: newBalance,
+            processed_at: now,
+            created_at: now,
+            admin_notes: `Approved payment request #${selectedRequest.id}`,
+            approval_notes: adminNotes
+          });
 
           if (transactionError) {
             console.error('Failed to create transaction record:', transactionError);
@@ -263,8 +263,8 @@ export function PaymentRequestManagement() {
             </Button>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>);
+
   }
 
   return (
@@ -292,13 +292,13 @@ export function PaymentRequestManagement() {
             </Button>
           </div>
 
-          {requests.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+          {requests.length === 0 ?
+          <div className="text-center py-12 text-muted-foreground">
               <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>No payment requests found</p>
-            </div>
-          ) : (
-            <div className="rounded-md border">
+            </div> :
+
+          <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -313,9 +313,9 @@ export function PaymentRequestManagement() {
                 </TableHeader>
                 <TableBody>
                   {requests.map((request) => {
-                    const profile = userProfiles[request.user_id];
-                    return (
-                      <TableRow key={request.id}>
+                  const profile = userProfiles[request.user_id];
+                  return (
+                    <TableRow key={request.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
@@ -355,35 +355,35 @@ export function PaymentRequestManagement() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {request.status === 'pending' && (
-                              <>
+                            {request.status === 'pending' &&
+                          <>
                                 <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-green-600 border-green-600 hover:bg-green-50"
-                                  onClick={() => openProcessDialog(request, 'approve')}
-                                >
+                              size="sm"
+                              variant="outline"
+                              className="text-green-600 border-green-600 hover:bg-green-50"
+                              onClick={() => openProcessDialog(request, 'approve')}>
+
                                   <CheckCircle className="w-3 h-3" />
                                 </Button>
                                 <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-red-600 border-red-600 hover:bg-red-50"
-                                  onClick={() => openProcessDialog(request, 'reject')}
-                                >
+                              size="sm"
+                              variant="outline"
+                              className="text-red-600 border-red-600 hover:bg-red-50"
+                              onClick={() => openProcessDialog(request, 'reject')}>
+
                                   <XCircle className="w-3 h-3" />
                                 </Button>
                               </>
-                            )}
+                          }
                           </div>
                         </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                      </TableRow>);
+
+                })}
                 </TableBody>
               </Table>
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
@@ -395,15 +395,15 @@ export function PaymentRequestManagement() {
               {processingType === 'approve' ? 'Approve' : 'Reject'} Payment Request
             </DialogTitle>
             <DialogDescription>
-              {selectedRequest && (
-                <div className="space-y-2 mt-4">
+              {selectedRequest &&
+              <div className="space-y-2 mt-4">
                   <div><strong>Request ID:</strong> #{selectedRequest.id}</div>
                   <div><strong>User:</strong> {userProfiles[selectedRequest.user_id]?.full_name || `User #${selectedRequest.user_id.slice(-6)}`}</div>
                   <div><strong>Credits:</strong> {selectedRequest.credits_requested}</div>
                   <div><strong>Amount:</strong> {formatCurrency(selectedRequest.total_cost_mmk)}</div>
                   <div><strong>Payment Method:</strong> {selectedRequest.payment_method}</div>
                 </div>
-              )}
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -414,35 +414,35 @@ export function PaymentRequestManagement() {
                 placeholder={`Enter notes for ${processingType === 'approve' ? 'approval' : 'rejection'}...`}
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                className="mt-2"
-              />
+                className="mt-2" />
+
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setProcessingDialog(false)}
-              disabled={isProcessing}
-            >
+              disabled={isProcessing}>
+
               Cancel
             </Button>
             <Button
               onClick={handleProcessRequest}
               disabled={isProcessing}
-              variant={processingType === 'approve' ? 'default' : 'destructive'}
-            >
-              {isProcessing ? (
-                <LoadingSpinner className="w-4 h-4 mr-2" />
-              ) : processingType === 'approve' ? (
-                <CheckCircle className="w-4 h-4 mr-2" />
-              ) : (
-                <XCircle className="w-4 h-4 mr-2" />
-              )}
+              variant={processingType === 'approve' ? 'default' : 'destructive'}>
+
+              {isProcessing ?
+              <LoadingSpinner className="w-4 h-4 mr-2" /> :
+              processingType === 'approve' ?
+              <CheckCircle className="w-4 h-4 mr-2" /> :
+
+              <XCircle className="w-4 h-4 mr-2" />
+              }
               {processingType === 'approve' ? 'Approve Request' : 'Reject Request'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }

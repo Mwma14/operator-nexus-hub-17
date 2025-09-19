@@ -95,11 +95,11 @@ const ProductListing = () => {
 
   const loadUserBalance = async (userId: string) => {
     try {
-      let { data: profile, error } = await supabase.
-      from('user_profiles').
-      select('credits_balance').
-      eq('user_id', userId).
-      single();
+      let { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('credits_balance')
+        .eq('user_id', userId)
+        .single();
 
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -107,15 +107,16 @@ const ProductListing = () => {
 
       if (!profile) {
         // Create initial profile with 0 balance
-        const { data: user } = await supabase.auth.getUser();
-        if (user.user) {
-          const { error: insertError } = await supabase.
-          from('user_profiles').
-          insert({
-            user_id: userId,
-            full_name: user.user.user_metadata?.full_name || '',
-            credits_balance: 0
-          });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { error: insertError } = await supabase
+            .from('user_profiles')
+            .insert({
+              user_id: userId,
+              email: user.email || '',
+              full_name: user.user_metadata?.full_name || '',
+              credits_balance: 0
+            });
 
           if (insertError) {
             console.error('Failed to create user profile:', insertError);
@@ -123,7 +124,7 @@ const ProductListing = () => {
           setUserBalance(0);
         }
       } else {
-        setUserBalance(profile.credits_balance || 0);
+        setUserBalance(Number(profile.credits_balance) || 0);
       }
     } catch (error) {
       console.error('Failed to load user balance:', error);

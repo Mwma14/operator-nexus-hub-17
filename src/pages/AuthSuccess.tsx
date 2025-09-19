@@ -2,12 +2,60 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export default function AuthSuccess() {
   const [countdown, setCountdown] = useState(5);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const createUserProfile = async () => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        
+        if (user) {
+          // Check if profile already exists
+          const { data: existingProfile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
+
+          if (profileError && profileError.code === 'PGRST116') {
+            // Profile doesn't exist, create it
+            const { error: insertError } = await supabase
+              .from('user_profiles')
+              .insert({
+                user_id: user.id,
+                email: user.email || '',
+                full_name: user.user_metadata?.full_name || '',
+                credits_balance: 0
+              });
+
+            if (insertError) {
+              console.error('Failed to create user profile:', insertError);
+              toast({
+                title: 'Profile Setup Issue',
+                description: 'There was an issue setting up your profile. Please contact support if problems persist.',
+                variant: 'destructive'
+              });
+            } else {
+              toast({
+                title: 'Welcome!',
+                description: 'Your profile has been set up successfully.',
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error in profile setup:', error);
+      }
+    };
+
+    createUserProfile();
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {

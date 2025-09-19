@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS public.products (
 
 -- Create user_profiles table (table ID 44173)
 CREATE TABLE IF NOT EXISTS public.user_profiles (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
-    credits_balance INTEGER DEFAULT 0,
+    credits_balance NUMERIC(10,2) DEFAULT 0,
     avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -223,8 +224,13 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-    INSERT INTO public.user_profiles (user_id, full_name, credits_balance)
-    VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'full_name', ''), 0);
+    INSERT INTO public.user_profiles (user_id, email, full_name, credits_balance)
+    VALUES (
+        NEW.id, 
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', ''), 
+        0
+    );
     RETURN NEW;
 END;
 $$;
