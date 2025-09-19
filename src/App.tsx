@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import AuthSuccess from "./pages/AuthSuccess";
 import Premium from "./pages/Premium";
 import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import AdminSetup from "./pages/AdminSetup";
 import QuickAdminSetup from "./pages/QuickAdminSetup";
@@ -59,6 +60,7 @@ const App = () =>
             <Route path="/test-supabase" element={<SupabaseTest />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin-setup" element={<AdminSetup />} />
             <Route path="/quick-admin-setup" element={<QuickAdminSetup />} />
