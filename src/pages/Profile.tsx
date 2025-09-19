@@ -122,6 +122,15 @@ const Profile = () => {
 
       if (ordersError) throw new Error('Failed to load orders');
 
+      // Get user payment requests
+      const { data: paymentRequestsData, error: paymentRequestsError } = await supabase
+        .from('payment_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (paymentRequestsError) throw new Error('Failed to load payment requests');
+
       // Map the data to ensure correct types
       const typedOrders: Order[] = (ordersData || []).map(order => ({
         id: Number(order.id),
@@ -139,12 +148,34 @@ const Profile = () => {
 
       setOrders(typedOrders);
 
-      // Calculate order stats
+      // Map payment requests to orders-like structure for display
+      const paymentRequestOrders: Order[] = (paymentRequestsData || []).map(request => ({
+        id: Number(request.id),
+        user_id: request.user_id,
+        product_id: 0, // Payment requests don't have product_id
+        quantity: 1,
+        total_price: request.total_cost_mmk,
+        currency: 'MMK',
+        status: (request.status as 'completed' | 'pending' | 'failed' | 'cancelled') || 'pending',
+        operator: 'Credit Purchase',
+        phone_number: `${request.credits_requested} credits`,
+        created_at: request.created_at,
+        processed_at: request.processed_at
+      }));
+
+      // Combine orders and payment requests
+      const allOrders = [...typedOrders, ...paymentRequestOrders].sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setOrders(allOrders);
+
+      // Calculate order stats (including payment requests)
       const stats: OrderStats = {
-        total_orders: typedOrders?.length || 0,
-        successful_orders: typedOrders?.filter((o) => o.status === 'completed').length || 0,
-        pending_orders: typedOrders?.filter((o) => o.status === 'pending').length || 0,
-        total_spent: typedOrders
+        total_orders: allOrders?.length || 0,
+        successful_orders: allOrders?.filter((o) => o.status === 'completed').length || 0,
+        pending_orders: allOrders?.filter((o) => o.status === 'pending').length || 0,
+        total_spent: allOrders
           ?.filter((o) => o.status === 'completed')
           .reduce((sum, o) => sum + o.total_price, 0) || 0
       };

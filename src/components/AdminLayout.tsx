@@ -8,7 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
 import ProductManagementTemp from '@/components/ProductManagementTemp';
 import UserManagementTemp from '@/components/UserManagementTemp';
-import { PaymentRequestManagementTemp } from '@/components/PaymentRequestManagementTemp';
+import PaymentRequestManagement from '@/components/PaymentRequestManagement';
 import ApprovalWorkflowsTemp from '@/components/ApprovalWorkflowsTemp';
 
 type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'approvals';
@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
 { value: 'dashboard', label: 'Dashboard', icon: BarChart3, component: AdminDashboard },
 { value: 'products', label: 'Products', icon: Package, component: ProductManagementTemp },
 { value: 'users', label: 'Users', icon: Users, component: UserManagementTemp },
-{ value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagementTemp },
+{ value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
 { value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflowsTemp }];
 
 
