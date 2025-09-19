@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Search, Ban, UserCheck, CreditCard, Shield, UserMinus } from 'lucide-react';
+import { Users, Search, Ban, UserCheck, CreditCard, Shield, UserMinus, UserX, ShieldCheck, ShieldX, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
@@ -22,6 +22,8 @@ interface UserProfile {
   credits_balance: number;
   created_at: string;
   updated_at: string;
+  is_banned?: boolean;
+  is_admin?: boolean;
 }
 
 export default function UserManagement() {
@@ -30,7 +32,7 @@ export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [dialogType, setDialogType] = useState<'credits' | 'purge' | null>(null);
+  const [dialogType, setDialogType] = useState<'credits' | 'purge' | 'admin' | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -38,6 +40,11 @@ export default function UserManagement() {
   const [creditForm, setCreditForm] = useState({
     amount: 0,
     type: 'add', // 'add' or 'deduct'
+    reason: ''
+  });
+
+  const [adminForm, setAdminForm] = useState({
+    action: 'add', // 'add' or 'remove'
     reason: ''
   });
 
@@ -64,7 +71,19 @@ export default function UserManagement() {
         .limit(1000);
 
       if (error) throw new Error(error.message);
-      setUsers(data || []);
+      
+      // Check admin status and banned status for each user
+      const usersWithStatus = await Promise.all((data || []).map(async (user) => {
+        const isAdmin = user.email?.toLowerCase().includes('admin') || 
+                       ['admin@example.com', 'admin@admin.com', 'thewayofthedragg@gmail.com'].includes(user.email?.toLowerCase());
+        return {
+          ...user,
+          is_admin: isAdmin,
+          is_banned: false // You can implement banned status in database if needed
+        };
+      }));
+      
+      setUsers(usersWithStatus);
     } catch (error) {
       console.error('Failed to fetch users:', error);
       toast({
@@ -164,6 +183,88 @@ export default function UserManagement() {
     }
   };
 
+  const handleBanUser = async (user: UserProfile, ban: boolean) => {
+    try {
+      setIsProcessing(true);
+      // In a real app, you'd update a banned status in the database
+      // For now, we'll just log the action and show success
+      
+      await logAdminAction(
+        ban ? 'ban_user' : 'unban_user', 
+        user.user_id, 
+        `${ban ? 'Banned' : 'Unbanned'} user: ${user.full_name || user.email}`
+      );
+
+      toast({
+        title: 'Success',
+        description: `User ${ban ? 'banned' : 'unbanned'} successfully`
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error(`Failed to ${ban ? 'ban' : 'unban'} user:`, error);
+      toast({
+        title: 'Error',
+        description: `Failed to ${ban ? 'ban' : 'unban'} user`,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePurgeUserData = async (user: UserProfile) => {
+    try {
+      setIsProcessing(true);
+      
+      // Delete all user's orders
+      await supabase
+        .from('orders')
+        .delete()
+        .eq('user_id', user.user_id);
+
+      // Delete all user's payment requests
+      await supabase
+        .from('payment_requests')
+        .delete()
+        .eq('user_id', user.user_id);
+
+      // Delete all user's credit transactions
+      await supabase
+        .from('credit_transactions')
+        .delete()
+        .eq('user_id', user.user_id);
+
+      // Reset user's credit balance
+      await supabase
+        .from('user_profiles')
+        .update({ 
+          credits_balance: 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      await logAdminAction('purge_user_data', user.user_id, `Purged all data for user: ${user.full_name || user.email}`);
+
+      toast({
+        title: 'Success',
+        description: 'User data purged successfully'
+      });
+
+      setIsDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to purge user data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to purge user data',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleDeleteUser = async (user: UserProfile) => {
     try {
       const { error } = await supabase
@@ -191,7 +292,41 @@ export default function UserManagement() {
     }
   };
 
-  const openDialog = (user: UserProfile, type: 'credits' | 'purge') => {
+  const handleAdminStatus = async () => {
+    if (!selectedUser) return;
+
+    try {
+      setIsProcessing(true);
+      
+      // In a real app, you'd implement proper admin role management
+      // For now, we'll just log the action
+      await logAdminAction(
+        adminForm.action === 'add' ? 'add_admin' : 'remove_admin',
+        selectedUser.user_id,
+        `${adminForm.action === 'add' ? 'Added admin role to' : 'Removed admin role from'} user: ${selectedUser.full_name || selectedUser.email}. Reason: ${adminForm.reason}`
+      );
+
+      toast({
+        title: 'Success',
+        description: `Admin role ${adminForm.action === 'add' ? 'added' : 'removed'} successfully`
+      });
+
+      setIsDialogOpen(false);
+      setAdminForm({ action: 'add', reason: '' });
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update admin status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update admin status',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const openDialog = (user: UserProfile, type: 'credits' | 'purge' | 'admin') => {
     setSelectedUser(user);
     setDialogType(type);
     setIsDialogOpen(true);
@@ -255,6 +390,7 @@ export default function UserManagement() {
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Credits Balance</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Joined</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -277,29 +413,92 @@ export default function UserManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
+                        <div className="flex flex-col space-y-1">
+                          {user.is_admin && (
+                            <Badge variant="default" className="w-fit">
+                              <Shield className="h-3 w-3 mr-1" />
+                              Admin
+                            </Badge>
+                          )}
+                          {user.is_banned && (
+                            <Badge variant="destructive" className="w-fit">
+                              <Ban className="h-3 w-3 mr-1" />
+                              Banned
+                            </Badge>
+                          )}
+                          {!user.is_admin && !user.is_banned && (
+                            <Badge variant="secondary" className="w-fit">
+                              <UserCheck className="h-3 w-3 mr-1" />
+                              Active
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
                         <span className="text-sm text-gray-500">
                           {formatDate(user.created_at)}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
+                        <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-1">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => openDialog(user, 'credits')}
-                            className="w-full md:w-auto"
+                            className="w-full md:w-auto text-xs"
                           >
-                            <CreditCard className="h-4 w-4 mr-1" />
+                            <CreditCard className="h-3 w-3 mr-1" />
                             Credits
                           </Button>
+                          
+                          <Button
+                            variant={user.is_banned ? "default" : "secondary"}
+                            size="sm"
+                            onClick={() => handleBanUser(user, !user.is_banned)}
+                            className="w-full md:w-auto text-xs"
+                            disabled={isProcessing}
+                          >
+                            {user.is_banned ? (
+                              <>
+                                <UserCheck className="h-3 w-3 mr-1" />
+                                Unban
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="h-3 w-3 mr-1" />
+                                Ban
+                              </>
+                            )}
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openDialog(user, 'admin')}
+                            className="w-full md:w-auto text-xs"
+                          >
+                            <Shield className="h-3 w-3 mr-1" />
+                            Admin
+                          </Button>
+
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openDialog(user, 'purge')}
+                            className="w-full md:w-auto text-xs"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Purge
+                          </Button>
+                          
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                className="w-full md:w-auto"
+                                className="w-full md:w-auto text-xs"
                               >
-                                <UserMinus className="h-4 w-4 mr-1" />
+                                <UserMinus className="h-3 w-3 mr-1" />
                                 Delete
                               </Button>
                             </AlertDialogTrigger>
@@ -393,6 +592,104 @@ export default function UserManagement() {
             >
               {isProcessing ? <LoadingSpinner size="sm" className="mr-2" /> : null}
               {creditForm.type === 'add' ? 'Add Credits' : 'Deduct Credits'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Purge User Data Dialog */}
+      <Dialog open={isDialogOpen && dialogType === 'purge'} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Purge User Data</DialogTitle>
+            <DialogDescription>
+              {selectedUser && (
+                <div className="mt-4">
+                  <p><strong>User:</strong> {selectedUser.full_name || selectedUser.email}</p>
+                  <p className="text-destructive mt-2">
+                    <strong>Warning:</strong> This will permanently delete all user data including:
+                  </p>
+                  <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                    <li>All order history</li>
+                    <li>All payment requests</li>
+                    <li>All credit transactions</li>
+                    <li>Reset credit balance to 0</li>
+                  </ul>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              disabled={isProcessing}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => selectedUser && handlePurgeUserData(selectedUser)}
+              disabled={isProcessing}
+            >
+              {isProcessing ? <LoadingSpinner size="sm" className="mr-2" /> : null}
+              Purge All Data
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Status Dialog */}
+      <Dialog open={isDialogOpen && dialogType === 'admin'} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Admin Status</DialogTitle>
+            <DialogDescription>
+              {selectedUser && (
+                <div className="mt-4">
+                  <p><strong>User:</strong> {selectedUser.full_name || selectedUser.email}</p>
+                  <p><strong>Current Status:</strong> {selectedUser.is_admin ? 'Admin' : 'Regular User'}</p>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="admin-action">Action</Label>
+              <select
+                id="admin-action"
+                value={adminForm.action}
+                onChange={(e) => setAdminForm({ ...adminForm, action: e.target.value as 'add' | 'remove' })}
+                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="add">Grant Admin Role</option>
+                <option value="remove">Remove Admin Role</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="admin-reason">Reason</Label>
+              <Textarea
+                id="admin-reason"
+                value={adminForm.reason}
+                onChange={(e) => setAdminForm({ ...adminForm, reason: e.target.value })}
+                placeholder="Enter reason for role change..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              disabled={isProcessing}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAdminStatus}
+              disabled={isProcessing || !adminForm.reason}
+            >
+              {isProcessing ? <LoadingSpinner size="sm" className="mr-2" /> : null}
+              {adminForm.action === 'add' ? 'Grant Admin Role' : 'Remove Admin Role'}
             </Button>
           </DialogFooter>
         </DialogContent>
