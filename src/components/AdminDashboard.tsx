@@ -240,17 +240,17 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <Button 
+        <Button
           onClick={handleInitializeProducts}
-          className="h-20 text-left flex flex-col items-start justify-center bg-blue-600 hover:bg-blue-700"
-        >
+          className="h-20 text-left flex flex-col items-start justify-center bg-blue-600 hover:bg-blue-700">
+
           <span className="font-semibold">Initialize Sample Products</span>
           <span className="text-sm text-blue-100">Add sample telecom products to the database</span>
         </Button>
-        <Button 
+        <Button
           onClick={handleSetupAdmin}
-          className="h-20 text-left flex flex-col items-start justify-center bg-green-600 hover:bg-green-700"
-        >
+          className="h-20 text-left flex flex-col items-start justify-center bg-green-600 hover:bg-green-700">
+
           <span className="font-semibold">Setup Admin Account</span>
           <span className="text-sm text-green-100">Configure current user as admin</span>
         </Button>

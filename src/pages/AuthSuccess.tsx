@@ -14,25 +14,25 @@ export default function AuthSuccess() {
       try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) throw userError;
-        
+
         if (user) {
           // Check if profile already exists
-          const { data: existingProfile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('id')
-            .eq('user_id', user.id)
-            .single();
+          const { data: existingProfile, error: profileError } = await supabase.
+          from('user_profiles').
+          select('id').
+          eq('user_id', user.id).
+          single();
 
           if (profileError && profileError.code === 'PGRST116') {
             // Profile doesn't exist, create it
-            const { error: insertError } = await supabase
-              .from('user_profiles')
-              .insert({
-                user_id: user.id,
-                email: user.email || '',
-                full_name: user.user_metadata?.full_name || '',
-                credits_balance: 0
-              });
+            const { error: insertError } = await supabase.
+            from('user_profiles').
+            insert({
+              user_id: user.id,
+              email: user.email || '',
+              full_name: user.user_metadata?.full_name || '',
+              credits_balance: 0
+            });
 
             if (insertError) {
               console.error('Failed to create user profile:', insertError);
@@ -44,7 +44,7 @@ export default function AuthSuccess() {
             } else {
               toast({
                 title: 'Welcome!',
-                description: 'Your profile has been set up successfully.',
+                description: 'Your profile has been set up successfully.'
               });
             }
           }

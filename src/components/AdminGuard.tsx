@@ -27,11 +27,11 @@ export default function AdminGuard({ children }: AdminGuardProps) {
         }
 
         // Check if user has admin privileges by checking email or user_profiles table
-        const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('email')
-          .eq('user_id', user.id)
-          .single();
+        const { data: profile, error: profileError } = await supabase.
+        from('user_profiles').
+        select('email').
+        eq('user_id', user.id).
+        single();
 
         if (profileError && profileError.code !== 'PGRST116') {
           throw new Error('Failed to check admin status');
@@ -39,9 +39,9 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
         // Check if user is admin (either from profile email or auth email)
         const userEmail = profile?.email || user.email || '';
-        const isAdminUser = userEmail.toLowerCase().includes('admin') || 
-                           userEmail.toLowerCase() === 'admin@example.com' ||
-                           userEmail.toLowerCase() === 'admin@admin.com';
+        const isAdminUser = userEmail.toLowerCase().includes('admin') ||
+        userEmail.toLowerCase() === 'admin@example.com' ||
+        userEmail.toLowerCase() === 'admin@admin.com';
 
         if (!isAdminUser) {
           throw new Error('Access denied. Admin privileges required. Only users with admin email addresses can access this panel.');
@@ -57,7 +57,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
     checkAdminAccess();
   }, []);
-    
+
 
   if (isLoading) {
     return (
