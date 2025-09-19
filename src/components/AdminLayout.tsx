@@ -6,8 +6,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard, ShoppingCart } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
-import ProductManagementTemp from '@/components/ProductManagementTemp';
-import UserManagementTemp from '@/components/UserManagementTemp';
+import ProductManagement from '@/components/ProductManagement';
+import UserManagement from '@/components/UserManagement';
 import PaymentRequestManagement from '@/components/PaymentRequestManagement';
 import PendingOrdersManagement from '@/components/PendingOrdersManagement';
 import ApprovalWorkflowsTemp from '@/components/ApprovalWorkflowsTemp';
@@ -23,8 +23,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
 { value: 'dashboard', label: 'Dashboard', icon: BarChart3, component: AdminDashboard },
-{ value: 'products', label: 'Products', icon: Package, component: ProductManagementTemp },
-{ value: 'users', label: 'Users', icon: Users, component: UserManagementTemp },
+{ value: 'products', label: 'Products', icon: Package, component: ProductManagement },
+{ value: 'users', label: 'Users', icon: Users, component: UserManagement },
 { value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
 { value: 'orders', label: 'Pending Orders', icon: ShoppingCart, component: PendingOrdersManagement },
 { value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflowsTemp }];
