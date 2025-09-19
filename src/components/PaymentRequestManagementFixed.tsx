@@ -4,69 +4,65 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle } from
-"@/components/ui/card";
+  CardTitle 
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow } from
-"@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+  TableRow 
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle } from
-"@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import { useToast } from "@/hooks/use-toast";
+  DialogTitle 
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useToast } from '@/hooks/use-toast';
 import {
-  Eye,
   CheckCircle,
   XCircle,
   Clock,
   User,
   CreditCard,
-  Calendar,
-  FileImage,
-  RefreshCw } from
-'lucide-react';
+  RefreshCw 
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentRequest {
   id: number;
-  user_id: number;
+  user_id: string;
   credits_requested: number;
   total_cost_mmk: number;
   payment_method: string;
-  payment_proof_file_id: number;
+  payment_proof_file_id?: number;
   status: string;
   created_at: string;
-  processed_at: string;
-  admin_notes: string;
-  user_name?: string;
-  user_email?: string;
-  user_avatar?: string;
+  processed_at?: string;
+  admin_notes?: string;
 }
 
 interface UserProfile {
-  user_id: number;
-  full_name: string;
+  id: number;
+  user_id: string;
+  full_name?: string;
   credits_balance: number;
-  avatar_url: string;
+  avatar_url?: string;
 }
 
 export function PaymentRequestManagement() {
   const [requests, setRequests] = useState<PaymentRequest[]>([]);
-  const [userProfiles, setUserProfiles] = useState<Record<number, UserProfile>>({});
+  const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null);
@@ -74,11 +70,6 @@ export function PaymentRequestManagement() {
   const [processingType, setProcessingType] = useState<'approve' | 'reject'>('approve');
   const [adminNotes, setAdminNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [imageViewer, setImageViewer] = useState<{open: boolean;url: string;title: string;}>({
-    open: false,
-    url: '',
-    title: ''
-  });
 
   const { toast } = useToast();
 
@@ -91,51 +82,32 @@ export function PaymentRequestManagement() {
       setIsLoading(true);
       setError(null);
 
-      // Fetch payment requests
-      const { data: requestsData, error: requestsError } = await window.ezsite.apis.tablePage(44197, {
-        PageNo: 1,
-        PageSize: 100,
-        OrderByField: "created_at",
-        IsAsc: false,
-        Filters: []
-      });
+      // Fetch payment requests using Supabase client
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('payment_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (requestsError) throw requestsError;
 
-      const paymentRequests = requestsData?.List || [];
+      const paymentRequests = requestsData || [];
       setRequests(paymentRequests);
 
       // Fetch user profiles for all unique user IDs
       const userIds = [...new Set(paymentRequests.map((req) => req.user_id))];
-      const profiles: Record<number, UserProfile> = {};
+      const profiles: Record<string, UserProfile> = {};
 
       for (const userId of userIds) {
         try {
-          const { data: profileData, error: profileError } = await window.ezsite.apis.tablePage(44173, {
-            PageNo: 1,
-            PageSize: 1,
-            OrderByField: "id",
-            IsAsc: false,
-            Filters: [{ name: "user_id", op: "Equal", value: userId }]
-          });
+          // Fetch user profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
 
-          if (!profileError && profileData?.List?.[0]) {
-            profiles[userId] = profileData.List[0];
-          }
-
-          // Also get auth user data
-          const { data: authData, error: authError } = await window.ezsite.apis.tablePage(44171, {
-            PageNo: 1,
-            PageSize: 1,
-            OrderByField: "id",
-            IsAsc: false,
-            Filters: [{ name: "id", op: "Equal", value: userId }]
-          });
-
-          if (!authError && authData?.List?.[0]) {
-            if (profiles[userId]) {
-              profiles[userId].user_email = authData.List[0].email;
-            }
+          if (!profileError && profileData) {
+            profiles[userId] = profileData;
           }
         } catch (err) {
           console.warn(`Failed to fetch profile for user ${userId}:`, err);
@@ -151,25 +123,6 @@ export function PaymentRequestManagement() {
     }
   };
 
-  const handleViewImage = async (fileId: number, requestId: number) => {
-    try {
-      const { data: fileUrl, error } = await window.ezsite.apis.getUploadUrl(fileId);
-      if (error) throw error;
-
-      setImageViewer({
-        open: true,
-        url: fileUrl,
-        title: `Payment Proof - Request #${requestId}`
-      });
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to load payment proof image",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleProcessRequest = async () => {
     if (!selectedRequest) return;
 
@@ -179,13 +132,15 @@ export function PaymentRequestManagement() {
       const isApproved = processingType === 'approve';
       const now = new Date().toISOString();
 
-      // Update the payment request status
-      const { error: updateError } = await window.ezsite.apis.tableUpdate(44197, {
-        ID: selectedRequest.id,
-        status: isApproved ? 'approved' : 'rejected',
-        processed_at: now,
-        admin_notes: adminNotes
-      });
+      // Update the payment request status using Supabase client
+      const { error: updateError } = await supabase
+        .from('payment_requests')
+        .update({
+          status: isApproved ? 'approved' : 'rejected',
+          processed_at: now,
+          admin_notes: adminNotes
+        })
+        .eq('id', selectedRequest.id);
 
       if (updateError) throw updateError;
 
@@ -196,46 +151,41 @@ export function PaymentRequestManagement() {
           const newBalance = userProfile.credits_balance + selectedRequest.credits_requested;
 
           // Update user's credit balance
-          const { error: balanceError } = await window.ezsite.apis.tableUpdate(44173, {
-            ID: userProfile.id,
-            credits_balance: newBalance
-          });
+          const { error: balanceError } = await supabase
+            .from('user_profiles')
+            .update({
+              credits_balance: newBalance,
+              updated_at: now
+            })
+            .eq('user_id', selectedRequest.user_id);
 
           if (balanceError) throw balanceError;
 
           // Create a credit transaction record
-          const { error: transactionError } = await window.ezsite.apis.tableCreate(44176, {
-            user_id: selectedRequest.user_id,
-            transaction_type: 'purchase',
-            mmk_amount: selectedRequest.total_cost_mmk,
-            credit_amount: selectedRequest.credits_requested,
-            currency: 'MMK',
-            status: 'completed',
-            payment_method: selectedRequest.payment_method,
-            payment_reference: `REQ-${selectedRequest.id}`,
-            previous_balance: userProfile.credits_balance,
-            new_balance: newBalance,
-            processed_at: now,
-            created_at: now,
-            admin_notes: `Approved payment request #${selectedRequest.id}`,
-            approval_notes: adminNotes
-          });
+          const { error: transactionError } = await supabase
+            .from('credit_transactions')
+            .insert({
+              user_id: selectedRequest.user_id,
+              transaction_type: 'purchase',
+              mmk_amount: selectedRequest.total_cost_mmk,
+              credit_amount: selectedRequest.credits_requested,
+              currency: 'MMK',
+              status: 'completed',
+              payment_method: selectedRequest.payment_method,
+              payment_reference: `REQ-${selectedRequest.id}`,
+              previous_balance: userProfile.credits_balance,
+              new_balance: newBalance,
+              processed_at: now,
+              created_at: now,
+              admin_notes: `Approved payment request #${selectedRequest.id}`,
+              approval_notes: adminNotes
+            });
 
-          if (transactionError) throw transactionError;
+          if (transactionError) {
+            console.error('Failed to create transaction record:', transactionError);
+            // Don't throw error here as the main operation succeeded
+          }
         }
-      }
-
-      // Create audit log entry
-      try {
-        await window.ezsite.apis.tableCreate(44177, {
-          action_type: isApproved ? 'approve_payment' : 'reject_payment',
-          target_type: 'payment_request',
-          target_id: selectedRequest.id.toString(),
-          notes: `${isApproved ? 'Approved' : 'Rejected'} payment request #${selectedRequest.id} for ${selectedRequest.credits_requested} credits. Admin notes: ${adminNotes}`,
-          created_at: now
-        });
-      } catch (auditError) {
-        console.warn('Failed to create audit log:', auditError);
       }
 
       toast({
@@ -290,7 +240,7 @@ export function PaymentRequestManagement() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString();
   };
@@ -313,8 +263,8 @@ export function PaymentRequestManagement() {
             </Button>
           </div>
         </CardContent>
-      </Card>);
-
+      </Card>
+    );
   }
 
   return (
@@ -342,13 +292,13 @@ export function PaymentRequestManagement() {
             </Button>
           </div>
 
-          {requests.length === 0 ?
-          <div className="text-center py-12 text-muted-foreground">
+          {requests.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
               <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>No payment requests found</p>
-            </div> :
-
-          <div className="rounded-md border">
+            </div>
+          ) : (
+            <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -363,9 +313,9 @@ export function PaymentRequestManagement() {
                 </TableHeader>
                 <TableBody>
                   {requests.map((request) => {
-                  const profile = userProfiles[request.user_id];
-                  return (
-                    <TableRow key={request.id}>
+                    const profile = userProfiles[request.user_id];
+                    return (
+                      <TableRow key={request.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
@@ -376,10 +326,10 @@ export function PaymentRequestManagement() {
                             </Avatar>
                             <div>
                               <div className="font-medium text-sm">
-                                {profile?.full_name || `User #${request.user_id}`}
+                                {profile?.full_name || `User #${request.user_id.slice(-6)}`}
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {profile?.user_email || ''}
+                                {request.user_id.slice(-12)}
                               </div>
                             </div>
                           </div>
@@ -405,42 +355,35 @@ export function PaymentRequestManagement() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleViewImage(request.payment_proof_file_id, request.id)}>
-
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            {request.status === 'pending' &&
-                          <>
+                            {request.status === 'pending' && (
+                              <>
                                 <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-green-600 border-green-600 hover:bg-green-50"
-                              onClick={() => openProcessDialog(request, 'approve')}>
-
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-green-600 border-green-600 hover:bg-green-50"
+                                  onClick={() => openProcessDialog(request, 'approve')}
+                                >
                                   <CheckCircle className="w-3 h-3" />
                                 </Button>
                                 <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-red-600 border-red-600 hover:bg-red-50"
-                              onClick={() => openProcessDialog(request, 'reject')}>
-
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-red-600 border-red-600 hover:bg-red-50"
+                                  onClick={() => openProcessDialog(request, 'reject')}
+                                >
                                   <XCircle className="w-3 h-3" />
                                 </Button>
                               </>
-                          }
+                            )}
                           </div>
                         </TableCell>
-                      </TableRow>);
-
-                })}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
-          }
+          )}
         </CardContent>
       </Card>
 
@@ -452,15 +395,15 @@ export function PaymentRequestManagement() {
               {processingType === 'approve' ? 'Approve' : 'Reject'} Payment Request
             </DialogTitle>
             <DialogDescription>
-              {selectedRequest &&
-              <div className="space-y-2 mt-4">
+              {selectedRequest && (
+                <div className="space-y-2 mt-4">
                   <div><strong>Request ID:</strong> #{selectedRequest.id}</div>
-                  <div><strong>User:</strong> {userProfiles[selectedRequest.user_id]?.full_name || `User #${selectedRequest.user_id}`}</div>
+                  <div><strong>User:</strong> {userProfiles[selectedRequest.user_id]?.full_name || `User #${selectedRequest.user_id.slice(-6)}`}</div>
                   <div><strong>Credits:</strong> {selectedRequest.credits_requested}</div>
                   <div><strong>Amount:</strong> {formatCurrency(selectedRequest.total_cost_mmk)}</div>
                   <div><strong>Payment Method:</strong> {selectedRequest.payment_method}</div>
                 </div>
-              }
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -471,44 +414,35 @@ export function PaymentRequestManagement() {
                 placeholder={`Enter notes for ${processingType === 'approve' ? 'approval' : 'rejection'}...`}
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                className="mt-2" />
-
+                className="mt-2"
+              />
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setProcessingDialog(false)}
-              disabled={isProcessing}>
-
+              disabled={isProcessing}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleProcessRequest}
               disabled={isProcessing}
-              variant={processingType === 'approve' ? 'default' : 'destructive'}>
-
-              {isProcessing ?
-              <LoadingSpinner className="w-4 h-4 mr-2" /> :
-              processingType === 'approve' ?
-              <CheckCircle className="w-4 h-4 mr-2" /> :
-
-              <XCircle className="w-4 h-4 mr-2" />
-              }
+              variant={processingType === 'approve' ? 'default' : 'destructive'}
+            >
+              {isProcessing ? (
+                <LoadingSpinner className="w-4 h-4 mr-2" />
+              ) : processingType === 'approve' ? (
+                <CheckCircle className="w-4 h-4 mr-2" />
+              ) : (
+                <XCircle className="w-4 h-4 mr-2" />
+              )}
               {processingType === 'approve' ? 'Approve Request' : 'Reject Request'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Image Viewer */}
-      <ImageViewer
-        open={imageViewer.open}
-        onOpenChange={(open) => setImageViewer((prev) => ({ ...prev, open }))}
-        imageUrl={imageViewer.url}
-        title={imageViewer.title}
-        alt="Payment Proof Screenshot" />
-
-    </div>);
-
+    </div>
+  );
 }

@@ -41,46 +41,46 @@ export type Database = {
         };
         Relationships: [];
       };
-      credit_requests: {
+      payment_requests: {
         Row: {
           admin_notes: string | null;
-          amount_mmk: number;
           created_at: string;
           credits_requested: number;
-          id: string;
-          payment_method: Database["public"]["Enums"]["payment_method"];
-          payment_proof_url: string | null;
-          status: Database["public"]["Enums"]["credit_request_status"];
-          updated_at: string;
+          id: number;
+          payment_method: string;
+          payment_proof_file_id: number | null;
+          processed_at: string | null;
+          status: string;
+          total_cost_mmk: number;
           user_id: string;
         };
         Insert: {
           admin_notes?: string | null;
-          amount_mmk: number;
           created_at?: string;
           credits_requested: number;
-          id?: string;
-          payment_method: Database["public"]["Enums"]["payment_method"];
-          payment_proof_url?: string | null;
-          status?: Database["public"]["Enums"]["credit_request_status"];
-          updated_at?: string;
+          id?: number;
+          payment_method: string;
+          payment_proof_file_id?: number | null;
+          processed_at?: string | null;
+          status?: string;
+          total_cost_mmk: number;
           user_id: string;
         };
         Update: {
           admin_notes?: string | null;
-          amount_mmk?: number;
           created_at?: string;
           credits_requested?: number;
-          id?: string;
-          payment_method?: Database["public"]["Enums"]["payment_method"];
-          payment_proof_url?: string | null;
-          status?: Database["public"]["Enums"]["credit_request_status"];
-          updated_at?: string;
+          id?: number;
+          payment_method?: string;
+          payment_proof_file_id?: number | null;
+          processed_at?: string | null;
+          status?: string;
+          total_cost_mmk?: number;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "credit_requests_user_id_users_id_fk";
+            foreignKeyName: "payment_requests_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "users";
@@ -226,44 +226,216 @@ export type Database = {
           }];
 
       };
-      users: {
+      user_profiles: {
         Row: {
+          avatar_url: string | null;
           created_at: string;
-          credits: number;
-          email: string;
-          google_id: string | null;
-          id: string;
-          is_banned: boolean;
-          name: string;
-          profile_picture: string | null;
-          role: Database["public"]["Enums"]["user_role"];
+          credits_balance: number;
+          full_name: string | null;
+          id: number;
           updated_at: string;
+          user_id: string;
         };
         Insert: {
+          avatar_url?: string | null;
           created_at?: string;
-          credits?: number;
-          email: string;
-          google_id?: string | null;
-          id?: string;
-          is_banned?: boolean;
-          name: string;
-          profile_picture?: string | null;
-          role?: Database["public"]["Enums"]["user_role"];
+          credits_balance?: number;
+          full_name?: string | null;
+          id?: number;
           updated_at?: string;
+          user_id: string;
         };
         Update: {
+          avatar_url?: string | null;
           created_at?: string;
-          credits?: number;
-          email?: string;
-          google_id?: string | null;
-          id?: string;
-          is_banned?: boolean;
-          name?: string;
-          profile_picture?: string | null;
-          role?: Database["public"]["Enums"]["user_role"];
+          credits_balance?: number;
+          full_name?: string | null;
+          id?: number;
           updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }];
+      };
+      products: {
+        Row: {
+          admin_notes: string | null;
+          category: string;
+          created_at: string;
+          currency: string;
+          description: string | null;
+          id: number;
+          is_active: boolean;
+          logo: string | null;
+          name: string;
+          operator: string;
+          price: number;
+          stock_quantity: number;
+          updated_at: string;
+          validity_days: number;
+        };
+        Insert: {
+          admin_notes?: string | null;
+          category: string;
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          id?: number;
+          is_active?: boolean;
+          logo?: string | null;
+          name: string;
+          operator: string;
+          price: number;
+          stock_quantity?: number;
+          updated_at?: string;
+          validity_days?: number;
+        };
+        Update: {
+          admin_notes?: string | null;
+          category?: string;
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          id?: number;
+          is_active?: boolean;
+          logo?: string | null;
+          name?: string;
+          operator?: string;
+          price?: number;
+          stock_quantity?: number;
+          updated_at?: string;
+          validity_days?: number;
         };
         Relationships: [];
+      };
+      orders: {
+        Row: {
+          admin_notes: string | null;
+          created_at: string;
+          credits_used: number;
+          currency: string;
+          id: number;
+          operator: string | null;
+          phone_number: string | null;
+          processed_at: string | null;
+          product_id: number;
+          quantity: number;
+          status: string;
+          total_price: number;
+          user_id: string;
+        };
+        Insert: {
+          admin_notes?: string | null;
+          created_at?: string;
+          credits_used?: number;
+          currency?: string;
+          id?: number;
+          operator?: string | null;
+          phone_number?: string | null;
+          processed_at?: string | null;
+          product_id: number;
+          quantity?: number;
+          status?: string;
+          total_price: number;
+          user_id: string;
+        };
+        Update: {
+          admin_notes?: string | null;
+          created_at?: string;
+          credits_used?: number;
+          currency?: string;
+          id?: number;
+          operator?: string | null;
+          phone_number?: string | null;
+          processed_at?: string | null;
+          product_id?: number;
+          quantity?: number;
+          status?: string;
+          total_price?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }];
+      };
+      credit_transactions: {
+        Row: {
+          admin_notes: string | null;
+          approval_notes: string | null;
+          created_at: string;
+          credit_amount: number;
+          currency: string;
+          id: number;
+          mmk_amount: number | null;
+          new_balance: number;
+          payment_method: string | null;
+          payment_reference: string | null;
+          previous_balance: number;
+          processed_at: string | null;
+          status: string;
+          transaction_type: string;
+          user_id: string;
+        };
+        Insert: {
+          admin_notes?: string | null;
+          approval_notes?: string | null;
+          created_at?: string;
+          credit_amount: number;
+          currency?: string;
+          id?: number;
+          mmk_amount?: number | null;
+          new_balance?: number;
+          payment_method?: string | null;
+          payment_reference?: string | null;
+          previous_balance?: number;
+          processed_at?: string | null;
+          status?: string;
+          transaction_type: string;
+          user_id: string;
+        };
+        Update: {
+          admin_notes?: string | null;
+          approval_notes?: string | null;
+          created_at?: string;
+          credit_amount?: number;
+          currency?: string;
+          id?: number;
+          mmk_amount?: number | null;
+          new_balance?: number;
+          payment_method?: string | null;
+          payment_reference?: string | null;
+          previous_balance?: number;
+          processed_at?: string | null;
+          status?: string;
+          transaction_type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }];
       };
     };
     Views: { [_ in
