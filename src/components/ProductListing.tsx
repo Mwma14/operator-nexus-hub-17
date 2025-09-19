@@ -205,12 +205,7 @@ const ProductListing = () => {
                 <span className="font-bold">{((userBalance || 0) * 100).toLocaleString()} MMK</span>
               </div>
               <Button
-              onClick={() => {
-                toast({
-                  title: "Buy Credit",
-                  description: "Credit purchase feature coming soon!"
-                });
-              }}
+              onClick={() => navigate('/premium')}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
 
                 Buy Credit
