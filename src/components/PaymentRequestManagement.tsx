@@ -158,7 +158,7 @@ export function PaymentRequestManagement() {
             .update({
               credits_balance: newBalance
             })
-            .eq('id', userProfile.id);
+            .eq('user_id', selectedRequest.user_id);
 
           if (balanceError) throw balanceError;
 

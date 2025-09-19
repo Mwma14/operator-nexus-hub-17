@@ -45,7 +45,7 @@ export default function AdminDashboard() {
           supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
           supabase.from('products').select('*', { count: 'exact', head: true }),
           supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-          supabase.from('credit_transactions').select('*', { count: 'exact', head: true }).eq('status', 'pending')
+          supabase.from('payment_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')
         ]);
 
         // Calculate total revenue from completed orders
