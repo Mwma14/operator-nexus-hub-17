@@ -117,30 +117,63 @@ export default function ProductManagement() {
     }
   };
 
+  // Create a workflow entry for product approvals/rejections
+  const createProductWorkflow = async (
+    productId: number,
+    status: 'approved' | 'rejected',
+    notes: string
+  ) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const now = new Date().toISOString();
+      await supabase.from('approval_workflows').insert({
+        workflow_type: 'product',
+        target_id: productId,
+        status,
+        admin_user_id: user?.id || null,
+        admin_notes: notes,
+        processed_at: now,
+        created_at: now,
+      });
+    } catch (error) {
+      console.warn('Failed to create product approval workflow:', error);
+    }
+  };
+
   const handleSave = async () => {
     try {
       setIsCreating(true);
       const now = new Date().toISOString();
 
-      if (editingProduct) {
-        // Update existing product
-        const { error } = await supabase
-          .from('products')
-          .update({
-            ...formData,
-            updated_at: now
-          })
-          .eq('id', editingProduct.id);
+        if (editingProduct) {
+          // Update existing product
+          const statusChanged = editingProduct.is_active !== formData.is_active;
+          const { error } = await supabase
+            .from('products')
+            .update({
+              ...formData,
+              updated_at: now
+            })
+            .eq('id', editingProduct.id);
 
-        if (error) throw new Error(error.message);
+          if (error) throw new Error(error.message);
 
-        await logAdminAction('update', editingProduct.id.toString(), `Updated product: ${formData.name}`, editingProduct, formData);
+          // Record workflow if approval status changed
+          if (statusChanged) {
+            await createProductWorkflow(
+              editingProduct.id,
+              formData.is_active ? 'approved' : 'rejected',
+              formData.admin_notes || `Status ${formData.is_active ? 'approved' : 'rejected'} by admin`
+            );
+          }
 
-        toast({
-          title: 'Success',
-          description: 'Product updated successfully'
-        });
-      } else {
+          await logAdminAction('update', editingProduct.id.toString(), `Updated product: ${formData.name}`, editingProduct, formData);
+
+          toast({
+            title: 'Success',
+            description: 'Product updated successfully'
+          });
+        } else {
         // Create new product
         const { error } = await supabase
           .from('products')
@@ -247,6 +280,13 @@ export default function ProductManagement() {
           
           if (error) throw new Error(error.message);
           await logAdminAction('bulk_status_update', productId.toString(), `Bulk ${isActive ? 'activated' : 'deactivated'} product: ${product.name}`);
+
+          // Create product approval workflow entry
+          await createProductWorkflow(
+            productId,
+            isActive ? 'approved' : 'rejected',
+            product?.admin_notes || `Bulk ${isActive ? 'activation' : 'deactivation'} by admin`
+          );
         }
       }
 
