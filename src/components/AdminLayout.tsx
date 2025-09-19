@@ -6,12 +6,12 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
-import ProductManagement from '@/components/ProductManagement';
-import UserManagement from '@/components/UserManagement';
-import { PaymentRequestManagement } from '@/components/PaymentRequestManagement';
-import ApprovalWorkflows from '@/components/ApprovalWorkflows';
+import ProductManagementTemp from '@/components/ProductManagementTemp';
+import UserManagementTemp from '@/components/UserManagementTemp';
+import { PaymentRequestManagementTemp } from '@/components/PaymentRequestManagementTemp';
+import ApprovalWorkflowsTemp from '@/components/ApprovalWorkflowsTemp';
 
-type TabValue = 'dashboard' | 'products' | 'users' | 'approvals';
+type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'approvals';
 
 interface NavItem {
   value: TabValue;
@@ -22,10 +22,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
 { value: 'dashboard', label: 'Dashboard', icon: BarChart3, component: AdminDashboard },
-{ value: 'products', label: 'Products', icon: Package, component: ProductManagement },
-{ value: 'users', label: 'Users', icon: Users, component: UserManagement },
-{ value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
-{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflows }];
+{ value: 'products', label: 'Products', icon: Package, component: ProductManagementTemp },
+{ value: 'users', label: 'Users', icon: Users, component: UserManagementTemp },
+{ value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagementTemp },
+{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflowsTemp }];
 
 
 export default function AdminLayout() {

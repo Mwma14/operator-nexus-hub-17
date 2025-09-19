@@ -18,7 +18,7 @@ export interface Product {
 export const products: Product[] = [
 // MPT Products
 {
-  id: "mpt-data-1gb",
+  id: 1,
   name: "1GB Data Pack",
   description: "High-speed internet for 30 days",
   price: 3000,
@@ -27,7 +27,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "mpt-data-5gb",
+  id: 2,
   name: "5GB Data Pack",
   description: "Extended data bundle for heavy users",
   price: 12000,
@@ -36,7 +36,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "mpt-minutes-100",
+  id: 3,
   name: "100 Minutes Pack",
   description: "Talk time for local calls",
   price: 2500,
@@ -45,7 +45,7 @@ export const products: Product[] = [
   category: "Minutes"
 },
 {
-  id: "mpt-combo-package",
+  id: 4,
   name: "Combo Package",
   description: "2GB data + 50 minutes + 100 SMS",
   price: 8000,
@@ -56,7 +56,7 @@ export const products: Product[] = [
 
 // OOREDOO Products
 {
-  id: "ooredoo-data-2gb",
+  id: 5,
   name: "2GB SuperNet",
   description: "Fast 4G data for streaming",
   price: 5500,
@@ -65,7 +65,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "ooredoo-data-10gb",
+  id: 6,
   name: "10GB Ultimate",
   description: "Ultimate data experience",
   price: 20000,
@@ -74,7 +74,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "ooredoo-minutes-200",
+  id: 7,
   name: "200 Minutes Plus",
   description: "Extended talk time package",
   price: 4500,
@@ -83,7 +83,7 @@ export const products: Product[] = [
   category: "Minutes"
 },
 {
-  id: "ooredoo-beautiful-1",
+  id: 8,
   name: "09-123-456-789",
   description: "Premium number with easy pattern",
   price: 150000,
@@ -94,7 +94,7 @@ export const products: Product[] = [
 
 // ATOM Products
 {
-  id: "atom-data-3gb",
+  id: 9,
   name: "3GB Speed Pack",
   description: "Perfect for social media",
   price: 7000,
@@ -103,7 +103,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "atom-points-1000",
+  id: 10,
   name: "1000 Reward Points",
   description: "Redeem for exclusive offers",
   price: 5000,
@@ -112,7 +112,7 @@ export const products: Product[] = [
   category: "Points"
 },
 {
-  id: "atom-beautiful-2",
+  id: 11,
   name: "09-888-888-888",
   description: "VIP number with lucky 8s",
   price: 500000,
@@ -123,7 +123,7 @@ export const products: Product[] = [
 
 // MYTEL Products
 {
-  id: "mytel-data-1.5gb",
+  id: 12,
   name: "1.5GB Smart Pack",
   description: "Affordable data solution",
   price: 3500,
@@ -132,7 +132,7 @@ export const products: Product[] = [
   category: "Data"
 },
 {
-  id: "mytel-minutes-150",
+  id: 13,
   name: "150 Minutes Value",
   description: "Great value talk time",
   price: 3000,
@@ -141,7 +141,7 @@ export const products: Product[] = [
   category: "Minutes"
 },
 {
-  id: "mytel-points-500",
+  id: 14,
   name: "500 Bonus Points",
   description: "Loyalty rewards program",
   price: 2500,
@@ -150,7 +150,7 @@ export const products: Product[] = [
   category: "Points"
 },
 {
-  id: "mytel-family-package",
+  id: 15,
   name: "Family Package",
   description: "5GB shared + unlimited family calls",
   price: 15000,

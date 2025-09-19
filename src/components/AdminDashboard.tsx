@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import SampleDataInitializer from '@/components/SampleDataInitializer';
+import SampleDataInitializerTemp from '@/components/SampleDataInitializerTemp';
 import { initializeSampleProducts, setupAdminUser } from '@/utils/init-database';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { products } from '@/lib/products';
 import { Users, Package, CreditCard, AlertCircle, TrendingUp, DollarSign } from 'lucide-react';
 
 interface DashboardStats {
@@ -39,60 +40,49 @@ export default function AdminDashboard() {
       try {
         setIsLoading(true);
 
-        // Fetch statistics
+        // Fetch statistics from Supabase
         const [usersRes, productsRes, ordersRes, creditsRes] = await Promise.all([
-        window.ezsite.apis.tablePage(44173, { PageNo: 1, PageSize: 1 }), // user_profiles
-        window.ezsite.apis.tablePage(44172, { PageNo: 1, PageSize: 1 }), // products
-        window.ezsite.apis.tablePage(44175, {
-          PageNo: 1,
-          PageSize: 1,
-          Filters: [{ name: 'approval_status', op: 'Equal', value: 'pending' }]
-        }), // pending orders
-        window.ezsite.apis.tablePage(44176, {
-          PageNo: 1,
-          PageSize: 1,
-          Filters: [{ name: 'status', op: 'Equal', value: 'pending' }]
-        }) // pending credit transactions
+          supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
+          supabase.from('products').select('*', { count: 'exact', head: true }),
+          supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.from('credit_transactions').select('*', { count: 'exact', head: true }).eq('status', 'pending')
         ]);
 
         // Calculate total revenue from completed orders
-        const completedOrdersRes = await window.ezsite.apis.tablePage(44175, {
-          PageNo: 1,
-          PageSize: 1000,
-          Filters: [{ name: 'status', op: 'Equal', value: 'completed' }]
-        });
+        const { data: completedOrders } = await supabase
+          .from('orders')
+          .select('total_price')
+          .eq('status', 'completed');
 
-        const totalRevenue = completedOrdersRes.data?.List?.reduce((sum: number, order: any) => sum + (order.amount || 0), 0) || 0;
+        const totalRevenue = completedOrders?.reduce((sum: number, order: any) => sum + (order.total_price || 0), 0) || 0;
 
         // Count active users (logged in within last 30 days)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const activeUsersRes = await window.ezsite.apis.tablePage(44173, {
-          PageNo: 1,
-          PageSize: 1,
-          Filters: [{ name: 'last_login', op: 'GreaterThan', value: thirtyDaysAgo.toISOString() }]
-        });
+        const { count: activeUsersCount } = await supabase
+          .from('user_profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('updated_at', thirtyDaysAgo.toISOString());
 
         setStats({
-          totalUsers: usersRes.data?.VirtualCount || 0,
-          totalProducts: productsRes.data?.VirtualCount || 0,
-          pendingOrders: ordersRes.data?.VirtualCount || 0,
-          pendingCreditRequests: creditsRes.data?.VirtualCount || 0,
+          totalUsers: usersRes.count || 0,
+          totalProducts: productsRes.count || 0,
+          pendingOrders: ordersRes.count || 0,
+          pendingCreditRequests: creditsRes.count || 0,
           totalRevenue,
-          activeUsers: activeUsersRes.data?.VirtualCount || 0
+          activeUsers: activeUsersCount || 0
         });
 
         // Fetch recent activities
-        const activitiesRes = await window.ezsite.apis.tablePage(44177, {
-          PageNo: 1,
-          PageSize: 10,
-          OrderByField: 'created_at',
-          IsAsc: false
-        });
+        const { data: activities, error: activitiesError } = await supabase
+          .from('admin_audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
 
-        if (activitiesRes.error) throw new Error(activitiesRes.error);
+        if (activitiesError) throw new Error(activitiesError.message);
 
-        setRecentActivities(activitiesRes.data?.List || []);
+        setRecentActivities(activities || []);
       } catch (err) {
         console.error('Dashboard fetch error:', err);
         setError(err instanceof Error ? err.message : 'Failed to load dashboard');
@@ -241,16 +231,41 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <Button
-          onClick={handleInitializeProducts}
+          onClick={async () => {
+            try {
+              const { error } = await supabase.from('products').upsert(products.map(p => ({
+                ...p,
+                is_active: true,
+                stock_quantity: 100
+              })));
+              if (error) throw error;
+              toast({ title: "Success", description: "Sample products initialized" });
+            } catch (error) {
+              toast({ title: "Error", description: "Failed to initialize products", variant: "destructive" });
+            }
+          }}
           className="h-20 text-left flex flex-col items-start justify-center bg-blue-600 hover:bg-blue-700">
-
           <span className="font-semibold">Initialize Sample Products</span>
           <span className="text-sm text-blue-100">Add sample telecom products to the database</span>
         </Button>
         <Button
-          onClick={handleSetupAdmin}
+          onClick={async () => {
+            try {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (!user) throw new Error('No user found');
+              
+              const { error } = await supabase.from('user_profiles').upsert({
+                user_id: user.id,
+                email: user.email || 'thewayofthedragg@gmail.com',
+                full_name: user.user_metadata?.full_name || 'Admin User'
+              });
+              if (error) throw error;
+              toast({ title: "Success", description: "Admin account configured" });
+            } catch (error) {
+              toast({ title: "Error", description: "Failed to setup admin", variant: "destructive" });
+            }
+          }}
           className="h-20 text-left flex flex-col items-start justify-center bg-green-600 hover:bg-green-700">
-
           <span className="font-semibold">Setup Admin Account</span>
           <span className="text-sm text-green-100">Configure current user as admin</span>
         </Button>
@@ -258,8 +273,8 @@ export default function AdminDashboard() {
 
       {/* Sample Data Section */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Database Management</h2>
-        <SampleDataInitializer />
+        <h2 className="text-xl font-semibold text-white mb-4">Database Management</h2>
+        <SampleDataInitializerTemp />
       </div>
     </div>);
 

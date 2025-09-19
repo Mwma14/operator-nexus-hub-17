@@ -56,9 +56,14 @@ const ProductListing = () => {
       order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
+      const typedProducts = data?.map(product => ({
+        ...product,
+        operator: product.operator as "MPT" | "OOREDOO" | "ATOM" | "MYTEL",
+        category: product.category as "Data" | "Minutes" | "Points" | "Packages" | "Beautiful Numbers"
+      })) || [];
+      setProducts(typedProducts);
 
-      if ((data || []).length === 0) {
+      if ((typedProducts || []).length === 0) {
         setProductsError("No products found in the database. Please add some products through the admin panel or initialize sample data.");
       }
     } catch (error) {
