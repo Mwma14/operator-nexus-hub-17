@@ -7,18 +7,17 @@ import { CheckSquare, Package, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
-interface ApprovalWorkflow {
+interface ProductApproval {
   id: number;
-  workflow_type: string;
+  name: string;
   status: string;
-  target_id: number;
-  user_id: string;
-  admin_user_id: string;
   admin_notes: string;
-  notes: string;
-  priority: string;
+  category: string;
+  operator: string;
+  price: number;
+  is_active: boolean;
   created_at: string;
-  processed_at: string;
+  updated_at: string;
 }
 
 interface PaymentRequest {
@@ -34,7 +33,7 @@ interface PaymentRequest {
 }
 
 export default function ApprovalWorkflows() {
-  const [productApprovals, setProductApprovals] = useState<ApprovalWorkflow[]>([]);
+  const [productApprovals, setProductApprovals] = useState<ProductApproval[]>([]);
   const [creditRequests, setCreditRequests] = useState<PaymentRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,15 +45,14 @@ export default function ApprovalWorkflows() {
     try {
       setLoading(true);
 
-      // Fetch product approval workflows
-      const { data: workflows, error: workflowError } = await supabase
-        .from('approval_workflows')
+      // Fetch products with admin activity (products with admin notes)
+      const { data: products, error: productError } = await supabase
+        .from('products')
         .select('*')
-        .in('workflow_type', ['product_approval', 'product_edit'])
-        .in('status', ['approved', 'denied'])
-        .order('created_at', { ascending: false });
+        .not('admin_notes', 'is', null)
+        .order('updated_at', { ascending: false });
 
-      if (workflowError) throw workflowError;
+      if (productError) throw productError;
 
       // Fetch payment requests (credit approvals)
       const { data: payments, error: paymentError } = await supabase
@@ -65,7 +63,13 @@ export default function ApprovalWorkflows() {
 
       if (paymentError) throw paymentError;
 
-      setProductApprovals(workflows || []);
+      // Transform products to approval format
+      const transformedProducts = (products || []).map(product => ({
+        ...product,
+        status: product.is_active ? 'approved' : 'denied'
+      }));
+
+      setProductApprovals(transformedProducts);
       setCreditRequests(payments || []);
     } catch (error) {
       console.error('Error fetching approval data:', error);
@@ -140,12 +144,13 @@ export default function ApprovalWorkflows() {
                     <TableHeader>
                       <TableRow className="border-b border-white/10">
                         <TableHead className="text-white/70">ID</TableHead>
-                        <TableHead className="text-white/70">Type</TableHead>
-                        <TableHead className="text-white/70">Target ID</TableHead>
+                        <TableHead className="text-white/70">Product Name</TableHead>
+                        <TableHead className="text-white/70">Category</TableHead>
+                        <TableHead className="text-white/70">Operator</TableHead>
+                        <TableHead className="text-white/70">Price</TableHead>
                         <TableHead className="text-white/70">Status</TableHead>
-                        <TableHead className="text-white/70">Priority</TableHead>
                         <TableHead className="text-white/70">Created</TableHead>
-                        <TableHead className="text-white/70">Processed</TableHead>
+                        <TableHead className="text-white/70">Last Updated</TableHead>
                         <TableHead className="text-white/70">Admin Notes</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -153,17 +158,16 @@ export default function ApprovalWorkflows() {
                       {productApprovals.map((approval) => (
                         <TableRow key={approval.id} className="border-b border-white/10">
                           <TableCell className="text-white">{approval.id}</TableCell>
-                          <TableCell className="text-white capitalize">
-                            {approval.workflow_type.replace('_', ' ')}
-                          </TableCell>
-                          <TableCell className="text-white">{approval.target_id}</TableCell>
+                          <TableCell className="text-white">{approval.name}</TableCell>
+                          <TableCell className="text-white capitalize">{approval.category}</TableCell>
+                          <TableCell className="text-white">{approval.operator}</TableCell>
+                          <TableCell className="text-white">{approval.price} MMK</TableCell>
                           <TableCell>{getStatusBadge(approval.status)}</TableCell>
-                          <TableCell className="text-white capitalize">{approval.priority}</TableCell>
                           <TableCell className="text-white">
                             {formatDate(approval.created_at)}
                           </TableCell>
                           <TableCell className="text-white">
-                            {approval.processed_at ? formatDate(approval.processed_at) : '-'}
+                            {formatDate(approval.updated_at)}
                           </TableCell>
                           <TableCell className="text-white max-w-xs truncate">
                             {approval.admin_notes || '-'}
