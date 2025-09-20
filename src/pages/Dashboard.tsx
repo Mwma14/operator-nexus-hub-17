@@ -226,13 +226,15 @@ const Dashboard = () => {
         <div>
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/')}>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+              navigate('/?scrollTo=products');
+            }}>
               <CardContent className="p-4 text-center">
                 <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg w-fit mx-auto mb-3">
                   <Smartphone className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="font-medium">Operators</h3>
-                <p className="text-sm text-muted-foreground">Browse all operators</p>
+                <h3 className="font-medium">All Products</h3>
+                <p className="text-sm text-muted-foreground">Browse all products</p>
               </CardContent>
             </Card>
 
@@ -273,7 +275,11 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold mb-4">Favorite Operators</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {['MPT', 'ATOM', 'MYTEL', 'OOREDOO'].map((operator) => (
-              <Card key={operator} className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card 
+                key={operator} 
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => navigate(`/?operator=${operator}&scrollTo=products`)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${getOperatorColor(operator)}`}>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PurchaseDialog from "./PurchaseDialog";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const ProductListing = () => {
@@ -25,11 +25,18 @@ const ProductListing = () => {
   const [productsError, setProductsError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     checkAuthStatus();
     fetchProducts();
-  }, []);
+    
+    // Check for operator filter from URL
+    const operator = searchParams.get('operator');
+    if (operator && ['MPT', 'ATOM', 'MYTEL', 'OOREDOO'].includes(operator)) {
+      setSelectedOperator(operator);
+    }
+  }, [searchParams]);
 
   // Scroll to products section when filters are applied
   useEffect(() => {
