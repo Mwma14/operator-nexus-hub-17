@@ -87,7 +87,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
+              <Route path="/" element={<Index />} />
               <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
               <Route path="/onauthsuccess" element={<AuthSuccess />} />
               <Route path="/test-supabase" element={<SupabaseTest />} />

@@ -12,15 +12,19 @@ const Index = () => {
     const operator = searchParams.get('operator');
     
     if (scrollTo === 'products') {
+      // Wait for both component render and any filter application
       setTimeout(() => {
+        const productsGrid = document.getElementById('products-grid');
         const productsSection = document.getElementById('products-section');
-        if (productsSection) {
-          productsSection.scrollIntoView({
+        const targetElement = productsGrid || productsSection;
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
         }
-      }, 100); // Small delay to ensure component is rendered
+      }, 300); // Increased delay to ensure filters are applied
     }
   }, [searchParams]);
 
