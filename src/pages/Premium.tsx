@@ -167,7 +167,7 @@ const Premium = () => {
                 We're working on bringing you exclusive premium products soon.
               </p>
               <Button
-              onClick={() => navigate('/?scrollTo=products')}
+              onClick={() => navigate('/browse?scrollTo=products')}
               className="btn-premium">
 
                 Browse All Products
