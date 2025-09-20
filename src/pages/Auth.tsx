@@ -27,7 +27,7 @@ const Auth = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          navigate('/');
+          navigate('/dashboard');
         }
       } catch (error) {
         // User not authenticated, stay on auth page
@@ -65,7 +65,7 @@ const Auth = () => {
           title: 'Success',
           description: 'You have been successfully signed in'
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     });
 
