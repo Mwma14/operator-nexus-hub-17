@@ -15,6 +15,7 @@ import Admin from "./pages/Admin";
 import AdminSetup from "./pages/AdminSetup";
 import QuickAdminSetup from "./pages/QuickAdminSetup";
 import NotFound from "./pages/NotFound";
+import FAQ from "./pages/FAQ";
 import SupabaseTest from "./components/SupabaseTest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { toast } from "@/hooks/use-toast";
@@ -98,6 +99,8 @@ const App = () => {
               <Route path="/admin" element={user ? <Admin /> : <Navigate to="/auth" replace />} />
               <Route path="/admin-setup" element={<AdminSetup />} />
               <Route path="/quick-admin-setup" element={<QuickAdminSetup />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/help" element={<FAQ />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

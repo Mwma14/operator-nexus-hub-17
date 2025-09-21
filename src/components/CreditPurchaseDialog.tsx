@@ -1,1 +1,1 @@
-export { default } from './CreditPurchaseDialogFixed';
+export { default } from './CreditPurchaseDialogNew';

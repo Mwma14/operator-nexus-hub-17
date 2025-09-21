@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard, ShoppingCart } from 'lucide-react';
+import { BarChart3, Users, Package, CheckSquare, Shield, ArrowLeft, Zap, Menu, CreditCard, ShoppingCart, Settings } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AdminDashboard from '@/components/AdminDashboard';
 import ProductManagement from '@/components/ProductManagement';
@@ -11,8 +11,9 @@ import UserManagement from '@/components/UserManagement';
 import PaymentRequestManagement from '@/components/PaymentRequestManagement';
 import PendingOrdersManagement from '@/components/PendingOrdersManagement';
 import ApprovalWorkflows from '@/components/ApprovalWorkflows';
+import SiteSettingsPanel from '@/components/SiteSettingsPanel';
 
-type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'orders' | 'approvals';
+type TabValue = 'dashboard' | 'products' | 'users' | 'payments' | 'orders' | 'approvals' | 'settings';
 
 interface NavItem {
   value: TabValue;
@@ -27,7 +28,8 @@ const navItems: NavItem[] = [
 { value: 'users', label: 'Users', icon: Users, component: UserManagement },
 { value: 'payments', label: 'Payment Requests', icon: CreditCard, component: PaymentRequestManagement },
 { value: 'orders', label: 'Pending Orders', icon: ShoppingCart, component: PendingOrdersManagement },
-{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflows }];
+{ value: 'approvals', label: 'Approvals', icon: CheckSquare, component: ApprovalWorkflows },
+{ value: 'settings', label: 'Site Settings', icon: Settings, component: SiteSettingsPanel }];
 
 
 export default function AdminLayout() {
@@ -152,7 +154,7 @@ export default function AdminLayout() {
           // Desktop: Tabs interface
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)} className="space-y-6 mt-6">
               <div className="glass-card rounded-2xl p-1">
-                <TabsList className="grid w-full grid-cols-6 bg-transparent border-none">
+                <TabsList className="grid w-full grid-cols-7 bg-transparent border-none">
                   {navItems.map((item) => {
                   const Icon = item.icon;
                   return (

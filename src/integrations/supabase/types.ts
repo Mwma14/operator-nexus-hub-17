@@ -298,6 +298,48 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          credit_rate_mmk: number | null
+          id: number
+          kpay_account_name: string | null
+          kpay_account_number: string | null
+          support_email: string | null
+          support_phone: string | null
+          support_telegram: string | null
+          updated_at: string | null
+          wave_pay_account_name: string | null
+          wave_pay_account_number: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credit_rate_mmk?: number | null
+          id?: number
+          kpay_account_name?: string | null
+          kpay_account_number?: string | null
+          support_email?: string | null
+          support_phone?: string | null
+          support_telegram?: string | null
+          updated_at?: string | null
+          wave_pay_account_name?: string | null
+          wave_pay_account_number?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credit_rate_mmk?: number | null
+          id?: number
+          kpay_account_name?: string | null
+          kpay_account_number?: string | null
+          support_email?: string | null
+          support_phone?: string | null
+          support_telegram?: string | null
+          updated_at?: string | null
+          wave_pay_account_name?: string | null
+          wave_pay_account_number?: string | null
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
