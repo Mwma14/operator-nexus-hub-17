@@ -263,7 +263,7 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
 
   const renderStepIndicator = () => (
     <div className="mb-6">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between px-4 mb-4">
         {[
           { key: 'AMOUNT', label: 'Select Amount', icon: CreditCard },
           { key: 'PAYMENT_METHOD', label: 'Payment Method', icon: Smartphone },
@@ -275,22 +275,27 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
           const isCompleted = getStepProgress() > (index + 1) * 25;
           
           return (
-            <div key={stepItem.key} className="flex flex-col items-center">
-              <div className={`
-                w-12 h-12 rounded-full flex items-center justify-center transition-all
-                ${isActive ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : 
-                  isCompleted ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'}
-              `}>
-                <Icon className="h-5 w-5" />
+            <div key={stepItem.key} className="flex items-center flex-1">
+              <div className="flex flex-col items-center flex-1">
+                <div className={`
+                  w-12 h-12 rounded-full flex items-center justify-center transition-all mb-2
+                  ${isActive || isCompleted ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}
+                `}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <span className={`text-xs text-center font-medium ${isActive ? 'text-blue-600' : isCompleted ? 'text-blue-600' : 'text-gray-400'}`}>
+                  {stepItem.label}
+                </span>
               </div>
-              <span className={`text-xs mt-1 ${isActive ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                {stepItem.label}
-              </span>
+              {index < 3 && (
+                <div className={`h-0.5 flex-1 mx-4 ${
+                  getStepProgress() > (index + 1) * 25 ? 'bg-blue-600' : 'bg-gray-200'
+                }`} />
+              )}
             </div>
           );
         })}
       </div>
-      <Progress value={getStepProgress()} className="h-2" />
     </div>
   );
 

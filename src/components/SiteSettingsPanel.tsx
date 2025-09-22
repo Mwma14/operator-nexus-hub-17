@@ -63,7 +63,17 @@ const SiteSettingsPanel: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('site_settings')
-        .insert([{ id: 1 }])
+        .insert([{
+          id: 1,
+          kpay_account_name: 'Hlaing Ko Phyo',
+          kpay_account_number: '09883249943',
+          wave_pay_account_name: 'Hlaing Ko Phyo',
+          wave_pay_account_number: '09883249943',
+          support_email: 'thewayofthedragg@gmail.com',
+          support_telegram: 'https://t.me/CEO_METAVERSE',
+          support_phone: '09789037037',
+          credit_rate_mmk: 100
+        }])
         .select()
         .single();
 
