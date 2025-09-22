@@ -258,7 +258,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/faq')}>
               <CardContent className="p-4 text-center">
                 <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg w-fit mx-auto mb-3">
                   <HelpCircle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -414,9 +414,6 @@ const Dashboard = () => {
                 ) : (
                   <div className="p-8 text-center text-muted-foreground">
                     <p>No orders yet</p>
-                    <Button className="mt-4" onClick={() => navigate('/')}>
-                      Browse Products
-                    </Button>
                   </div>
                 )}
               </CardContent>

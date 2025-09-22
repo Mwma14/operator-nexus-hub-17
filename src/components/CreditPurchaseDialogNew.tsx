@@ -43,10 +43,10 @@ interface SiteSettings {
 type Step = 'AMOUNT' | 'PAYMENT_METHOD' | 'PAYMENT_PROOF' | 'SUCCESS';
 
 const CREDIT_PACKAGES = [
-  { credits: 100, price: 10000, popular: false },
-  { credits: 500, price: 50000, popular: true },
-  { credits: 1000, price: 100000, popular: false },
-  { credits: 2000, price: 200000, popular: false }
+  { credits: 10, price: 1000, popular: false },
+  { credits: 30, price: 3000, popular: true },
+  { credits: 50, price: 5000, popular: false },
+  { credits: 100, price: 10000, popular: false }
 ];
 
 const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
@@ -279,17 +279,17 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
               <div className="flex flex-col items-center flex-1">
                 <div className={`
                   w-12 h-12 rounded-full flex items-center justify-center transition-all mb-2
-                  ${isActive || isCompleted ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}
+                  ${isActive || isCompleted ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-black' : 'bg-gray-200 text-gray-500'}
                 `}>
                   <Icon className="h-5 w-5" />
                 </div>
-                <span className={`text-xs text-center font-medium ${isActive ? 'text-blue-600' : isCompleted ? 'text-blue-600' : 'text-gray-400'}`}>
+                <span className={`text-xs text-center font-medium ${isActive ? 'text-yellow-400' : isCompleted ? 'text-yellow-400' : 'text-gray-400'}`}>
                   {stepItem.label}
                 </span>
               </div>
               {index < 3 && (
                 <div className={`h-0.5 flex-1 mx-4 ${
-                  getStepProgress() > (index + 1) * 25 ? 'bg-blue-600' : 'bg-gray-200'
+                  getStepProgress() > (index + 1) * 25 ? 'bg-gradient-to-r from-yellow-400 to-orange-400' : 'bg-gray-200'
                 }`} />
               )}
             </div>
@@ -455,9 +455,12 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border border-yellow-500/30 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Purchase Credits</DialogTitle>
+          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-yellow-400" />
+            Purchase Credits
+          </DialogTitle>
         </DialogHeader>
 
         {renderStepIndicator()}
@@ -466,17 +469,17 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
           {/* Step 1: Amount Selection */}
           {step === 'AMOUNT' && (
             <div className="space-y-6">
-              <Card>
+              <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 border-yellow-400/30">
                 <CardContent className="p-6">
-                  <h3 className="font-medium mb-4">Credit Packages</h3>
+                  <h3 className="font-medium mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Credit Packages</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     {CREDIT_PACKAGES.map((pkg, index) => (
                       <Card
                         key={index}
                         className={`cursor-pointer transition-all relative border-2 ${
                           selectedPackage === index 
-                            ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
-                            : 'border-border hover:border-primary/50'
+                            ? 'border-yellow-400 bg-gradient-to-br from-yellow-400/20 to-orange-400/10 shadow-lg shadow-yellow-400/20' 
+                            : 'border-gray-600 bg-gradient-to-br from-gray-800/50 to-gray-700/30 hover:border-yellow-400/50'
                         }`}
                         onClick={() => {
                           setSelectedPackage(index);
@@ -484,14 +487,14 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                         }}
                       >
                         {pkg.popular && (
-                          <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-black text-xs px-2 py-1 rounded-full font-medium">
                             Popular
                           </div>
                         )}
                         <CardContent className="p-4 text-center">
-                          <div className="font-bold text-lg">{pkg.credits}</div>
-                          <div className="text-sm text-muted-foreground">Credits</div>
-                          <div className="text-sm font-medium mt-1">
+                          <div className="font-bold text-lg text-white">{pkg.credits}</div>
+                          <div className="text-sm text-gray-300">Credits</div>
+                          <div className="text-sm font-medium mt-1 text-yellow-400">
                             {pkg.price.toLocaleString()} MMK
                           </div>
                         </CardContent>
@@ -596,34 +599,34 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
             <div className="space-y-6">
               {renderPaymentInstructions()}
 
-              <Card>
+              <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/40 border-yellow-400/30">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <Upload className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">Upload Payment Proof</h3>
+                    <Upload className="h-5 w-5 text-yellow-400" />
+                    <h3 className="font-medium bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Upload Payment Proof</h3>
                   </div>
                   
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                  <div className="border-2 border-dashed border-yellow-400/50 rounded-lg p-8 text-center bg-gradient-to-br from-gray-800/30 to-gray-700/20">
                     {paymentProofFile ? (
                       <div className="space-y-3">
-                        <div className="flex items-center justify-center gap-2 text-green-600">
+                        <div className="flex items-center justify-center gap-2 text-green-400">
                           <CheckCircle className="h-5 w-5" />
-                          <span>Image uploaded successfully</span>
+                          <span className="font-medium">Image uploaded successfully</span>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-300">
                           Make sure your screenshot shows the complete transaction details
                         </p>
-                        <Button variant="outline" size="sm" onClick={() => setPaymentProofFile(null)}>
+                        <Button variant="outline" size="sm" onClick={() => setPaymentProofFile(null)} className="border-gray-600 text-gray-300 hover:bg-gray-800">
                           <X className="h-4 w-4 mr-2" />
                           Remove
                         </Button>
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <Upload className="h-12 w-12 mx-auto text-primary opacity-50" />
+                        <Upload className="h-12 w-12 mx-auto text-yellow-400 opacity-75" />
                         <div>
-                          <p className="font-medium">Upload Payment Screenshot</p>
-                          <p className="text-sm text-muted-foreground">Drag and drop your payment proof or click to browse</p>
+                          <p className="font-medium text-white">Upload Payment Screenshot</p>
+                          <p className="text-sm text-gray-300">Drag and drop your payment proof or click to browse</p>
                         </div>
                         <Input
                           type="file"
@@ -633,7 +636,7 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                           id="payment-proof"
                         />
                         <Label htmlFor="payment-proof" className="cursor-pointer">
-                          <Button variant="outline" type="button">
+                          <Button variant="outline" type="button" className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold border-0">
                             <Upload className="h-4 w-4 mr-2" />
                             Choose File
                           </Button>
@@ -667,10 +670,11 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
               </Card>
 
               <div className="flex justify-between">
-                <Button variant="outline" onClick={handleBack}>Back</Button>
+                <Button variant="outline" onClick={handleBack} className="border-gray-600 text-gray-300 hover:bg-gray-800">Back</Button>
                 <Button 
                   onClick={handleFinalConfirm} 
                   disabled={!paymentProofFile || loading}
+                  className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold shadow-lg"
                 >
                   {loading ? (
                     <>
@@ -687,22 +691,22 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
 
           {/* Step 4: Success */}
           {step === 'SUCCESS' && (
-            <Card className="border-green-200 bg-green-50">
+            <Card className="border-green-400/50 bg-gradient-to-br from-green-900/60 to-green-800/40">
               <CardContent className="p-6 text-center">
-                <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-green-800 mb-2">Request Submitted Successfully!</h3>
-                <p className="text-green-700 mb-4">
+                <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-green-300 mb-2">Request Submitted Successfully!</h3>
+                <p className="text-green-200 mb-4">
                   Your payment request for {getSelectedCredits()} credits has been submitted for admin review.
                 </p>
-                <div className="bg-white rounded-lg p-4 border border-green-200 mb-4">
-                  <h4 className="font-medium text-green-800 mb-2">What happens next?</h4>
-                  <div className="text-sm text-green-700 space-y-1">
+                <div className="bg-green-800/30 rounded-lg p-4 border border-green-400/30 mb-4">
+                  <h4 className="font-medium text-green-300 mb-2">What happens next?</h4>
+                  <div className="text-sm text-green-200 space-y-1">
                     <p>1. Our admin team will verify your payment proof</p>
                     <p>2. Credits will be added to your account within 2-4 hours</p>
                     <p>3. You'll receive a notification once approved</p>
                   </div>
                 </div>
-                <Button onClick={onClose} className="mt-4">
+                <Button onClick={onClose} className="mt-4 bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold">
                   Close
                 </Button>
               </CardContent>
