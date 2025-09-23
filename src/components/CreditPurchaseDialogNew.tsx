@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -63,6 +63,9 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+
+  // Ref to programmatically trigger file picker (better on mobile browsers)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Reset states when dialog opens
   useEffect(() => {
@@ -606,7 +609,7 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                     <h3 className="font-medium bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Upload Payment Proof</h3>
                   </div>
                   
-                  <div className="border-2 border-dashed border-yellow-400/50 rounded-lg p-8 text-center bg-gradient-to-br from-gray-800/30 to-gray-700/20">
+                  <div className="border-2 border-dashed border-yellow-400/50 rounded-lg p-8 text-center bg-gradient-to-br from-gray-800/30 to-gray-700/20" onClick={() => fileInputRef.current?.click()} role="button" aria-label="Upload payment proof">
                     {paymentProofFile ? (
                       <div className="space-y-3">
                         <div className="flex items-center justify-center gap-2 text-green-400">
@@ -634,13 +637,12 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                           onChange={handleFileUpload}
                           className="sr-only"
                           id="payment-proof"
+                          ref={fileInputRef}
                         />
-                        <Label htmlFor="payment-proof" className="cursor-pointer">
-                          <Button variant="outline" type="button" className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold border-0">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Choose File
-                          </Button>
-                        </Label>
+                        <Button variant="outline" type="button" onClick={() => fileInputRef.current?.click()} className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold border-0">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Choose File
+                        </Button>
                       </div>
                     )}
                   </div>
