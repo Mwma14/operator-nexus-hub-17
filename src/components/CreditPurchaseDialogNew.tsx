@@ -632,7 +632,7 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                           type="file"
                           accept="image/*"
                           onChange={handleFileUpload}
-                          className="hidden"
+                          className="sr-only"
                           id="payment-proof"
                         />
                         <Label htmlFor="payment-proof" className="cursor-pointer">
