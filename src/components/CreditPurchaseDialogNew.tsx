@@ -205,9 +205,9 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
-      // Upload payment proof file
+      // Upload payment proof file to user-scoped folder
       const fileExt = paymentProofFile.name.split('.').pop();
-      const fileName = `payment-proof-${Date.now()}.${fileExt}`;
+      const fileName = `${session.user.id}/payment-proof-${Date.now()}.${fileExt}`;
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('payment-proofs')
