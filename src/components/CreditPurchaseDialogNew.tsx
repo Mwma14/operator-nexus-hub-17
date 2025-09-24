@@ -339,21 +339,27 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
               
               <div className="space-y-4">
                 <h4 className="font-medium text-blue-800">Payment Details:</h4>
-                <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="bg-blue-600 rounded-lg p-4 border border-blue-200">
                   <img src={kpayQR} alt="K Pay QR Code" className="w-full max-w-48 mx-auto mb-4" />
-                  <p className="text-center text-sm text-blue-600 mb-4">Scan QR code with your K PAY app</p>
-                  <div className="space-y-2 text-sm">
+                  <p className="text-center text-sm font-medium text-white mb-2">
+                    {siteSettings?.kpay_account_name || 'Hlaing Ko Phyo'}
+                  </p>
+                  <p className="text-center text-sm font-medium text-white mb-4">
+                    {siteSettings?.kpay_account_number || '09883249943'}
+                  </p>
+                  <p className="text-center text-sm text-blue-100 mb-4">Scan QR code with your K PAY app</p>
+                  <div className="space-y-2 text-sm bg-white rounded-lg p-3">
                     <div className="flex justify-between">
-                      <span className="text-blue-600">Amount:</span>
-                      <span className="font-medium">{getTotalPrice().toLocaleString()} MMK</span>
+                      <span className="text-blue-600 font-medium">Amount:</span>
+                      <span className="font-bold text-gray-900">{getTotalPrice().toLocaleString()} MMK</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-600">Credits:</span>
-                      <span className="font-medium">{getSelectedCredits()}</span>
+                      <span className="text-blue-600 font-medium">Credits:</span>
+                      <span className="font-bold text-gray-900">{getSelectedCredits()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-600">Processing:</span>
-                      <span className="font-medium">Within 2-4 hours</span>
+                      <span className="text-blue-600 font-medium">Processing:</span>
+                      <span className="font-bold text-gray-900">Within 2-4 hours</span>
                     </div>
                   </div>
                 </div>
@@ -413,21 +419,27 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
               
               <div className="space-y-4">
                 <h4 className="font-medium text-yellow-800">Payment Details:</h4>
-                <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                <div className="bg-yellow-500 rounded-lg p-4 border border-yellow-200">
                   <img src={wavePayQR} alt="Wave Pay QR Code" className="w-full max-w-48 mx-auto mb-4" />
-                  <p className="text-center text-sm text-yellow-600 mb-4">Scan QR code with your Wave Pay app</p>
-                  <div className="space-y-2 text-sm">
+                  <p className="text-center text-sm font-medium text-black mb-2">
+                    {siteSettings?.wave_pay_account_name || 'Hlaing Ko Phyo'}
+                  </p>
+                  <p className="text-center text-sm font-medium text-black mb-4">
+                    {siteSettings?.wave_pay_account_number || '09883249943'}
+                  </p>
+                  <p className="text-center text-sm text-yellow-900 mb-4">Scan QR code with your Wave Pay app</p>
+                  <div className="space-y-2 text-sm bg-white rounded-lg p-3">
                     <div className="flex justify-between">
-                      <span className="text-yellow-600">Amount:</span>
-                      <span className="font-medium">{getTotalPrice().toLocaleString()} MMK</span>
+                      <span className="text-yellow-600 font-medium">Amount:</span>
+                      <span className="font-bold text-gray-900">{getTotalPrice().toLocaleString()} MMK</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-yellow-600">Credits:</span>
-                      <span className="font-medium">{getSelectedCredits()}</span>
+                      <span className="text-yellow-600 font-medium">Credits:</span>
+                      <span className="font-bold text-gray-900">{getSelectedCredits()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-yellow-600">Processing:</span>
-                      <span className="font-medium">Within 2-4 hours</span>
+                      <span className="text-yellow-600 font-medium">Processing:</span>
+                      <span className="font-bold text-gray-900">Within 2-4 hours</span>
                     </div>
                   </div>
                 </div>
