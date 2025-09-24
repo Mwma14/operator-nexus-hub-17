@@ -621,13 +621,16 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                     <h3 className="font-medium bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Upload Payment Proof</h3>
                   </div>
                   
-                  <div className="border-2 border-dashed border-yellow-400/50 rounded-lg p-8 text-center bg-gradient-to-br from-gray-800/30 to-gray-700/20" onClick={() => fileInputRef.current?.click()} role="button" aria-label="Upload payment proof">
+                  <div className="border-2 border-dashed border-yellow-400/50 rounded-lg p-8 text-center bg-gradient-to-br from-gray-800/30 to-gray-700/20">
                     {paymentProofFile ? (
                       <div className="space-y-3">
                         <div className="flex items-center justify-center gap-2 text-green-400">
                           <CheckCircle className="h-5 w-5" />
                           <span className="font-medium">Image uploaded successfully</span>
                         </div>
+                        <p className="text-sm text-gray-300">
+                          {paymentProofFile.name}
+                        </p>
                         <p className="text-sm text-gray-300">
                           Make sure your screenshot shows the complete transaction details
                         </p>
@@ -641,17 +644,26 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
                         <Upload className="h-12 w-12 mx-auto text-yellow-400 opacity-75" />
                         <div>
                           <p className="font-medium text-white">Upload Payment Screenshot</p>
-                          <p className="text-sm text-gray-300">Drag and drop your payment proof or click to browse</p>
+                          <p className="text-sm text-gray-300">Click the button below to select your payment proof</p>
                         </div>
                         <Input
                           type="file"
                           accept="image/*"
                           onChange={handleFileUpload}
-                          className="sr-only"
+                          className="hidden"
                           id="payment-proof"
                           ref={fileInputRef}
                         />
-                        <Button variant="outline" type="button" onClick={() => fileInputRef.current?.click()} className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold border-0">
+                        <Button 
+                          variant="outline" 
+                          type="button" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            fileInputRef.current?.click();
+                          }} 
+                          className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-semibold border-0"
+                        >
                           <Upload className="h-4 w-4 mr-2" />
                           Choose File
                         </Button>
