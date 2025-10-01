@@ -14,362 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_audit_logs: {
+      bot_users: {
         Row: {
-          action_type: string
-          admin_user_id: string | null
           created_at: string | null
-          id: number
-          ip_address: string | null
-          new_values: string | null
-          notes: string | null
-          old_values: string | null
-          target_id: string | null
-          target_type: string | null
-          user_agent: string | null
+          first_name: string | null
+          id: string
+          language_code: string | null
+          last_name: string | null
+          preferred_output_language: string | null
+          telegram_user_id: number
+          updated_at: string | null
+          username: string | null
+          voice_enabled: boolean | null
         }
         Insert: {
-          action_type: string
-          admin_user_id?: string | null
           created_at?: string | null
-          id?: number
-          ip_address?: string | null
-          new_values?: string | null
-          notes?: string | null
-          old_values?: string | null
-          target_id?: string | null
-          target_type?: string | null
-          user_agent?: string | null
+          first_name?: string | null
+          id?: string
+          language_code?: string | null
+          last_name?: string | null
+          preferred_output_language?: string | null
+          telegram_user_id: number
+          updated_at?: string | null
+          username?: string | null
+          voice_enabled?: boolean | null
         }
         Update: {
-          action_type?: string
-          admin_user_id?: string | null
           created_at?: string | null
-          id?: number
-          ip_address?: string | null
-          new_values?: string | null
-          notes?: string | null
-          old_values?: string | null
-          target_id?: string | null
-          target_type?: string | null
-          user_agent?: string | null
+          first_name?: string | null
+          id?: string
+          language_code?: string | null
+          last_name?: string | null
+          preferred_output_language?: string | null
+          telegram_user_id?: number
+          updated_at?: string | null
+          username?: string | null
+          voice_enabled?: boolean | null
         }
         Relationships: []
       }
-      approval_workflows: {
+      conversations: {
         Row: {
-          admin_notes: string | null
-          admin_user_id: string | null
+          bot_user_id: string | null
           created_at: string | null
-          id: number
-          notes: string | null
-          priority: string | null
-          processed_at: string | null
-          status: string | null
-          target_id: number
-          user_id: string | null
-          workflow_type: string
+          id: string
+          input_language: string | null
+          input_text: string | null
+          input_type: string | null
+          output_burmese: string | null
+          output_english: string | null
+          output_hanzi: string | null
+          output_pinyin: string | null
         }
         Insert: {
-          admin_notes?: string | null
-          admin_user_id?: string | null
+          bot_user_id?: string | null
           created_at?: string | null
-          id?: number
-          notes?: string | null
-          priority?: string | null
-          processed_at?: string | null
-          status?: string | null
-          target_id: number
-          user_id?: string | null
-          workflow_type: string
+          id?: string
+          input_language?: string | null
+          input_text?: string | null
+          input_type?: string | null
+          output_burmese?: string | null
+          output_english?: string | null
+          output_hanzi?: string | null
+          output_pinyin?: string | null
         }
         Update: {
-          admin_notes?: string | null
-          admin_user_id?: string | null
+          bot_user_id?: string | null
           created_at?: string | null
-          id?: number
-          notes?: string | null
-          priority?: string | null
-          processed_at?: string | null
-          status?: string | null
-          target_id?: number
-          user_id?: string | null
-          workflow_type?: string
-        }
-        Relationships: []
-      }
-      credit_transactions: {
-        Row: {
-          admin_notes: string | null
-          approval_notes: string | null
-          created_at: string | null
-          credit_amount: number
-          currency: string | null
-          id: number
-          mmk_amount: number | null
-          new_balance: number | null
-          payment_method: string | null
-          payment_reference: string | null
-          previous_balance: number | null
-          processed_at: string | null
-          status: string | null
-          transaction_type: string
-          user_id: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          approval_notes?: string | null
-          created_at?: string | null
-          credit_amount: number
-          currency?: string | null
-          id?: number
-          mmk_amount?: number | null
-          new_balance?: number | null
-          payment_method?: string | null
-          payment_reference?: string | null
-          previous_balance?: number | null
-          processed_at?: string | null
-          status?: string | null
-          transaction_type: string
-          user_id?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          approval_notes?: string | null
-          created_at?: string | null
-          credit_amount?: number
-          currency?: string | null
-          id?: number
-          mmk_amount?: number | null
-          new_balance?: number | null
-          payment_method?: string | null
-          payment_reference?: string | null
-          previous_balance?: number | null
-          processed_at?: string | null
-          status?: string | null
-          transaction_type?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      orders: {
-        Row: {
-          admin_notes: string | null
-          created_at: string | null
-          credits_used: number | null
-          currency: string | null
-          id: number
-          operator: string | null
-          phone_number: string | null
-          processed_at: string | null
-          product_id: number | null
-          quantity: number | null
-          status: string | null
-          total_price: number
-          user_id: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          created_at?: string | null
-          credits_used?: number | null
-          currency?: string | null
-          id?: number
-          operator?: string | null
-          phone_number?: string | null
-          processed_at?: string | null
-          product_id?: number | null
-          quantity?: number | null
-          status?: string | null
-          total_price: number
-          user_id?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          created_at?: string | null
-          credits_used?: number | null
-          currency?: string | null
-          id?: number
-          operator?: string | null
-          phone_number?: string | null
-          processed_at?: string | null
-          product_id?: number | null
-          quantity?: number | null
-          status?: string | null
-          total_price?: number
-          user_id?: string | null
+          id?: string
+          input_language?: string | null
+          input_text?: string | null
+          input_type?: string | null
+          output_burmese?: string | null
+          output_english?: string | null
+          output_hanzi?: string | null
+          output_pinyin?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "orders_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "conversations_bot_user_id_fkey"
+            columns: ["bot_user_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "bot_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      payment_requests: {
+      vocabulary: {
         Row: {
-          admin_notes: string | null
+          burmese: string
           created_at: string | null
-          credits_requested: number
-          id: number
-          payment_method: string
-          payment_proof_file_id: number | null
-          processed_at: string | null
-          status: string | null
-          total_cost_mmk: number
-          user_id: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          created_at?: string | null
-          credits_requested: number
-          id?: number
-          payment_method: string
-          payment_proof_file_id?: number | null
-          processed_at?: string | null
-          status?: string | null
-          total_cost_mmk: number
-          user_id?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          created_at?: string | null
-          credits_requested?: number
-          id?: number
-          payment_method?: string
-          payment_proof_file_id?: number | null
-          processed_at?: string | null
-          status?: string | null
-          total_cost_mmk?: number
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      products: {
-        Row: {
-          admin_notes: string | null
-          category: string
-          created_at: string | null
-          currency: string | null
-          description: string | null
-          id: number
-          is_active: boolean | null
-          logo: string | null
-          name: string
-          operator: string
-          price: number
-          stock_quantity: number | null
-          updated_at: string | null
-          validity_days: number | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          category: string
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          id?: number
-          is_active?: boolean | null
-          logo?: string | null
-          name: string
-          operator: string
-          price: number
-          stock_quantity?: number | null
-          updated_at?: string | null
-          validity_days?: number | null
-        }
-        Update: {
-          admin_notes?: string | null
-          category?: string
-          created_at?: string | null
-          currency?: string | null
-          description?: string | null
-          id?: number
-          is_active?: boolean | null
-          logo?: string | null
-          name?: string
-          operator?: string
-          price?: number
-          stock_quantity?: number | null
-          updated_at?: string | null
-          validity_days?: number | null
-        }
-        Relationships: []
-      }
-      site_settings: {
-        Row: {
-          created_at: string | null
-          credit_rate_mmk: number | null
-          id: number
-          kpay_account_name: string | null
-          kpay_account_number: string | null
-          support_email: string | null
-          support_phone: string | null
-          support_telegram: string | null
-          updated_at: string | null
-          wave_pay_account_name: string | null
-          wave_pay_account_number: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          credit_rate_mmk?: number | null
-          id?: number
-          kpay_account_name?: string | null
-          kpay_account_number?: string | null
-          support_email?: string | null
-          support_phone?: string | null
-          support_telegram?: string | null
-          updated_at?: string | null
-          wave_pay_account_name?: string | null
-          wave_pay_account_number?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          credit_rate_mmk?: number | null
-          id?: number
-          kpay_account_name?: string | null
-          kpay_account_number?: string | null
-          support_email?: string | null
-          support_phone?: string | null
-          support_telegram?: string | null
-          updated_at?: string | null
-          wave_pay_account_name?: string | null
-          wave_pay_account_number?: string | null
-        }
-        Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          credits_balance: number | null
-          email: string
-          full_name: string | null
+          english: string
+          example_sentences: Json | null
+          hanzi: string
           id: string
-          updated_at: string | null
-          user_id: string | null
+          pinyin: string
+          usage_count: number | null
         }
         Insert: {
-          avatar_url?: string | null
+          burmese: string
           created_at?: string | null
-          credits_balance?: number | null
-          email: string
-          full_name?: string | null
+          english: string
+          example_sentences?: Json | null
+          hanzi: string
           id?: string
-          updated_at?: string | null
-          user_id?: string | null
+          pinyin: string
+          usage_count?: number | null
         }
         Update: {
-          avatar_url?: string | null
+          burmese?: string
           created_at?: string | null
-          credits_balance?: number | null
-          email?: string
-          full_name?: string | null
+          english?: string
+          example_sentences?: Json | null
+          hanzi?: string
           id?: string
-          updated_at?: string | null
-          user_id?: string | null
+          pinyin?: string
+          usage_count?: number | null
         }
         Relationships: []
       }
@@ -378,10 +138,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
