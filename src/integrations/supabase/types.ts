@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       bot_users: {
         Row: {
           created_at: string | null
@@ -99,6 +129,194 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          phone_number: string | null
+          product_id: number | null
+          quantity: number | null
+          status: string | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          product_id?: number | null
+          quantity?: number | null
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          product_id?: number | null
+          quantity?: number | null
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          credits_requested: number
+          id: string
+          payment_method: string
+          payment_proof_url: string | null
+          status: string | null
+          total_cost_mmk: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          credits_requested: number
+          id?: string
+          payment_method: string
+          payment_proof_url?: string | null
+          status?: string | null
+          total_cost_mmk: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          credits_requested?: number
+          id?: string
+          payment_method?: string
+          payment_proof_url?: string | null
+          status?: string | null
+          total_cost_mmk?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: number
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          operator: string | null
+          price: number
+          stock_quantity: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          operator?: string | null
+          price: number
+          stock_quantity?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: number
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          operator?: string | null
+          price?: number
+          stock_quantity?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          id: number
+          setting_key: string
+          setting_value: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          setting_key: string
+          setting_value?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          setting_key?: string
+          setting_value?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          credits_balance: number | null
+          email: string | null
+          full_name: string | null
+          id: string
+          is_admin: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_balance?: number | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_balance?: number | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       vocabulary: {
         Row: {
