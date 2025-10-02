@@ -14,13 +14,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, Search, Package } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Product {
+import type { Product } from '@/types/admin';
+
+interface ProductFormData {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   currency: string;
-  operator: string;
+  operator: string | null;
   category: string;
   logo: string;
   is_active: boolean;

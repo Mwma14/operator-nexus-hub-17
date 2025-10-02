@@ -7,26 +7,19 @@ import { CheckSquare, Package, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
+import type { PaymentRequest } from '@/types/admin';
+
 interface ProductApproval {
   id: number;
   name: string;
   status: string;
-  admin_notes: string;
-  category: string;
-  operator: string;
+  admin_notes: string | null;
+  category: string | null;
+  operator: string | null;
   price: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
-}
-
-interface PaymentRequest {
-  id: number;
-  user_id: string;
-  credits_requested: number;
-  total_cost_mmk: number;
-  payment_method: string;
-  status: string;
   admin_notes: string;
   created_at: string;
   processed_at: string;

@@ -13,13 +13,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Users, Search, Ban, UserCheck, CreditCard, Shield, UserMinus, UserX, ShieldCheck, ShieldX, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface UserProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  email: string;
-  avatar_url: string;
-  credits_balance: number;
+import type { UserProfile } from '@/types/admin';
+
+interface ExtendedUserProfile extends UserProfile {
+  is_admin: boolean;
+  is_banned: boolean;
   created_at: string;
   updated_at: string;
   is_banned?: boolean;
