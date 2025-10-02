@@ -112,81 +112,22 @@ export function PaymentRequestManagement() {
       setIsProcessing(true);
 
       const isApproved = processingType === 'approve';
-      const now = new Date().toISOString();
 
-      // Update the payment request status
-      const { error: updateError } = await supabase
-        .from('payment_requests')
-        .update({
-          status: isApproved ? 'approved' : 'rejected',
-          processed_at: now,
-          admin_notes: adminNotes
-        })
-        .eq('id', selectedRequest.id);
-
-      if (updateError) throw updateError;
-
-      // If approved, add credits to user account
-      if (isApproved) {
-        const userProfile = userProfiles[selectedRequest.user_id];
-        if (!userProfile) {
-          throw new Error('User profile not found. Cannot process credit approval.');
+      // Call edge function for secure, atomic processing
+      const { data, error } = await supabase.functions.invoke('process-payment-request', {
+        body: {
+          requestId: selectedRequest.id,
+          action: processingType,
+          adminNotes: adminNotes || undefined
         }
+      });
 
-        const newBalance = userProfile.credits_balance + selectedRequest.credits_requested;
-
-        // Update user's credit balance
-        const { error: balanceError } = await supabase
-          .from('user_profiles')
-          .update({
-            credits_balance: newBalance
-          })
-          .eq('user_id', selectedRequest.user_id);
-
-        if (balanceError) throw balanceError;
-
-        // Create a credit transaction record
-        const { error: transactionError } = await supabase
-          .from('credit_transactions')
-          .insert({
-            user_id: selectedRequest.user_id,
-            transaction_type: 'purchase',
-            mmk_amount: selectedRequest.total_cost_mmk,
-            credit_amount: selectedRequest.credits_requested,
-            currency: 'MMK',
-            status: 'completed',
-            payment_method: selectedRequest.payment_method,
-            payment_reference: `REQ-${selectedRequest.id}`,
-            previous_balance: userProfile.credits_balance,
-            new_balance: newBalance,
-            processed_at: now,
-            created_at: now,
-            admin_notes: `Approved payment request #${selectedRequest.id}`,
-            approval_notes: adminNotes
-          });
-
-        if (transactionError) throw transactionError;
-      }
-
-      // Create audit log entry
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        await supabase
-          .from('admin_audit_logs')
-          .insert({
-            admin_id: user?.id || '',
-            action_type: isApproved ? 'approve_payment' : 'reject_payment',
-            target_type: 'payment_request',
-            target_id: selectedRequest.id,
-            notes: `${isApproved ? 'Approved' : 'Rejected'} payment request for ${selectedRequest.credits_requested} credits. Admin notes: ${adminNotes}`
-          });
-      } catch (auditError) {
-        console.warn('Failed to create audit log:', auditError);
-      }
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Failed to process payment request');
 
       toast({
         title: "Success",
-        description: `Payment request ${isApproved ? 'approved' : 'rejected'} successfully`
+        description: `Payment request ${isApproved ? 'approved' : 'rejected'} successfully${data.request.creditsAdded > 0 ? ` (${data.request.creditsAdded} credits added)` : ''}`
       });
 
       // Refresh data

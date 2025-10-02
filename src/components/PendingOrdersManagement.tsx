@@ -145,75 +145,22 @@ export function PendingOrdersManagement() {
       setIsProcessing(true);
 
       const isApproved = processingType === 'approve';
-      const now = new Date().toISOString();
 
-      // Update the order status
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({
-          status: isApproved ? 'completed' : 'rejected'
-        })
-        .eq('id', selectedOrder.id);
-
-      if (updateError) throw updateError;
-
-      // If rejected, refund credits to user
-      if (!isApproved) {
-        const userProfile = userProfiles[selectedOrder.user_id];
-        if (userProfile && selectedOrder.credits_used > 0) {
-          const newBalance = userProfile.credits_balance + selectedOrder.credits_used;
-
-          const { error: refundError } = await supabase
-            .from('user_profiles')
-            .update({
-              credits_balance: newBalance
-            })
-            .eq('user_id', selectedOrder.user_id);
-
-          if (refundError) throw refundError;
-
-          // Create a refund transaction record
-          const { error: transactionError } = await supabase
-            .from('credit_transactions')
-            .insert({
-              user_id: selectedOrder.user_id,
-              transaction_type: 'refund',
-              credit_amount: selectedOrder.credits_used,
-              currency: selectedOrder.currency || 'MMK',
-              status: 'completed',
-              payment_method: 'refund',
-              payment_reference: `ORDER-REFUND-${selectedOrder.id}`,
-              previous_balance: userProfile.credits_balance,
-              new_balance: newBalance,
-              processed_at: now,
-              created_at: now,
-              admin_notes: `Refund for rejected order #${selectedOrder.id}`,
-              approval_notes: adminNotes
-            });
-
-          if (transactionError) throw transactionError;
+      // Call edge function for secure, atomic processing
+      const { data, error } = await supabase.functions.invoke('process-order', {
+        body: {
+          orderId: selectedOrder.id,
+          action: processingType,
+          adminNotes: adminNotes || undefined
         }
-      }
+      });
 
-      // Create audit log entry
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        await supabase
-          .from('admin_audit_logs')
-          .insert({
-            admin_id: user?.id || '',
-            action_type: isApproved ? 'approve_order' : 'reject_order',
-            target_type: 'order',
-            target_id: selectedOrder.id,
-            notes: `${isApproved ? 'Approved' : 'Rejected'} order for ${selectedOrder.phone_number}. Admin notes: ${adminNotes}`
-          });
-      } catch (auditError) {
-        console.warn('Failed to create audit log:', auditError);
-      }
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Failed to process order');
 
       toast({
         title: "Success",
-        description: `Order ${isApproved ? 'approved' : 'rejected'} successfully`
+        description: `Order ${isApproved ? 'approved' : 'rejected'} successfully${data.order.refunded > 0 ? ` (${data.order.refunded} credits refunded)` : ''}`
       });
 
       // Refresh data
