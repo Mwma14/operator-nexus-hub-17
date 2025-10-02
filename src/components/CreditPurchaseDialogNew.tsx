@@ -215,7 +215,12 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
 
       if (uploadError) throw new Error('Failed to upload payment proof: ' + uploadError.message);
 
-      // Create payment request
+      // Get public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('payment-proofs')
+        .getPublicUrl(fileName);
+
+      // Create payment request with payment proof URL
       const { error: insertError } = await supabase
         .from('payment_requests')
         .insert({
@@ -223,6 +228,7 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
           credits_requested: getSelectedCredits(),
           total_cost_mmk: getTotalPrice(),
           payment_method: paymentMethod,
+          payment_proof_url: publicUrl,
           status: 'pending'
         });
 

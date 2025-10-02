@@ -26,26 +26,21 @@ export default function AdminGuard({ children }: AdminGuardProps) {
           throw new Error('Please log in to access the admin panel');
         }
 
-        // Check if user has admin privileges by checking email or user_profiles table
-        const { data: profile, error: profileError } = await supabase.
-        from('user_profiles').
-        select('email').
-        eq('user_id', user.id).
-        single();
+        // Check if user has admin role in user_roles table
+        const { data: userRole, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          throw new Error('Failed to check admin status');
+        if (roleError) {
+          console.error('Error checking admin role:', roleError);
+          throw new Error('Failed to verify admin privileges');
         }
 
-        // Check if user is admin (either from profile email or auth email)
-        const userEmail = profile?.email || user.email || '';
-        const isAdminUser = userEmail.toLowerCase().includes('admin') ||
-        userEmail.toLowerCase() === 'admin@example.com' ||
-        userEmail.toLowerCase() === 'admin@admin.com' ||
-        userEmail.toLowerCase() === 'thewayofthedragg@gmail.com';
-
-        if (!isAdminUser) {
-          throw new Error('Access denied. Admin privileges required. Only users with admin email addresses can access this panel.');
+        if (!userRole) {
+          throw new Error('Access denied. Admin privileges required. Please contact the administrator to grant you admin access.');
         }
 
         setIsAdmin(true);

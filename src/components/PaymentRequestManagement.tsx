@@ -41,25 +41,25 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 
 interface PaymentRequest {
-  id: number;
+  id: string;
   user_id: string;
   credits_requested: number;
   total_cost_mmk: number;
   payment_method: string;
-  payment_proof_file_id: number;
+  payment_proof_url: string | null;
   status: string;
   created_at: string;
-  processed_at: string;
-  admin_notes: string;
+  updated_at: string;
+  admin_notes: string | null;
 }
 
 interface UserProfile {
   id: string;
   user_id: string;
-  full_name: string;
+  full_name: string | null;
   credits_balance: number;
-  avatar_url: string;
-  email: string;
+  avatar_url: string | null;
+  email: string | null;
 }
 
 export function PaymentRequestManagement() {
