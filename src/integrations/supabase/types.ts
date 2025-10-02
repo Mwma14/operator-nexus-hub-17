@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_workflows: {
+        Row: {
+          admin_id: string | null
+          admin_notes: string | null
+          created_at: string | null
+          id: string
+          processed_at: string | null
+          status: string | null
+          target_id: number | null
+          workflow_type: string
+        }
+        Insert: {
+          admin_id?: string | null
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          status?: string | null
+          target_id?: number | null
+          workflow_type: string
+        }
+        Update: {
+          admin_id?: string | null
+          admin_notes?: string | null
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          status?: string | null
+          target_id?: number | null
+          workflow_type?: string
+        }
+        Relationships: []
+      }
       bot_users: {
         Row: {
           created_at: string | null
@@ -130,40 +163,106 @@ export type Database = {
           },
         ]
       }
+      credit_transactions: {
+        Row: {
+          admin_notes: string | null
+          approval_notes: string | null
+          created_at: string | null
+          credit_amount: number
+          currency: string | null
+          id: string
+          mmk_amount: number | null
+          new_balance: number | null
+          payment_method: string | null
+          payment_reference: string | null
+          previous_balance: number | null
+          processed_at: string | null
+          status: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          approval_notes?: string | null
+          created_at?: string | null
+          credit_amount: number
+          currency?: string | null
+          id?: string
+          mmk_amount?: number | null
+          new_balance?: number | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          previous_balance?: number | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          approval_notes?: string | null
+          created_at?: string | null
+          credit_amount?: number
+          currency?: string | null
+          id?: string
+          mmk_amount?: number | null
+          new_balance?: number | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          previous_balance?: number | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string | null
+          credits_used: number | null
+          currency: string | null
           id: string
           notes: string | null
+          operator: string | null
           phone_number: string | null
           product_id: number | null
           quantity: number | null
           status: string | null
           total_amount: number | null
+          total_price: number | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          credits_used?: number | null
+          currency?: string | null
           id?: string
           notes?: string | null
+          operator?: string | null
           phone_number?: string | null
           product_id?: number | null
           quantity?: number | null
           status?: string | null
           total_amount?: number | null
+          total_price?: number | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
+          credits_used?: number | null
+          currency?: string | null
           id?: string
           notes?: string | null
+          operator?: string | null
           phone_number?: string | null
           product_id?: number | null
           quantity?: number | null
           status?: string | null
           total_amount?: number | null
+          total_price?: number | null
           updated_at?: string | null
           user_id?: string
         }
