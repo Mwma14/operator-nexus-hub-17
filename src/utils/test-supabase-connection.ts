@@ -45,9 +45,13 @@ export async function testSupabaseAuth() {
 
 export async function listTables() {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
     // This will show us what tables actually exist
     const { data, error } = await supabase
-      .rpc('is_admin')
+      .rpc('has_role', { 
+        _role: 'admin',
+        _user_id: session?.user?.id || ''
+      })
       .limit(1);
 
     if (error) {

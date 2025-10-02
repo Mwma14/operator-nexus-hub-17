@@ -40,30 +40,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Order {
-  id: number;
-  user_id: string;
-  product_id: number;
-  quantity: number;
-  total_price: number;
-  credits_used: number;
-  currency: string;
-  operator: string;
-  phone_number: string;
-  status: string;
-  created_at: string;
-  processed_at: string;
-  admin_notes: string;
-}
-
-interface UserProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  credits_balance: number;
-  avatar_url: string;
-  email: string;
-}
+import type { Order, UserProfile } from '@/types/admin';
 
 interface Product {
   id: number;
@@ -174,9 +151,7 @@ export function PendingOrdersManagement() {
       const { error: updateError } = await supabase
         .from('orders')
         .update({
-          status: isApproved ? 'completed' : 'rejected',
-          processed_at: now,
-          admin_notes: adminNotes
+          status: isApproved ? 'completed' : 'rejected'
         })
         .eq('id', selectedOrder.id);
 
@@ -226,12 +201,11 @@ export function PendingOrdersManagement() {
         await supabase
           .from('admin_audit_logs')
           .insert({
-            admin_user_id: user?.id || null,
+            admin_id: user?.id || '',
             action_type: isApproved ? 'approve_order' : 'reject_order',
             target_type: 'order',
-            target_id: selectedOrder.id.toString(),
-            notes: `${isApproved ? 'Approved' : 'Rejected'} order #${selectedOrder.id} for ${selectedOrder.phone_number}. Admin notes: ${adminNotes}`,
-            created_at: now
+            target_id: selectedOrder.id,
+            notes: `${isApproved ? 'Approved' : 'Rejected'} order for ${selectedOrder.phone_number}. Admin notes: ${adminNotes}`
           });
       } catch (auditError) {
         console.warn('Failed to create audit log:', auditError);
@@ -364,7 +338,6 @@ export function PendingOrdersManagement() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={profile?.avatar_url} />
                               <AvatarFallback>
                                 <User className="h-4 w-4" />
                               </AvatarFallback>

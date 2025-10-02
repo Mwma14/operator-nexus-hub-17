@@ -9,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Settings, DollarSign, Mail, MessageCircle, Phone, Save, Loader2 } from 'lucide-react';
 
 interface SiteSettings {
-  id: number;
   kpay_account_name: string;
   kpay_account_number: string;
   wave_pay_account_name: string;
@@ -31,22 +30,31 @@ const SiteSettingsPanel: React.FC = () => {
 
   const fetchSettings = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('site_settings')
-        .select('*')
-        .eq('id', 1)
-        .single();
+        .select('setting_value')
+        .eq('setting_key', 'site_config')
+        .maybeSingle();
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No settings found, create default
-          await createDefaultSettings();
-          return;
-        }
-        throw error;
+      if (error) throw error;
+
+      if (data?.setting_value) {
+        const config = data.setting_value as any;
+        setSettings({
+          kpay_account_name: config.kpay_account_name || '',
+          kpay_account_number: config.kpay_account_number || '',
+          wave_pay_account_name: config.wave_pay_account_name || '',
+          wave_pay_account_number: config.wave_pay_account_number || '',
+          support_email: config.support_email || '',
+          support_telegram: config.support_telegram || '',
+          support_phone: config.support_phone || '',
+          credit_rate_mmk: config.credit_rate_mmk || 100
+        });
+      } else {
+        // No settings found, create default
+        await createDefaultSettings();
       }
-
-      setSettings(data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
       toast({
@@ -61,24 +69,26 @@ const SiteSettingsPanel: React.FC = () => {
 
   const createDefaultSettings = async () => {
     try {
-      const { data, error } = await supabase
+      const defaultConfig = {
+        kpay_account_name: 'Hlaing Ko Phyo',
+        kpay_account_number: '09883249943',
+        wave_pay_account_name: 'Hlaing Ko Phyo',
+        wave_pay_account_number: '09883249943',
+        support_email: 'thewayofthedragg@gmail.com',
+        support_telegram: 'https://t.me/CEO_METAVERSE',
+        support_phone: '09789037037',
+        credit_rate_mmk: 100
+      };
+
+      const { error } = await supabase
         .from('site_settings')
         .insert([{
-          id: 1,
-          kpay_account_name: 'Hlaing Ko Phyo',
-          kpay_account_number: '09883249943',
-          wave_pay_account_name: 'Hlaing Ko Phyo',
-          wave_pay_account_number: '09883249943',
-          support_email: 'thewayofthedragg@gmail.com',
-          support_telegram: 'https://t.me/CEO_METAVERSE',
-          support_phone: '09789037037',
-          credit_rate_mmk: 100
-        }])
-        .select()
-        .single();
+          setting_key: 'site_config',
+          setting_value: defaultConfig
+        }]);
 
       if (error) throw error;
-      setSettings(data);
+      setSettings(defaultConfig);
     } catch (error) {
       console.error('Failed to create default settings:', error);
       toast({
@@ -96,18 +106,12 @@ const SiteSettingsPanel: React.FC = () => {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({
-          kpay_account_name: settings.kpay_account_name,
-          kpay_account_number: settings.kpay_account_number,
-          wave_pay_account_name: settings.wave_pay_account_name,
-          wave_pay_account_number: settings.wave_pay_account_number,
-          support_email: settings.support_email,
-          support_telegram: settings.support_telegram,
-          support_phone: settings.support_phone,
-          credit_rate_mmk: settings.credit_rate_mmk,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', 1);
+        .upsert([{
+          setting_key: 'site_config',
+          setting_value: settings as any
+        }], {
+          onConflict: 'setting_key'
+        });
 
       if (error) throw error;
 

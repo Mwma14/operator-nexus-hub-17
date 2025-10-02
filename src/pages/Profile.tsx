@@ -14,19 +14,10 @@ import { CreditCard, Package, TrendingUp, Calendar, Eye, RefreshCw } from 'lucid
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
-interface UserProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  email: string;
-  credits_balance: number;
-  avatar_url: string;
-  created_at: string;
-  updated_at: string;
-}
+import type { UserProfile } from '@/types/admin';
 
-interface Order {
-  id: number;
+interface ProfileOrder {
+  id: string;
   user_id: string;
   product_id: number;
   quantity: number;
@@ -36,7 +27,6 @@ interface Order {
   operator: string;
   phone_number: string;
   created_at: string;
-  processed_at: string;
 }
 
 interface OrderStats {
@@ -48,11 +38,11 @@ interface OrderStats {
 
 const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<ProfileOrder[]>([]);
   const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<ProfileOrder | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -132,25 +122,24 @@ const Profile = () => {
       if (paymentRequestsError) throw new Error('Failed to load payment requests');
 
       // Map the data to ensure correct types
-      const typedOrders: Order[] = (ordersData || []).map(order => ({
-        id: Number(order.id),
+      const typedOrders: ProfileOrder[] = (ordersData || []).map(order => ({
+        id: order.id,
         user_id: order.user_id,
         product_id: order.product_id,
         quantity: order.quantity || 1,
-        total_price: order.total_price,
+        total_price: order.total_price || 0,
         currency: order.currency || 'MMK',
         status: (order.status as 'completed' | 'pending' | 'failed' | 'cancelled') || 'pending',
         operator: order.operator || '',
         phone_number: order.phone_number || '',
-        created_at: order.created_at,
-        processed_at: order.processed_at
+        created_at: order.created_at
       }));
 
       setOrders(typedOrders);
 
       // Map payment requests to orders-like structure for display
-      const paymentRequestOrders: Order[] = (paymentRequestsData || []).map(request => ({
-        id: Number(request.id),
+      const paymentRequestOrders: ProfileOrder[] = (paymentRequestsData || []).map(request => ({
+        id: request.id,
         user_id: request.user_id,
         product_id: 0, // Payment requests don't have product_id
         quantity: 1,
@@ -159,8 +148,7 @@ const Profile = () => {
         status: (request.status as 'completed' | 'pending' | 'failed' | 'cancelled') || 'pending',
         operator: 'Credit Purchase',
         phone_number: `${request.credits_requested} credits`,
-        created_at: request.created_at,
-        processed_at: request.processed_at
+        created_at: request.created_at
       }));
 
       // Combine orders and payment requests
@@ -203,7 +191,7 @@ const Profile = () => {
     });
   };
 
-  const getStatusBadgeVariant = (status: Order['status']) => {
+  const getStatusBadgeVariant = (status: ProfileOrder['status']) => {
     switch (status) {
       case 'completed': return 'default';
       case 'pending': return 'secondary';
@@ -330,10 +318,9 @@ const Profile = () => {
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="text-lg">
                         {profile?.full_name ? getInitials(profile.full_name) :
-                        profile?.email ? getInitials(profile.email) : 'U'}
+                        profile?.email ? getInitials(profile.email || 'User') : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">

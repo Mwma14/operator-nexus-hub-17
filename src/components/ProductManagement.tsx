@@ -17,20 +17,14 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Product } from '@/types/admin';
 
 interface ProductFormData {
-  id: number;
   name: string;
-  description: string | null;
+  description: string;
   price: number;
   currency: string;
-  operator: string | null;
+  operator: string;
   category: string;
-  logo: string;
   is_active: boolean;
   stock_quantity: number;
-  validity_days: number;
-  admin_notes: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export default function ProductManagement() {
@@ -44,18 +38,15 @@ export default function ProductManagement() {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
     price: 0,
     currency: 'MMK',
     operator: '',
     category: '',
-    logo: '',
     is_active: true,
-    stock_quantity: 0,
-    validity_days: 30,
-    admin_notes: ''
+    stock_quantity: 0
   });
 
   const operators = ['MPT', 'OOREDOO', 'ATOM', 'MYTEL'];
@@ -103,16 +94,11 @@ export default function ProductManagement() {
       await supabase
         .from('admin_audit_logs')
         .insert({
-          admin_user_id: user?.id || null,
+          admin_id: user?.id || '',
           action_type: actionType,
           target_type: 'product',
           target_id: targetId,
-          old_values: oldValues ? JSON.stringify(oldValues) : '',
-          new_values: newValues ? JSON.stringify(newValues) : '',
-          ip_address: '',
-          user_agent: navigator.userAgent,
-          notes,
-          created_at: new Date().toISOString()
+          notes
         });
     } catch (error) {
       console.error('Failed to log admin action:', error);
@@ -165,7 +151,7 @@ export default function ProductManagement() {
             await createProductWorkflow(
               editingProduct.id,
               formData.is_active ? 'approved' : 'rejected',
-              formData.admin_notes || `Status ${formData.is_active ? 'approved' : 'rejected'} by admin`
+              `Status ${formData.is_active ? 'approved' : 'rejected'} by admin`
             );
           }
 
@@ -287,7 +273,7 @@ export default function ProductManagement() {
           await createProductWorkflow(
             productId,
             isActive ? 'approved' : 'rejected',
-            product?.admin_notes || `Bulk ${isActive ? 'activation' : 'deactivation'} by admin`
+            `Bulk ${isActive ? 'activation' : 'deactivation'} by admin`
           );
         }
       }
@@ -317,11 +303,8 @@ export default function ProductManagement() {
       currency: 'MMK',
       operator: '',
       category: '',
-      logo: '',
       is_active: true,
-      stock_quantity: 0,
-      validity_days: 30,
-      admin_notes: ''
+      stock_quantity: 0
     });
     setEditingProduct(null);
   };
@@ -330,16 +313,13 @@ export default function ProductManagement() {
     setEditingProduct(product);
     setFormData({
       name: product.name,
-      description: product.description,
+      description: product.description || '',
       price: product.price,
       currency: product.currency,
-      operator: product.operator,
-      category: product.category,
-      logo: product.logo,
+      operator: product.operator || '',
+      category: product.category || '',
       is_active: product.is_active,
-      stock_quantity: product.stock_quantity,
-      validity_days: product.validity_days,
-      admin_notes: product.admin_notes
+      stock_quantity: product.stock_quantity
     });
     setIsDialogOpen(true);
   };
@@ -438,16 +418,6 @@ export default function ProductManagement() {
                       onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) || 0 })}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="validity">Validity (Days)</Label>
-                    <Input
-                      id="validity"
-                      type="number"
-                      value={formData.validity_days || ''}
-                      placeholder="Enter validity in days (e.g. 30)"
-                      onChange={(e) => setFormData({ ...formData, validity_days: Number(e.target.value) || 0 })}
-                    />
-                  </div>
                   <div className="col-span-1 md:col-span-2 space-y-2">
                     <Label htmlFor="description">Description</Label>
                     <Textarea
@@ -455,15 +425,6 @@ export default function ProductManagement() {
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       placeholder="Enter detailed product description..."
-                    />
-                  </div>
-                  <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="admin-notes">Admin Notes</Label>
-                    <Textarea
-                      id="admin-notes"
-                      value={formData.admin_notes}
-                      onChange={(e) => setFormData({ ...formData, admin_notes: e.target.value })}
-                      placeholder="Internal notes for administrators (not visible to customers)..."
                     />
                   </div>
                   <div className="col-span-1 md:col-span-2 flex items-center space-x-2">

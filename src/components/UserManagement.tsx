@@ -18,18 +18,14 @@ import type { UserProfile } from '@/types/admin';
 interface ExtendedUserProfile extends UserProfile {
   is_admin: boolean;
   is_banned: boolean;
-  created_at: string;
-  updated_at: string;
-  is_banned?: boolean;
-  is_admin?: boolean;
 }
 
 export default function UserManagement() {
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
+  const [users, setUsers] = useState<ExtendedUserProfile[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<ExtendedUserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [selectedUser, setSelectedUser] = useState<ExtendedUserProfile | null>(null);
   const [dialogType, setDialogType] = useState<'credits' | 'purge' | 'admin' | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -100,16 +96,11 @@ export default function UserManagement() {
       await supabase
         .from('admin_audit_logs')
         .insert({
-          admin_user_id: user?.id || null,
+          admin_id: user?.id || '',
           action_type: actionType,
           target_type: 'user',
           target_id: targetId,
-          old_values: oldValues ? JSON.stringify(oldValues) : '',
-          new_values: newValues ? JSON.stringify(newValues) : '',
-          ip_address: '',
-          user_agent: navigator.userAgent,
-          notes,
-          created_at: new Date().toISOString()
+          notes
         });
     } catch (error) {
       console.error('Failed to log admin action:', error);
@@ -181,7 +172,7 @@ export default function UserManagement() {
     }
   };
 
-  const handleBanUser = async (user: UserProfile, ban: boolean) => {
+  const handleBanUser = async (user: ExtendedUserProfile, ban: boolean) => {
     try {
       setIsProcessing(true);
       // In a real app, you'd update a banned status in the database
@@ -211,7 +202,7 @@ export default function UserManagement() {
     }
   };
 
-  const handlePurgeUserData = async (user: UserProfile) => {
+  const handlePurgeUserData = async (user: ExtendedUserProfile) => {
     try {
       setIsProcessing(true);
       
@@ -263,7 +254,7 @@ export default function UserManagement() {
     }
   };
 
-  const handleDeleteUser = async (user: UserProfile) => {
+  const handleDeleteUser = async (user: ExtendedUserProfile) => {
     try {
       const { error } = await supabase
         .from('user_profiles')
@@ -324,7 +315,7 @@ export default function UserManagement() {
     }
   };
 
-  const openDialog = (user: UserProfile, type: 'credits' | 'purge' | 'admin') => {
+  const openDialog = (user: ExtendedUserProfile, type: 'credits' | 'purge' | 'admin') => {
     setSelectedUser(user);
     setDialogType(type);
     setIsDialogOpen(true);

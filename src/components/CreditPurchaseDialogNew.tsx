@@ -85,12 +85,21 @@ const CreditPurchaseDialog: React.FC<CreditPurchaseDialogProps> = ({
     try {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('*')
-        .eq('id', 1)
-        .single();
+        .select('setting_value')
+        .eq('setting_key', 'site_config')
+        .maybeSingle();
 
       if (error) throw error;
-      setSiteSettings(data);
+      if (data?.setting_value) {
+        const config = data.setting_value as any;
+        setSiteSettings({
+          kpay_account_name: config.kpay_account_name || '',
+          kpay_account_number: config.kpay_account_number || '',
+          wave_pay_account_name: config.wave_pay_account_name || '',
+          wave_pay_account_number: config.wave_pay_account_number || '',
+          credit_rate_mmk: config.credit_rate_mmk || 100
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch site settings:', error);
     }

@@ -20,7 +20,11 @@ const AdminSetup = () => {
     try {
       setIsChecking(true);
       
-      const { data: isAdminResult, error } = await supabase.rpc('is_admin');
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: isAdminResult, error } = await supabase.rpc('has_role', { 
+        _role: 'admin',
+        _user_id: user?.id || ''
+      });
       
       if (error) {
         console.error('Error checking admin status:', error);

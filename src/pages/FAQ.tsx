@@ -36,12 +36,19 @@ const FAQ = () => {
     try {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('support_email, support_telegram, support_phone')
-        .eq('id', 1)
-        .single();
+        .select('setting_value')
+        .eq('setting_key', 'site_config')
+        .maybeSingle();
 
       if (error) throw error;
-      setSiteSettings(data);
+      if (data?.setting_value) {
+        const config = data.setting_value as any;
+        setSiteSettings({
+          support_email: config.support_email || '',
+          support_telegram: config.support_telegram || '',
+          support_phone: config.support_phone || ''
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch site settings:', error);
     }
