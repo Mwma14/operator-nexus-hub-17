@@ -26,28 +26,28 @@ interface UserProfile {
 }
 
 interface Transaction {
-  id: number;
+  id: string;
   transaction_type: string;
   credit_amount: number;
   status: string;
   created_at: string;
-  payment_method?: string;
+  payment_method?: string | null;
 }
 
 interface Order {
-  id: number;
+  id: string;
   product_id: number;
   quantity: number;
-  total_price: number;
-  credits_used: number;
+  total_price: number | null;
+  credits_used: number | null;
   status: string;
   created_at: string;
-  phone_number?: string;
-  operator?: string;
+  phone_number?: string | null;
+  operator?: string | null;
   products?: {
     name: string;
-    operator: string;
-    category: string;
+    operator: string | null;
+    category: string | null;
   };
 }
 

@@ -82,7 +82,7 @@ export function PaymentRequestManagement() {
 
       for (const userId of userIds) {
         try {
-          const { data: profileData, error: profileError } = await supabase
+          const { data: profileData, error: profileError} = await supabase
             .from('user_profiles')
             .select('*')
             .eq('user_id', userId)
@@ -174,12 +174,11 @@ export function PaymentRequestManagement() {
         await supabase
           .from('admin_audit_logs')
           .insert({
-            admin_user_id: user?.id || null,
+            admin_id: user?.id || '',
             action_type: isApproved ? 'approve_payment' : 'reject_payment',
             target_type: 'payment_request',
-            target_id: selectedRequest.id.toString(),
-            notes: `${isApproved ? 'Approved' : 'Rejected'} payment request #${selectedRequest.id} for ${selectedRequest.credits_requested} credits. Admin notes: ${adminNotes}`,
-            created_at: now
+            target_id: selectedRequest.id,
+            notes: `${isApproved ? 'Approved' : 'Rejected'} payment request for ${selectedRequest.credits_requested} credits. Admin notes: ${adminNotes}`
           });
       } catch (auditError) {
         console.warn('Failed to create audit log:', auditError);

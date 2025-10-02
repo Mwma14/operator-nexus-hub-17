@@ -21,11 +21,11 @@ interface DashboardStats {
 }
 
 interface RecentActivity {
-  id: number;
+  id: string;
   action_type: string;
-  target_type: string;
-  target_id: string;
-  notes: string;
+  target_type: string | null;
+  target_id: string | null;
+  notes: string | null;
   created_at: string;
 }
 

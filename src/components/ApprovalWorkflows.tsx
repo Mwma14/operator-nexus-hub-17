@@ -20,9 +20,6 @@ interface ProductApproval {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-  admin_notes: string;
-  created_at: string;
-  processed_at: string;
 }
 
 export default function ApprovalWorkflows() {
@@ -244,9 +241,6 @@ export default function ApprovalWorkflows() {
                           <TableCell>{getStatusBadge(request.status)}</TableCell>
                           <TableCell className="text-white">
                             {formatDate(request.created_at)}
-                          </TableCell>
-                          <TableCell className="text-white">
-                            {request.processed_at ? formatDate(request.processed_at) : '-'}
                           </TableCell>
                           <TableCell className="text-white max-w-xs truncate">
                             {request.admin_notes || '-'}
