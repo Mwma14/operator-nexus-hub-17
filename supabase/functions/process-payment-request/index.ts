@@ -145,6 +145,44 @@ Deno.serve(async (req) => {
       console.error('Failed to log audit:', auditError);
     }
 
+    // Send Telegram notification to user if they have a telegram_chat_id
+    try {
+      const { data: userProfile } = await supabaseClient
+        .from('user_profiles')
+        .select('telegram_chat_id, full_name')
+        .eq('user_id', request.user_id)
+        .single();
+
+      if (userProfile?.telegram_chat_id) {
+        const notificationMessage = action === 'approve'
+          ? `✅ <b>Payment Approved!</b>\n\n` +
+            `Your payment request for ${request.credits_requested.toLocaleString()} credits has been approved.\n\n` +
+            `💰 Credits Added: ${request.credits_requested.toLocaleString()}\n` +
+            `🏦 New Balance: ${newBalance.toLocaleString()} credits\n\n` +
+            `Thank you for your purchase!`
+          : `❌ <b>Payment Rejected</b>\n\n` +
+            `Your payment request for ${request.credits_requested.toLocaleString()} credits has been rejected.\n\n` +
+            `Reason: ${adminNotes || 'No reason provided'}\n\n` +
+            `Please contact support if you have questions.`;
+
+        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-telegram-notification`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chatId: userProfile.telegram_chat_id,
+            message: notificationMessage,
+            parseMode: 'HTML'
+          })
+        });
+      }
+    } catch (notifError) {
+      console.error('Failed to send Telegram notification:', notifError);
+      // Don't fail the request if notification fails
+    }
+
     return new Response(
       JSON.stringify({
         success: true,

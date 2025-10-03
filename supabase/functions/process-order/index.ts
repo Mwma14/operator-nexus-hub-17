@@ -146,6 +146,45 @@ Deno.serve(async (req) => {
       console.error('Failed to log audit:', auditError);
     }
 
+    // Send Telegram notification to user if they have a telegram_chat_id
+    try {
+      const { data: userProfile } = await supabaseClient
+        .from('user_profiles')
+        .select('telegram_chat_id, full_name')
+        .eq('user_id', order.user_id)
+        .single();
+
+      if (userProfile?.telegram_chat_id) {
+        const notificationMessage = action === 'approve'
+          ? `✅ <b>Order Completed!</b>\n\n` +
+            `Order ID: #${orderId.substring(0, 8)}\n` +
+            `Status: Completed\n\n` +
+            `Your order has been successfully processed and completed.`
+          : `❌ <b>Order Rejected</b>\n\n` +
+            `Order ID: #${orderId.substring(0, 8)}\n` +
+            `Status: Rejected\n\n` +
+            (refundAmount > 0 ? `💰 Refunded: ${refundAmount.toLocaleString()} credits\n\n` : '') +
+            `Reason: ${adminNotes || 'No reason provided'}\n\n` +
+            `Please contact support if you have questions.`;
+
+        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-telegram-notification`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chatId: userProfile.telegram_chat_id,
+            message: notificationMessage,
+            parseMode: 'HTML'
+          })
+        });
+      }
+    } catch (notifError) {
+      console.error('Failed to send Telegram notification:', notifError);
+      // Don't fail the request if notification fails
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
