@@ -8,3 +8,9 @@ verify_jwt = true
 
 [functions.send-telegram-notification]
 verify_jwt = true
+
+[functions.notify-admin-new-order]
+verify_jwt = false
+
+[functions.notify-admin-new-payment]
+verify_jwt = false
