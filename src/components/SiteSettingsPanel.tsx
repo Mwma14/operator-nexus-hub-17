@@ -17,6 +17,7 @@ interface SiteSettings {
   support_telegram: string;
   support_phone: string;
   credit_rate_mmk: number;
+  admin_telegram_chat_id?: string;
 }
 
 const SiteSettingsPanel: React.FC = () => {
@@ -49,7 +50,8 @@ const SiteSettingsPanel: React.FC = () => {
           support_email: config.support_email || '',
           support_telegram: config.support_telegram || '',
           support_phone: config.support_phone || '',
-          credit_rate_mmk: config.credit_rate_mmk || 100
+          credit_rate_mmk: config.credit_rate_mmk || 100,
+          admin_telegram_chat_id: config.admin_telegram_chat_id || ''
         });
       } else {
         // No settings found, create default
@@ -104,7 +106,8 @@ const SiteSettingsPanel: React.FC = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
+      // Save site config
+      const { error: configError } = await supabase
         .from('site_settings')
         .upsert([{
           setting_key: 'site_config',
@@ -113,7 +116,21 @@ const SiteSettingsPanel: React.FC = () => {
           onConflict: 'setting_key'
         });
 
-      if (error) throw error;
+      if (configError) throw configError;
+
+      // Save telegram settings separately for edge functions
+      const { error: telegramError } = await supabase
+        .from('site_settings')
+        .upsert([{
+          setting_key: 'telegram_settings',
+          setting_value: {
+            admin_chat_id: settings.admin_telegram_chat_id || ''
+          }
+        }], {
+          onConflict: 'setting_key'
+        });
+
+      if (telegramError) throw telegramError;
 
       toast({
         title: "Settings Saved",
@@ -283,6 +300,30 @@ const SiteSettingsPanel: React.FC = () => {
                 onChange={(e) => updateSetting('support_phone', e.target.value)}
                 placeholder="09xxxxxxxxx"
               />
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Telegram Bot Settings */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold">Telegram Bot Notifications</h3>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <Label htmlFor="admin_telegram_chat_id">Admin Telegram Chat ID</Label>
+              <Input
+                id="admin_telegram_chat_id"
+                value={settings.admin_telegram_chat_id || ''}
+                onChange={(e) => updateSetting('admin_telegram_chat_id', e.target.value)}
+                placeholder="123456789"
+              />
+              <p className="text-sm text-muted-foreground mt-1">
+                Get your Chat ID by messaging your bot and checking the response. You'll receive instant notifications for new orders and payment requests.
+              </p>
             </div>
           </div>
         </div>
