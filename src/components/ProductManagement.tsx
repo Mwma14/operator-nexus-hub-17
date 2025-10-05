@@ -386,11 +386,11 @@ export default function ProductManagement() {
                       id="operator"
                       value={formData.operator}
                       onChange={(e) => setFormData({ ...formData, operator: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
-                      <option value="">Select Operator</option>
+                      <option value="" className="bg-background text-foreground">Select Operator</option>
                       {operators.map((op) => (
-                        <option key={op} value={op}>{op}</option>
+                        <option key={op} value={op} className="bg-background text-foreground">{op}</option>
                       ))}
                     </select>
                   </div>
@@ -400,11 +400,11 @@ export default function ProductManagement() {
                       id="category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
-                      <option value="">Select Category</option>
+                      <option value="" className="bg-background text-foreground">Select Category</option>
                       {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat} value={cat} className="bg-background text-foreground">{cat}</option>
                       ))}
                     </select>
                   </div>
