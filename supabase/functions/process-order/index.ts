@@ -34,20 +34,29 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    
-    if (userError || !user) {
-      throw new Error('Unauthorized');
-    }
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const isInternalCall = token === serviceRoleKey;
 
-    // Verify admin role
-    const { data: hasRole } = await supabaseClient.rpc('has_role', {
-      _user_id: user.id,
-      _role: 'admin'
-    });
+    let adminUserId: string | null = null;
 
-    if (!hasRole) {
-      throw new Error('Admin privileges required');
+    if (!isInternalCall) {
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+      
+      if (userError || !user) {
+        throw new Error('Unauthorized');
+      }
+
+      // Verify admin role
+      const { data: hasRole } = await supabaseClient.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin'
+      });
+
+      if (!hasRole) {
+        throw new Error('Admin privileges required');
+      }
+
+      adminUserId = user.id;
     }
 
     const { orderId, action, adminNotes }: ProcessOrderRequest = await req.json();
@@ -135,7 +144,7 @@ Deno.serve(async (req) => {
     const { error: auditError } = await supabaseClient
       .from('admin_audit_logs')
       .insert({
-        admin_id: user.id,
+        admin_id: adminUserId ?? '00000000-0000-0000-0000-000000000000',
         action_type: `order_${action}`,
         target_type: 'order',
         target_id: orderId,
@@ -152,7 +161,7 @@ Deno.serve(async (req) => {
         .from('user_profiles')
         .select('telegram_chat_id, full_name')
         .eq('user_id', order.user_id)
-        .single();
+        .maybeSingle();
 
       if (userProfile?.telegram_chat_id) {
         const notificationMessage = action === 'approve'
