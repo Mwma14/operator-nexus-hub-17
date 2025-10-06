@@ -81,12 +81,15 @@ Deno.serve(async (req) => {
       if (action === 'approve_payment' || action === 'reject_payment') {
         const actionType = action === 'approve_payment' ? 'approve' : 'reject';
         
-        // Call the process-payment-request edge function
+        // Call the process-payment-request edge function with service role authorization
         const { data, error } = await supabaseClient.functions.invoke('process-payment-request', {
           body: {
             requestId: id,
             action: actionType,
             adminNotes: `Processed via Telegram by admin`
+          },
+          headers: {
+            Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
           }
         });
 
@@ -109,12 +112,15 @@ Deno.serve(async (req) => {
       } else if (action === 'approve_order' || action === 'reject_order') {
         const actionType = action === 'approve_order' ? 'approve' : 'reject';
         
-        // Call the process-order edge function
+        // Call the process-order edge function with service role authorization
         const { data, error } = await supabaseClient.functions.invoke('process-order', {
           body: {
             orderId: id,
             action: actionType,
             adminNotes: `Processed via Telegram by admin`
+          },
+          headers: {
+            Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`
           }
         });
 
