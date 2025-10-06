@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, DollarSign, Mail, MessageCircle, Phone, Save, Loader2 } from 'lucide-react';
+import { Settings, DollarSign, Mail, MessageCircle, Phone, Save, Loader2, Webhook } from 'lucide-react';
 
 interface SiteSettings {
   kpay_account_name: string;
@@ -24,6 +24,7 @@ const SiteSettingsPanel: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [settingUpWebhook, setSettingUpWebhook] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -151,6 +152,31 @@ const SiteSettingsPanel: React.FC = () => {
   const updateSetting = (field: keyof SiteSettings, value: string | number) => {
     if (!settings) return;
     setSettings({ ...settings, [field]: value });
+  };
+
+  const setupTelegramWebhook = async () => {
+    setSettingUpWebhook(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('setup-telegram-webhook', {
+        body: { action: 'set_webhook' }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Webhook Configured",
+        description: "Telegram webhook has been set up successfully. Approval buttons should now work in Telegram.",
+      });
+    } catch (error) {
+      console.error('Failed to setup webhook:', error);
+      toast({
+        title: "Error",
+        description: "Failed to setup Telegram webhook. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSettingUpWebhook(false);
+    }
   };
 
   if (loading) {
@@ -323,6 +349,30 @@ const SiteSettingsPanel: React.FC = () => {
               />
               <p className="text-sm text-muted-foreground mt-1">
                 Get your Chat ID by messaging your bot and checking the response. You'll receive instant notifications for new orders and payment requests.
+              </p>
+            </div>
+            <div>
+              <Label>Telegram Webhook Setup</Label>
+              <Button 
+                onClick={setupTelegramWebhook} 
+                disabled={settingUpWebhook}
+                variant="outline"
+                className="w-full mt-2"
+              >
+                {settingUpWebhook ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Setting up...
+                  </>
+                ) : (
+                  <>
+                    <Webhook className="h-4 w-4 mr-2" />
+                    Configure Telegram Webhook
+                  </>
+                )}
+              </Button>
+              <p className="text-sm text-muted-foreground mt-1">
+                Click this button to enable Approve/Reject buttons in Telegram notifications.
               </p>
             </div>
           </div>
