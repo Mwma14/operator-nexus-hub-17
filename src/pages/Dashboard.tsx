@@ -314,21 +314,21 @@ const Dashboard = () => {
                         <div className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-lg ${
-                              transaction.transaction_type === 'purchase' || transaction.transaction_type === 'debit' 
-                                ? 'bg-red-100 dark:bg-red-900' 
-                                : 'bg-green-100 dark:bg-green-900'
+                              transaction.credit_amount > 0
+                                ? 'bg-green-100 dark:bg-green-900' 
+                                : 'bg-red-100 dark:bg-red-900'
                             }`}>
-                              {transaction.transaction_type === 'purchase' || transaction.transaction_type === 'debit' ? (
-                                <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
-                              ) : (
+                              {transaction.credit_amount > 0 ? (
                                 <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              ) : (
+                                <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
                               )}
                             </div>
                             <div>
                               <p className="font-medium">
-                                {transaction.transaction_type === 'purchase' || transaction.transaction_type === 'debit' 
-                                  ? 'Product Purchase' 
-                                  : `Credit Top-up via ${transaction.payment_method || 'Payment'}`}
+                                {transaction.credit_amount > 0
+                                  ? `Credit Purchase via ${transaction.payment_method || 'Payment'}` 
+                                  : 'Product Purchase'}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {formatDate(transaction.created_at)} • {transaction.payment_method || 'Credit Balance'}
@@ -337,12 +337,12 @@ const Dashboard = () => {
                           </div>
                           <div className="text-right">
                             <p className={`font-medium ${
-                              transaction.transaction_type === 'purchase' || transaction.transaction_type === 'debit' 
-                                ? 'text-red-600' 
-                                : 'text-green-600'
+                              transaction.credit_amount > 0
+                                ? 'text-green-600' 
+                                : 'text-red-600'
                             }`}>
-                              {transaction.transaction_type === 'purchase' || transaction.transaction_type === 'debit' ? '-' : '+'}
-                              {transaction.credit_amount.toLocaleString()} Credits
+                              {transaction.credit_amount > 0 ? '+' : '-'}
+                              {Math.abs(transaction.credit_amount).toLocaleString()} Credits
                             </p>
                             <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
                               {transaction.status === 'completed' ? 'Completed' : transaction.status}
